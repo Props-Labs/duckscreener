@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=./node_modules/envio/fuel.schema.json
+name: mira-v1-amm
+ecosystem: fuel
+networks:
+- id: 9889
+  start_block: 0
+  contracts:
+  - name: MiraV1Core
+    address:
+    - 0x2e40f2b244b98ed6b8204b3de0156c6961f98525c8162f80162fcf53eebd90e7
+    abi_file_path: abis/mirav1core-abi.json
+    handler: src/EventHandlers.ts
+    events:
+    - name: ReentrancyError
+      logId: '5557842539076482339'
+    - name: SwapEvent
+      logId: '7938487056892321597'
+    - name: AmmError
+      logId: '8431332278172281949'
+    - name: TotalSupplyEvent
+      logId: '17462098202904023478'
+    - name: SetSymbolEvent
+      logId: '12152039456660331088'
+    - name: CreatePoolEvent
+      logId: '12224862438738316526'
+    - name: SetNameEvent
+      logId: '7845998088195677205'
+    - name: MintEvent
+      logId: '12547144180067087194'
+    - name: AccessError
+      logId: '4571204900286667806'
+    - name: BurnEvent
+      logId: '3903049024573527731'
+    - name: OwnershipTransferred
+      logId: '12970362301975156672'
+    - name: InputError
+      logId: '3176768710663004356'
+    - name: OwnershipSet
+      logId: '16280289466020123285'
+    - name: InitializationError
+      logId: '2161305517876418151'
+    - name: SetDecimalsEvent
+      logId: '18149631459970394923'

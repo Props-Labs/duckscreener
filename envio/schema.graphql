@@ -1,0 +1,191 @@
+type MiraV1Core_ReentrancyError {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type MiraV1Core_SwapEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  pool_id: String!
+  recipient: String!
+  asset_0_in: BigInt!
+  asset_1_in: BigInt!
+  asset_0_out: BigInt!
+  asset_1_out: BigInt!
+  exchange_rate: BigInt!
+  is_buy: Boolean!
+  is_sell: Boolean!
+}
+
+type MiraV1Core_AmmError {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type MiraV1Core_TotalSupplyEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  asset: String!
+  supply: BigInt!
+  sender: String!
+}
+
+type MiraV1Core_SetSymbolEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  asset: String!
+  symbol: String
+  sender: String!
+}
+
+type MiraV1Core_CreatePoolEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  pool_id: String!
+  decimals_0: Int!
+  decimals_1: Int!
+}
+
+type MiraV1Core_SetNameEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  asset: String!
+  name: String
+  sender: String!
+}
+
+type MiraV1Core_MintEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  pool_id: String!
+  recipient: String!
+  liquidity: Asset!
+  asset_0_in: BigInt!
+  asset_1_in: BigInt!
+}
+
+type MiraV1Core_AccessError {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type MiraV1Core_BurnEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  pool_id: String!
+  recipient: String!
+  liquidity: Asset!
+  asset_0_out: BigInt!
+  asset_1_out: BigInt!
+}
+
+type MiraV1Core_OwnershipTransferred {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  previousOwner: String
+  newOwner: String
+}
+
+type MiraV1Core_InputError {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type MiraV1Core_OwnershipSet {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  owner: String!
+}
+
+type MiraV1Core_InitializationError {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type MiraV1Core_SetDecimalsEvent {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  asset: String!
+  decimals: Int!
+  sender: String!
+}
+
+type MiraV1Core_Transfer {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  from: String!
+  to: String!
+  asset: String!
+  amount: BigInt!
+}
+
+type MiraV1Core_Mint {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  to: String!
+  asset: String!
+  amount: BigInt!
+}
+
+type MiraV1Core_Burn {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  from: String!
+  asset: String!
+  amount: BigInt!
+}
+
+type MiraV1Core_Call {
+  id: ID!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+  from: String!
+  to: String!
+  amount: BigInt!
+  asset: String!
+  data: String
+}
+
+type Asset {
+  id: String!
+  time: Int!
+  amount: BigInt!
+}
+
