@@ -173,7 +173,7 @@
         </div>
     {/if}
     
-    <div class="p-4 flex items-center space-x-4">
+    <div class="p-4 flex items-center space-x-4 w-full">
         <select 
             value={selectedTimeFrame}
             on:change={handleTimeFrameChange}

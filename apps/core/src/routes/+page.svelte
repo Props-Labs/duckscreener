@@ -36,10 +36,18 @@
 <div class="flex flex-col h-screen bg-[#131722]">
     <div class="flex-1">
         <Chart {poolId} on:priceUpdate={handlePriceUpdate}>
-            <div slot="toolbar" class="flex items-center space-x-4 text-[#d1d4dc]">
+            <div slot="toolbar" class="flex items-center justify-between flex-1 text-[#d1d4dc]">
                 <div class="flex items-center space-x-2">
                     <span class="text-sm opacity-80">Market Cap:</span>
                     <span class="font-semibold">{formatCurrency(marketCap)}</span>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-xl font-bold text-[#26a69a]">
+                        Duckscreener
+                    </span>
+                    <span class="text-[8px] opacity-20 mt-0.5">
+                        Donate: 0x77C960337715b598Feb92AC53b3F736cA9F87c88abC42BB02B763C738e69679A
+                    </span>
                 </div>
             </div>
         </Chart>
