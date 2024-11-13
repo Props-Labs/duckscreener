@@ -128,6 +128,19 @@ export async function convertTradingDataToChartData(data: SwapEvent[], timeFrame
     }).sort((a, b) => a.time - b.time);
 }
 
+export async function getAllLPs() {
+    const query = `
+        query MyQuery {
+            MiraV1Core_CreatePoolEvent {
+                pool_id
+            }
+        }
+    `;
+
+    const response = await queryDB(query, {});
+    return response.data.MiraV1Core_CreatePoolEvent;
+}
+
 export async function queryDB(query: string, variables: any) {
 
     if(!env.PUBLIC_GRAPHQL_URL) {

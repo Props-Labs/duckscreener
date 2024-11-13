@@ -91,7 +91,7 @@ MiraV1Core.TotalSupplyEvent.handler(async ({ event, context }) => {
     time: event.block.time,
     block_height: event.block.height,
     transaction_id: event.transaction.id,
-    asset: event.params.asset.toString(),
+    asset: event.params.asset.bits,
     supply: event.params.supply,
     sender: event.params.sender.payload.bits,
   };
@@ -105,7 +105,7 @@ MiraV1Core.SetSymbolEvent.handler(async ({ event, context }) => {
     time: event.block.time,
     block_height: event.block.height,
     transaction_id: event.transaction.id,
-    asset: event.params.asset.toString(),
+    asset: event.params.asset.bits,
     symbol: event.params.symbol.case === "Some" ? event.params.symbol.payload : undefined,
     sender: event.params.sender.payload.bits,
   };
@@ -119,7 +119,7 @@ MiraV1Core.CreatePoolEvent.handler(async ({ event, context }) => {
     time: event.block.time,
     block_height: event.block.height,
     transaction_id: event.transaction.id,
-    pool_id: `${event.params.pool_id[0].toString()}_${event.params.pool_id[1].toString()}_${event.params.pool_id[2]}`,
+    pool_id: `${event.params.pool_id[0].bits}_${event.params.pool_id[1].bits}_${event.params.pool_id[2]}`,
     decimals_0: event.params.decimals_0,
     decimals_1: event.params.decimals_1,
   };
@@ -128,12 +128,13 @@ MiraV1Core.CreatePoolEvent.handler(async ({ event, context }) => {
 });
 
 MiraV1Core.SetNameEvent.handler(async ({ event, context }) => {
+  console.log('MiraV1Core_SetNameEvent', event)
   const entity: MiraV1Core_SetNameEvent = {
     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
     time: event.block.time,
     block_height: event.block.height,
     transaction_id: event.transaction.id,
-    asset: event.params.asset.toString(),
+    asset: event.params.asset.bits,
     name: event.params.name.case === "Some" ? event.params.name.payload : undefined,
     sender: event.params.sender.payload.bits,
   };
@@ -243,7 +244,7 @@ MiraV1Core.SetDecimalsEvent.handler(async ({ event, context }) => {
     time: event.block.time,
     block_height: event.block.height,
     transaction_id: event.transaction.id,
-    asset: event.params.asset.toString(),
+    asset: event.params.asset.bits,
     decimals: event.params.decimals,
     sender: event.params.sender.payload.bits,
   };

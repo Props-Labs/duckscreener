@@ -1,6 +1,7 @@
 <script lang="ts">
     import Chart from '$lib/components/chart.svelte';
     import { getPriceData } from '$lib/services/blockchain';
+    import { getPoolMetadataForAllLPs } from '$lib/services/dex';
     const poolId = "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false";
 
     let ethPrice: any;
@@ -30,6 +31,8 @@
     }
 
     $: getEthPrice();
+    $: poolMetadata = getPoolMetadataForAllLPs();
+    $: console.log(poolMetadata);
     $: marketCap = currentTokenPrice * TOTAL_SUPPLY * (ethPrice?.formattedPrice || 0);
 </script>
 

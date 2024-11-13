@@ -29,6 +29,8 @@
 		"@envio-dev/hyperfuel-client": "^1.2.2",
 		"@sveltejs/adapter-node": "^5.2.9",
 		"ethers": "^6.13.4",
-		"lightweight-charts": "^4.2.1"
+		"fuels": "^0.96.1",
+		"lightweight-charts": "^4.2.1",
+		"mira-dex-ts": "^1.0.42"
 	}
 }
