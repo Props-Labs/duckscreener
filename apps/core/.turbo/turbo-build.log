@@ -1,0 +1,44 @@
+
+[43m[30m WARN [39m[49m Issue while reading "/Users/bobby/.npmrc". Failed to replace env in config: ${NODE_AUTH_TOKEN}
+
+> core@0.0.1 build /Users/bobby/Workspace/duckscreener/apps/core
+> vite build
+
+[36mvite v5.4.11 [32mbuilding SSR bundle for production...[36m[39m
+[2K[1Gtransforming (1) [2m.svelte-kit/generated/server/internal.js[22m[2K[1Gtransforming (9) [2m.svelte-kit/generated/root.js[22m[2K[1Gtransforming (30) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.0_@sveltejs+vite-plugin-svelte@4.0.0_svelte@5.1.16_vite@5.4.11_@types+node@_gix7dsbvidhyzcezh4adndxige/node_modules/@sveltejs/kit/src/runtime/app/environment/[2K[1Gtransforming (48) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.0_@sveltejs+vite-plugin-svelte@4.0.0_svelte@5.1.16_vite@5.4.11_@types+node@_gix7dsbvidhyzcezh4adndxige/node_modules/@sveltejs/kit/src/runtime/shared.js[22m[2K[1Gtransforming (72) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.0_@sveltejs+vite-plugin-svelte@4.0.0_svelte@5.1.16_vite@5.4.11_@types+node@_gix7dsbvidhyzcezh4adndxige/node_modules/@sveltejs/kit/src/utils/streaming.js[22m[2K[1Gtransforming (119) [2m../../node_modules/.pnpm/svelte@5.1.16/node_modules/svelte/src/internal/client/dom/legacy/lifecycle.js[22m[2K[1Gtransforming (141) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.0_@sveltejs+vite-plugin-svelte@4.0.0_svelte@5.1.16_vite@5.4.11_@types+node@_gix7dsbvidhyzcezh4adndxige/node_modules/@sveltejs/kit/src/runtime/client/parse.js[2K[1Gtransforming (158) [2m../../node_modules/.pnpm/svelte@5.1.16/node_modules/svelte/src/store/shared/index.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 162 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1G[36mvite v5.4.11 [32mbuilding for production...[36m[39m
+[2K[1Gtransforming (1) [2m.svelte-kit/generated/client-optimized/nodes/0.js[22m[2K[1Gtransforming (15) [2m../../node_modules/.pnpm/svelte@5.1.16/node_modules/svelte/src/internal/disclose-version.js[22m[2K[1Gtransforming (58) [2m../../node_modules/.pnpm/svelte@5.1.16/node_modules/svelte/src/internal/client/dom/template.js[22m[2K[1Gtransforming (101) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.0_@sveltejs+vite-plugin-svelte@4.0.0_svelte@5.1.16_vite@5.4.11_@types+node@_gix7dsbvidhyzcezh4adndxige/node_modules/@sveltejs/kit/src/runtime/client/client.j[2K[1Gtransforming (163) [2m../../node_modules/.pnpm/ethers@6.13.4/node_modules/ethers/lib.esm/crypto/scrypt.js[22m[2K[1Gtransforming (203) [2m../../node_modules/.pnpm/ethers@6.13.4/node_modules/ethers/lib.esm/utils/events.js[22m[2K[1Gtransforming (260) [2m../../node_modules/.pnpm/@noble+hashes@1.3.2/node_modules/@noble/hashes/esm/_sha2.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 276 modules transformed.
+[2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1Gcomputing gzip size (4)...[2K[1Gcomputing gzip size (5)...[2K[1Gcomputing gzip size (6)...[2K[1Gcomputing gzip size (7)...[2K[1Gcomputing gzip size (8)...[2K[1Gcomputing gzip size (9)...[2K[1Gcomputing gzip size (10)...[2K[1Gcomputing gzip size (11)...[2K[1Gcomputing gzip size (12)...[2K[1Gcomputing gzip size (13)...[2K[1Gcomputing gzip size (14)...[2K[1Gcomputing gzip size (15)...[2K[1G[2m.svelte-kit/output/client/[22m[32m_app/version.json                                   [39m[1m[2m  0.03 kB[22m[1m[22m[2m │ gzip:   0.05 kB[22m
+[2m.svelte-kit/output/client/[22m[32m.vite/manifest.json                                 [39m[1m[2m  3.51 kB[22m[1m[22m[2m │ gzip:   0.67 kB[22m
+[2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/2.Vw4-JlRo.css                [39m[1m[2m  0.19 kB[22m[1m[22m[2m │ gzip:   0.14 kB[22m
+[2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/0.CCMKdMvL.css                [39m[1m[2m 13.54 kB[22m[1m[22m[2m │ gzip:   3.44 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/start.1rmC5A_A.js              [39m[1m[2m  0.07 kB[22m[1m[22m[2m │ gzip:   0.08 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/0.EWaRul_n.js                  [39m[1m[2m  0.38 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/legacy.qOU9ogUz.js            [39m[1m[2m  0.53 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/1.DLdmvvQj.js                  [39m[1m[2m  0.76 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/disclose-version.CxBhPVaV.js  [39m[1m[2m  0.98 kB[22m[1m[22m[2m │ gzip:   0.56 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/store.arrGc9X2.js             [39m[1m[2m  3.58 kB[22m[1m[22m[2m │ gzip:   1.78 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/index-client.BsE5SEcw.js      [39m[1m[2m  4.63 kB[22m[1m[22m[2m │ gzip:   2.19 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/app.BNHgtXhQ.js                [39m[1m[2m  5.51 kB[22m[1m[22m[2m │ gzip:   2.61 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/runtime.BKH9x4O_.js           [39m[1m[2m 11.97 kB[22m[1m[22m[2m │ gzip:   4.89 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/entry.CA1oSEK3.js             [39m[1m[2m 28.70 kB[22m[1m[22m[2m │ gzip:  11.33 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/2.DAazAlCv.js                  [39m[1m[2m428.12 kB[22m[1m[22m[2m │ gzip: 151.04 kB[22m
+[32m✓ built in 1.67s[39m
+[2K[1G[2m.svelte-kit/output/server/[22m[32m.vite/manifest.json                         [39m[1m[2m  2.52 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[35m_app/immutable/assets/_page.Vw4-JlRo.css    [39m[1m[2m  0.19 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[35m_app/immutable/assets/_layout.BKQ0m3tx.css  [39m[1m[2m 13.52 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/_layout.svelte.js             [39m[1m[2m  0.24 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36minternal.js                                 [39m[1m[2m  0.35 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/shared-server.js                     [39m[1m[2m  0.37 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/fallbacks/error.svelte.js           [39m[1m[2m  1.21 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/exports.js                           [39m[1m[2m  6.09 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mentries/pages/_page.svelte.js               [39m[1m[2m  6.35 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/internal.js                          [39m[1m[2m 18.02 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mchunks/index.js                             [39m[1m[2m 26.58 kB[22m[1m[22m
+[2m.svelte-kit/output/server/[22m[36mindex.js                                    [39m[1m[2m119.85 kB[22m[1m[22m
+[32m✓ built in 4.38s[39m
+
+Run [1m[36mnpm run preview[22m[39m to preview your production build locally.
+[1m[36m
+> Using @sveltejs/adapter-node[22m[39m
+  [32m✔ done[39m
