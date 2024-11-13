@@ -179,11 +179,11 @@
         </div>
     {/if}
     
-    <div class="p-4 flex items-center space-x-4 w-full">
+    <div class="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
         <select 
             value={selectedTimeFrame}
             on:change={handleTimeFrameChange}
-            class="p-2 border rounded bg-[#2B2B43] text-[#d1d4dc] border-[#2B2B43]"
+            class="p-2 border rounded bg-[#2B2B43] text-[#d1d4dc] border-[#2B2B43] text-sm"
         >
             {#each timeFrameOptions as timeFrame}
                 <option value={timeFrame}>{timeFrame}</option>

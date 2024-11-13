@@ -36,20 +36,20 @@
 <div class="flex flex-col h-screen bg-[#131722]">
     <div class="flex-1">
         <Chart {poolId} on:priceUpdate={handlePriceUpdate}>
-            <div slot="toolbar" class="flex items-center justify-between flex-1 text-[#d1d4dc]">
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm opacity-80">Market Cap:</span>
-                    <span class="font-semibold">{formatCurrency(marketCap)}</span>
+            <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">
+                <div class="flex items-center space-x-2 mb-2 sm:mb-0">
+                    <span class="text-xs sm:text-sm opacity-80">Market Cap:</span>
+                    <span class="text-sm sm:text-base font-semibold">{formatCurrency(marketCap)}</span>
                 </div>
-                <div class="flex flex-col items-end">
-                    <span class="text-xl font-bold text-[#26a69a]">
+                <div class="flex flex-col items-start sm:items-end w-full sm:w-auto">
+                    <span class="text-lg sm:text-xl font-bold text-[#26a69a]">
                         Duckscreener
                     </span>
-                    <span class="text-[8px] opacity-20 mt-0.5">
+                    <span class="text-[7px] sm:text-[8px] opacity-20 mt-0.5 break-all sm:break-normal max-w-[200px] sm:max-w-none">
                         Donate: 0x77C960337715b598Feb92AC53b3F736cA9F87c88abC42BB02B763C738e69679A
                     </span>
-                    <span class="text-[10px] opacity-40 mt-0.5 text-[#26a69a]">
-                        <a href="https://x.com/Bitcoinski" target="_blank" class="underline">Made by @Bitcoinski</a>
+                    <span class="text-[9px] sm:text-[10px] opacity-40 mt-0.5 text-[#26a69a]">
+                        <a href="https://x.com/Bitcoinski" target="_blank" class="hover:opacity-80">Made by @Bitcoinski</a>
                     </span>
                 </div>
             </div>
