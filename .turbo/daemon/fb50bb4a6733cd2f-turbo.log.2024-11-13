@@ -58,3 +58,22 @@
 2024-11-13T21:03:50.221795Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts")}
 2024-11-13T21:03:50.221811Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts") }}))
 2024-11-13T21:03:50.309338Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2024-11-13T21:18:41.121123Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/src/lib/components/chart.svelte")}
+2024-11-13T21:18:41.121163Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/src/lib/components/chart.svelte") }}))
+2024-11-13T21:19:31.120399Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/src/routes/+page.svelte")}
+2024-11-13T21:19:31.120422Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/src/routes/+page.svelte") }}))
+2024-11-13T21:19:31.320153Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts")}
+2024-11-13T21:19:31.320171Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts") }}))
+2024-11-13T21:19:31.398929Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2024-11-13T21:19:59.919973Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/src/lib/components/chart.svelte")}
+2024-11-13T21:19:59.919992Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/src/lib/components/chart.svelte") }}))
+2024-11-13T21:20:30.219572Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/src/routes/+page.svelte")}
+2024-11-13T21:20:30.219590Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/src/routes/+page.svelte") }}))
+2024-11-13T21:20:30.620473Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts")}
+2024-11-13T21:20:30.620490Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts") }}))
+2024-11-13T21:20:30.659988Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun
+2024-11-13T21:20:35.619652Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/src/routes/+page.svelte")}
+2024-11-13T21:20:35.619671Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/src/routes/+page.svelte") }}))
+2024-11-13T21:20:35.738380Z  WARN turborepo_lib::package_changes_watcher: changed_files: {AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts")}
+2024-11-13T21:20:35.738398Z  WARN turborepo_lib::package_changes_watcher: changed_packages: Ok(Some({WorkspacePackage { name: Other("core"), path: AnchoredSystemPathBuf("apps/core") }: FileChanged { file: AnchoredSystemPathBuf("apps/core/.svelte-kit/types/src/routes/$types.d.ts") }}))
+2024-11-13T21:20:35.738497Z  WARN turborepo_lib::package_changes_watcher: hashes are the same, no need to rerun

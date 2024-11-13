@@ -169,6 +169,12 @@
                 <div class="mt-4 text-[#d1d4dc] font-medium animate-pulse">
                     Loading Chart Data...
                 </div>
+                <div class="mt-2 text-[#26a69a] font-bold tracking-wider animate-glow">
+                    #WeLikeTheDuck
+                </div>
+                <div class="mt-1 text-[#d1d4dc] text-xs opacity-60">
+                    Made by @Bitcoinski
+                </div>
             </div>
         </div>
     {/if}
@@ -199,5 +205,20 @@
 
     img {
         animation: glow 2s ease-in-out infinite;
+    }
+
+    .animate-glow {
+        animation: textGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes textGlow {
+        0%, 100% { 
+            text-shadow: 0 0 5px #26a69a, 0 0 10px #26a69a, 0 0 15px #26a69a;
+            transform: scale(1);
+        }
+        50% { 
+            text-shadow: 0 0 10px #26a69a, 0 0 20px #26a69a, 0 0 30px #26a69a;
+            transform: scale(1.05);
+        }
     }
 </style>

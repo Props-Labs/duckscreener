@@ -48,6 +48,9 @@
                     <span class="text-[8px] opacity-20 mt-0.5">
                         Donate: 0x77C960337715b598Feb92AC53b3F736cA9F87c88abC42BB02B763C738e69679A
                     </span>
+                    <span class="text-[10px] opacity-40 mt-0.5 text-[#26a69a]">
+                        <a href="https://x.com/Bitcoinski" target="_blank" class="underline">Made by @Bitcoinski</a>
+                    </span>
                 </div>
             </div>
         </Chart>
