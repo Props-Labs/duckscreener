@@ -3,9 +3,10 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
+		"start": "node --experimental-specifier-resolution=node ./build/index.js",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
@@ -25,6 +26,9 @@
 		"vite": "^5.0.3"
 	},
 	"dependencies": {
-		"@envio-dev/hyperfuel-client": "^1.2.2"
+		"@envio-dev/hyperfuel-client": "^1.2.2",
+		"@sveltejs/adapter-node": "^5.2.9",
+		"ethers": "^6.13.4",
+		"lightweight-charts": "^4.2.1"
 	}
 }
