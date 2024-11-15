@@ -124,8 +124,8 @@
                 </div>
 
                 <div class="flex flex-col gap-3 w-full sm:w-auto">
-                    <div class="grid grid-cols-2 gap-3 w-full sm:flex sm:w-auto order-last sm:order-none">
-                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors">
+                    <div class="grid grid-cols-2 gap-3 w-full sm:flex sm:w-auto order-last sm:order-none px-0">
+                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors w-full">
                             <div class="flex items-center space-x-2">
                                 <span class="text-xs sm:text-sm opacity-80">Market Cap</span>
                                 <span class="text-sm sm:text-base font-semibold text-[#26a69a]">{formatCurrency(marketCap)}</span>
@@ -136,7 +136,7 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors">
+                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors w-full">
                             <div class="flex items-center space-x-2">
                                 <span class="text-xs sm:text-sm opacity-80">Pool TVL</span>
                                 <span class="text-sm sm:text-base font-semibold text-[#26a69a]">{formatCurrency(liquidityUSD)}</span>
