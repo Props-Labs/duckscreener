@@ -7,13 +7,12 @@
 		"pnpm": ">=9.4.0"
 	},
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
+		"start": "node --experimental-specifier-resolution=node ./build/index.js",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"heroku-postbuild": "npm run build",
-		"start": "node build/index.js"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
 		"@adraffy/ens-normalize": "^1.11.0",
