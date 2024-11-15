@@ -18,21 +18,30 @@
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
+		"assert": "^2.1.0",
 		"autoprefixer": "^10.4.20",
+		"buffer": "^6.0.3",
+		"crypto-browserify": "^3.12.1",
+		"process": "^0.11.10",
+		"stream-browserify": "^3.0.0",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"tailwindcss": "^3.4.9",
 		"typescript": "^5.0.0",
+		"util": "^0.12.5",
 		"vite": "^5.0.3"
 	},
 	"dependencies": {
 		"@envio-dev/hyperfuel-client": "^1.2.2",
+		"@fuels/connectors": "^0.36.1",
 		"@sveltejs/adapter-node": "^5.2.9",
+		"@wagmi/core": "^2.14.6",
 		"ethers": "^6.13.4",
 		"fuels": "^0.96.1",
 		"ioredis": "^5.4.1",
 		"lightweight-charts": "^4.2.1",
 		"lucide-svelte": "^0.459.0",
-		"mira-dex-ts": "^1.0.42"
+		"mira-dex-ts": "^1.0.42",
+		"svelte-fuels": "0.94.9-next.1"
 	}
 }
