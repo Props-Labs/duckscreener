@@ -1,19 +1,36 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
-import {getTradingData} from '$lib/services/data.server';
+import { addChatMessage, getChatData } from '$lib/services/chat.server';
 
-//@ts-ignore
-export const GET: RequestHandler = async ({ url }) => {
-  const pool_id = url.searchParams.get('pool_id');
-  const limit: number = parseInt(url.searchParams.get('limit') || '1000');
-  const offset: number = parseInt(url.searchParams.get('offset') || '0');
+export async function POST({ request }) {
+    try {
+        const { poolId, account, message } = await request.json();
+        
+        if (!poolId || !account || !message) {
+            return json({ error: 'Missing required fields' }, { status: 400 });
+        }
 
+        const chatMessage = await addChatMessage(poolId, account, message);
+        return json(chatMessage);
+    } catch (error) {
+        console.error('Error in POST /api/chat:', error);
+        return json({ error: 'Internal server error' }, { status: 500 });
+    }
+}
 
-  try {
-    const data = await getTradingData(pool_id, offset, limit);
-    return json(data);
-  } catch (error) {
-    console.error('Error fetching trades:', error);
-    return json({ error: 'Failed to fetch trade data' }, { status: 500 });
-  }
-};
+export async function GET({ url }) {
+    try {
+        const poolId = url.searchParams.get('poolId');
+        const offset = parseInt(url.searchParams.get('offset') || '0');
+        const limit = parseInt(url.searchParams.get('limit') || '50');
+
+        if (!poolId) {
+            return json({ error: 'Missing poolId' }, { status: 400 });
+        }
+
+        const messages = await getChatData(poolId, offset, limit);
+        return json(messages);
+    } catch (error) {
+        console.error('Error in GET /api/chat:', error);
+        return json({ error: 'Internal server error' }, { status: 500 });
+    }
+}

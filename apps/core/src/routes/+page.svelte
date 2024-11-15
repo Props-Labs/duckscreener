@@ -103,7 +103,7 @@
 
         <!-- Right side - Chat (Desktop) -->
         <div class="hidden sm:block w-80 border-l border-[#2B2B43]">
-            <Chat />
+            <Chat {poolId} />
         </div>
 
         <!-- Mobile Chat Panel -->
@@ -111,7 +111,7 @@
             class="sm:hidden fixed inset-0 bg-[#131722] z-10 transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
         >
             <div class="h-full pt-10">
-                <Chat on:close={() => isChatOpen = false} />
+                <Chat {poolId} on:close={() => isChatOpen = false} />
             </div>
         </div>
     </div>
@@ -164,7 +164,7 @@
 
     <!-- Right side - Chat (Desktop) -->
     <div class="hidden sm:block w-80 border-l border-[#2B2B43]">
-        <Chat />
+        <Chat {poolId} />
     </div>
 
     <!-- Mobile Chat Panel -->
@@ -172,7 +172,7 @@
         class="sm:hidden fixed inset-0 bg-[#131722] z-10 transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
     >
         <div class="h-full pt-10">
-            <Chat on:close={() => isChatOpen = false} />
+            <Chat {poolId} on:close={() => isChatOpen = false} />
         </div>
     </div>
 </div>

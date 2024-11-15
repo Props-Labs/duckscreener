@@ -1,22 +1,78 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import { showWalletModal } from '$lib/stores';
     import { browser } from '$app/environment';
-    import { account, connected,connect, disconnect, connectors, FuelConnector } from "svelte-fuels";
+    import { account, connected, connect, disconnect } from "svelte-fuels";
+    import { fetchChatMessages, sendChatMessage } from '$lib/services/chat';
 
+    export let poolId: string;
 
     interface ChatMessage {
         id: string;
-        user: string;
+        poolId: string;
+        account: string;
         message: string;
-        timestamp: Date;
-        isSystem?: boolean;
+        timestamp: number;
     }
 
     let messages: ChatMessage[] = [];
     let newMessage = '';
     let messagesContainer: HTMLDivElement;
-   
+    let isLoading = false;
+    let autoScrollToBottom = true;
+
+    async function loadMessages() {
+        try {
+            isLoading = true;
+            const fetchedMessages = await fetchChatMessages(poolId);
+            messages = fetchedMessages.sort((a, b) => a.timestamp - b.timestamp);
+            
+            if (autoScrollToBottom) {
+                setTimeout(() => {
+                    scrollToBottom();
+                    autoScrollToBottom = false;
+                }, 100);
+            }
+        } catch (error) {
+            console.error('Failed to load messages:', error);
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    let pollInterval: number;
+
+    onMount(() => {
+        loadMessages();
+        
+        pollInterval = setInterval(async () => {
+            const latestMessages = await fetchChatMessages(poolId);
+            const sortedMessages = latestMessages.sort((a, b) => a.timestamp - b.timestamp);
+            
+            if (sortedMessages.length > messages.length) {
+                const wasAtBottom = isAtBottom();
+                messages = sortedMessages;
+                if (wasAtBottom) {
+                    scrollToBottom();
+                }
+            }
+        }, 5000) as unknown as number;
+    });
+
+    onDestroy(() => {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+        }
+    });
+
+    function isAtBottom(): boolean {
+        if (!messagesContainer) return false;
+        const threshold = 50;
+        return (
+            messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight 
+            <= threshold
+        );
+    }
 
     function scrollToBottom() {
         if (messagesContainer) {
@@ -24,21 +80,23 @@
         }
     }
 
-    function handleSubmit() {
-        if (!newMessage.trim()) return;
+    async function handleSubmit() {
+        if (!newMessage.trim() || !$account) return;
         
-        const message: ChatMessage = {
-            id: crypto.randomUUID(),
-            user: $account ? $account.slice(0, 6) + '...' + $account.slice(-4) : 'Anonymous',
-            message: newMessage.trim(),
-            timestamp: new Date()
-        };
-        
-        messages = [...messages, message];
-        newMessage = '';
-        
-        // Scroll to bottom on next tick
-        setTimeout(scrollToBottom, 0);
+        try {
+            const response = await sendChatMessage(
+                poolId,
+                $account,
+                newMessage.trim()
+            );
+
+            messages = [...messages, response].sort((a, b) => a.timestamp - b.timestamp);
+            newMessage = '';
+            
+            setTimeout(scrollToBottom, 0);
+        } catch (error) {
+            console.error('Failed to send message:', error);
+        }
     }
 
     function handleKeyPress(event: KeyboardEvent) {
@@ -48,16 +106,12 @@
         }
     }
 
-    function formatTime(date: Date): string {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    function formatTime(timestamp: number): string {
+        return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
-
-    function handleConnectWallet() {
-        showWalletModal.set(true);
-    }
 </script>
 
 <div class="flex flex-col h-full">
@@ -84,7 +138,6 @@
             {/if}
         </div>
         
-        <!-- Close button only shows on mobile -->
         <button 
             class="sm:hidden text-[#d1d4dc] hover:text-[#26a69a] transition-colors"
             on:click={() => dispatch('close')}
@@ -100,28 +153,33 @@
         bind:this={messagesContainer}
         class="flex-1 overflow-y-auto p-4 space-y-4"
     >
-        {#each messages as message (message.id)}
-            <div 
-                class="animate-slide-in"
-                class:system-message={message.isSystem}
-            >
-                {#if message.isSystem}
-                    <div class="text-[#26a69a] text-xs opacity-75 text-center py-2">
-                        {message.message}
-                    </div>
-                {:else}
-                    <div class="flex flex-col">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-[#26a69a] text-sm font-medium">{message.user}</span>
-                            <span class="text-[#d1d4dc] opacity-50 text-xs">{formatTime(message.timestamp)}</span>
+        {#if isLoading}
+            <div class="text-center text-[#d1d4dc] opacity-60">
+                Loading messages...
+            </div>
+        {:else}
+            {#each messages as message (message.id)}
+                <div class="animate-slide-in {message.account === $account ? 'flex justify-end' : ''}">
+                    <div class="flex flex-col message-bubble">
+                        <div class="flex items-center space-x-2 {message.account === $account ? 'justify-end' : ''}">
+                            <span class="text-[#26a69a] text-xs font-medium">
+                                {message.account.slice(0, 6)}...{message.account.slice(-4)}
+                            </span>
+                            <span class="text-[#d1d4dc] opacity-50 text-[10px]">
+                                {formatTime(message.timestamp)}
+                            </span>
                         </div>
-                        <div class="mt-1 text-[#d1d4dc] break-words">
+                        <div class="mt-1 break-words text-sm {message.account === $account ? 
+                            'message-bubble-self' : 
+                            'message-bubble-other'} 
+                            px-3 py-1.5"
+                        >
                             {message.message}
                         </div>
                     </div>
-                {/if}
-            </div>
-        {/each}
+                </div>
+            {/each}
+        {/if}
     </div>
     
     <!-- Input area -->
@@ -133,6 +191,7 @@
                 on:keypress={handleKeyPress}
                 placeholder="Type a message..." 
                 class="flex-1 bg-[#2B2B43] text-[#d1d4dc] rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#26a69a] placeholder-[#d1d4dc]/50"
+                disabled={!$connected}
             >
             {#if $connected && $account}
                 <button 
@@ -145,7 +204,7 @@
             {:else}
                 <button 
                     on:click={() => connect()}
-                    class="w-full sm:w-auto bg-[#26a69a] text-white px-4 py-2 rounded hover:bg-[#2196f3] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full sm:w-auto bg-[#26a69a] text-white px-4 py-2 rounded hover:bg-[#2196f3] transition-colors"
                 >
                     Connect
                 </button>
@@ -156,17 +215,32 @@
 
 <style>
     .animate-slide-in {
-        animation: slideIn 0.2s ease-out;
+        animation: slideInOther 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes slideIn {
+    .animate-slide-in.flex.justify-end {
+        animation: slideInSelf 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideInSelf {
         from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateX(50px);
         }
         to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInOther {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
         }
     }
 
@@ -197,5 +271,26 @@
 
     .animate-spin {
         animation: spin 1s linear infinite;
+    }
+
+    /* Chat bubble styles */
+    .message-bubble {
+        max-width: 80%;
+    }
+
+    .message-bubble-self {
+        background-color: #2196f3;
+        color: white;
+        border-radius: 0.5rem 0.5rem 0 0.5rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        transform-origin: right;
+    }
+
+    .message-bubble-other {
+        background-color: #2B2B43;
+        color: #d1d4dc;
+        border-radius: 0.5rem 0.5rem 0.5rem 0;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        transform-origin: left;
     }
 </style> 
