@@ -7,6 +7,7 @@
     import { showWalletModal } from '$lib/stores';
     import WalletModal from "$lib/components/wallet-modal.svelte";
     import { getTotalAssets, getPoolMetadata} from '$lib/services/dex';
+    import SwapModal from '$lib/components/swap-modal.svelte';
     
     let WalletProvider: any;
     const poolId = "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false";
@@ -28,6 +29,7 @@
     const TOTAL_SUPPLY = 1_000_000_000;
     let isChatOpen = false;
     let liquidityUSD = 0;
+    let isSwapModalOpen = false;
 
     function handlePriceUpdate(event: CustomEvent<number>) {
         currentTokenPrice = event.detail;
@@ -98,9 +100,8 @@
                     <div class="flex flex-col gap-1 mt-2">
                         <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
                             <a 
-                                href="https://mira.ly/swap/" 
-                                target="_blank" 
-                                class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200"
+                                on:click|preventDefault={() => isSwapModalOpen = true}
+                                class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
                             >
                                 <span class="absolute inset-0 bg-[url('/sparkles.png')] opacity-20 bg-repeat animate-sparkle"></span>
                                 <span class="relative font-semibold text-white flex items-center gap-1.5">
@@ -181,6 +182,12 @@
         <WalletModal open={$showWalletModal} on:close={() => showWalletModal.set(false)} />
     </WalletProvider>
 {/if}
+
+<SwapModal 
+    bind:open={isSwapModalOpen}
+    {poolId}
+    on:close={() => isSwapModalOpen = false}
+/>
 
 <style>
     .bg-size-200 {
