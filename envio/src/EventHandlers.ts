@@ -45,9 +45,6 @@ MiraV1Core.SwapEvent.handler(async ({ event, context }) => {
   //   console.log("Found matching pool_id:", event.params.pool_id);
   // }
 
-  const asset_0_abs = Math.abs(Number(event.params.asset_0_in) - Number(event.params.asset_0_out));
-  const asset_1_abs = Math.abs(Number(event.params.asset_1_in) - Number(event.params.asset_1_out));
-  
   const is_buy = event.params.asset_0_out > event.params.asset_1_in;
   const is_sell = event.params.asset_0_in > event.params.asset_1_out;
   let exchange_rate;
