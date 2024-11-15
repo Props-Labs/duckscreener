@@ -24,6 +24,8 @@ import {
   MiraV1Core_Call,
 } from "generated";
 
+import * as util from 'util';
+
 MiraV1Core.ReentrancyError.handler(async ({ event, context }) => {
   const entity: MiraV1Core_ReentrancyError = {
     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
@@ -45,14 +47,22 @@ MiraV1Core.SwapEvent.handler(async ({ event, context }) => {
   //   console.log("Found matching pool_id:", event.params.pool_id);
   // }
 
-  const is_buy = event.params.asset_0_out > event.params.asset_1_in;
-  const is_sell = event.params.asset_0_in > event.params.asset_1_out;
-  let exchange_rate;
-  if (is_buy) {
-    exchange_rate = (BigInt(event.params.asset_1_in) * BigInt(10n ** 18n)) / BigInt(event.params.asset_0_out);
-  } else {
-    exchange_rate = (BigInt(event.params.asset_1_out) * BigInt(10n ** 18n)) / BigInt(event.params.asset_0_in);
+  
+  const is_buy = event.params.asset_1_in > 0;
+  const is_sell = event.params.asset_1_out > 0;
+  let exchange_rate = BigInt(0);
+  try{
+    if (is_buy) {
+      exchange_rate = (BigInt(event.params.asset_1_in) * BigInt(10n ** 18n)) / BigInt(event.params.asset_0_out);
+    } else {
+      exchange_rate = (BigInt(event.params.asset_1_out) * BigInt(10n ** 18n)) / BigInt(event.params.asset_0_in);
+    }
   }
+  catch(e){
+    console.log('MiraV1Core.SwapEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+    console.log('Error calculating exchange rate', e);
+  }
+  
 
   const entity: MiraV1Core_SwapEvent = {
     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
