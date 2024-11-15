@@ -29,18 +29,35 @@ async function getMiraAmm(wallet: WalletUnlocked) {
 
 function parseAmount(amount: string | number, decimals: number): bigint {
     try {
+        // Remove commas and convert to string
         const amountStr = amount.toString().replace(/,/g, '');
         const num = Number(amountStr);
         if (isNaN(num)) throw new Error('Invalid number');
         
-        const fixedStr = num.toFixed(decimals);
-        const [whole, fraction = ''] = fixedStr.split('.');
-        const paddedFraction = fraction.padEnd(decimals, '0');
-        const combinedStr = whole + paddedFraction;
-        return BigInt(combinedStr);
+        // Convert to integer representation with proper decimals
+        // Use string manipulation to avoid floating point precision issues
+        const [whole, fraction = ''] = amountStr.split('.');
+        const paddedFraction = fraction.padEnd(decimals, '0').slice(0, decimals);
+        const combinedStr = `${whole}${paddedFraction}`;
+        
+        // Remove leading zeros to avoid invalid octal literals
+        const cleanedStr = combinedStr.replace(/^0+/, '') || '0';
+        const scaledAmount = BigInt(cleanedStr);
+        
+        // Validate u64 range
+        const MAX_U64 = BigInt('18446744073709551615'); // 2^64 - 1
+        if (scaledAmount < 0n || scaledAmount > MAX_U64) {
+            throw new Error(`Amount exceeds maximum allowed value`);
+        }
+        
+        return scaledAmount;
     } catch (error) {
-        console.error('Error parsing amount:', error);
-        throw new Error('Invalid amount format');
+        console.error('Error parsing amount:', error, {
+            amount,
+            decimals,
+            originalValue: amount.toString()
+        });
+        throw error;
     }
 }
 
@@ -143,30 +160,69 @@ export async function executeSwap(
     isEthInput: boolean,
     deadline: number = Math.floor(Date.now() / 1000) + 1200
 ) {
-    const miraAmm = await getMiraAmm(wallet);
-    const pool = await miraAmm.poolMetadata(pools[0]);
+    const [readonlyMiraAmm, miraAmm] = await Promise.all([
+        getReadonlyMiraAmm(),
+        getMiraAmm(wallet)
+    ]);
+    
+    const pool = await readonlyMiraAmm.poolMetadata(pools[0]);
     if (!pool) throw new Error('Pool not found');
     
-    // Use decimals from pool metadata
     const inputDecimals = isEthInput ? pool.decimals1 : pool.decimals0;
     const outputDecimals = isEthInput ? pool.decimals0 : pool.decimals1;
-    const amountInBN = parseAmount(amountIn, inputDecimals);
-    const amountOutMinBN = parseAmount(amountOutMin, outputDecimals);
-
+    
     try {
-        // For ETH input (buying PSYCHO), use asset1 as input asset
-        // For PSYCHO input (selling PSYCHO), use asset0 as input asset
+        // Add input validation
+        if (Number(amountIn) <= 0) throw new Error('Input amount must be greater than 0');
+        if (Number(amountOutMin) <= 0) throw new Error('Minimum output amount must be greater than 0');
+        
+        const amountInBN = parseAmount(amountIn, inputDecimals);
+        const amountOutMinBN = parseAmount(amountOutMin, outputDecimals);
+        
+        console.log('Swap parameters:', {
+            rawAmountIn: amountIn,
+            rawAmountOutMin: amountOutMin,
+            amountIn: amountInBN.toString(),
+            amountOutMin: amountOutMinBN.toString(),
+            inputDecimals,
+            outputDecimals,
+            isEthInput,
+            poolReserves: {
+                reserve0: pool.reserve0.toString(),
+                reserve1: pool.reserve1.toString()
+            }
+        });
+
+        // Update transaction parameters to match TxParams type
+        const txParams = {
+            gasLimit: 1_000_000,
+            maxFee: 2500,
+            variableOutputs: 2,
+            witnessLimit: 10_000
+        };
+
+        // Get the transaction request from the SDK
         const txRequest = await miraAmm.swapExactInput(
-            isEthInput ? pools[0][1] : pools[0][0],
             amountInBN,
+            isEthInput ? pools[0][1] : pools[0][0], // assetIn
             amountOutMinBN,
             pools,
-            deadline
+            deadline,
+            txParams
         );
         
-        return await txRequest.wait();
+        // Send the transaction request to the wallet for signing and execution
+        const response = await wallet.sendTransaction(txRequest);
+        
+        // Wait for transaction to be mined
+        const result = await response.wait();
+        
+        return result;
     } catch (error) {
         console.error('Error executing swap:', error);
+        if (error instanceof Error) {
+            throw new Error(`Swap failed: ${error.message}`);
+        }
         throw error;
     }
 } 

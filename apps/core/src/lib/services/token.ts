@@ -1,23 +1,42 @@
 import { bn } from "fuels";
-import type { WalletUnlocked } from "fuels";
-import { env } from "$env/dynamic/public";
-import { getReadonlyMiraAmm } from './swap';
+import type { WalletUnlocked, AssetId } from "fuels";
+import { getReadonlyMiraAmm, createPoolId } from './swap';
 
-export async function getBalance(wallet: WalletUnlocked, token: 'ETH' | 'PSYCHO'): Promise<string> {
+export async function getBalance(
+    wallet: WalletUnlocked, 
+    token: 'ETH' | 'PSYCHO',
+    poolId: string
+): Promise<string> {
     try {
         if (token === 'ETH') {
             const balance = await wallet.getBalance();
-            return (Number(balance) / 1e9).toString(); // ETH uses 9 decimals on Fuel
+            console.log('balance', balance);
+            const formattedBalance = balance.format();
+            console.log('formattedBalance', formattedBalance);
+            return formattedBalance;
         } else {
-            // For PSYCHO token, we need to get the balance using the correct asset ID
             const miraAmm = await getReadonlyMiraAmm();
-            const pool = await miraAmm.poolMetadata(env.PUBLIC_POOL_ID);
+            const formattedPoolId = createPoolId(poolId);
+            const pool = await miraAmm.poolMetadata(formattedPoolId);
             if (!pool) throw new Error('Pool not found');
             
-            // Get the correct asset ID from the pool metadata
-            const psychoAssetId = pool.poolId[0]; // PSYCHO is always asset0 in the pool
+            const psychoAssetId = pool.poolId[0].bits;
             const balance = await wallet.getBalance(psychoAssetId);
-            return (Number(balance) / 1e9).toString(); // PSYCHO uses 9 decimals
+            
+            // Use toString() directly on BN to handle large numbers
+            const rawValue = balance.toString();
+            const value = BigInt(rawValue);
+            const divisor = BigInt(1e9); // PSYCHO uses 9 decimals
+            
+            // Calculate whole and fractional parts
+            const wholePart = value / divisor;
+            const fracPart = value % divisor;
+            
+            // Pad fraction with leading zeros and trim trailing zeros
+            const fracStr = fracPart.toString().padStart(9, '0');
+            const trimmedFracStr = fracStr.replace(/0+$/, '');
+            
+            return trimmedFracStr ? `${wholePart}.${trimmedFracStr}` : wholePart.toString();
         }
     } catch (error) {
         console.error(`Error getting ${token} balance:`, error);

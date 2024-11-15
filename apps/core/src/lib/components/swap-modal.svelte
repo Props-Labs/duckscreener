@@ -4,6 +4,7 @@
     import { previewSwap, executeSwap, createPoolId } from '$lib/services/swap';
     import { getBalance } from '$lib/services/token';
     import { onMount } from 'svelte';
+    import confetti from 'canvas-confetti';
     
     export let open = false;
     export let poolId: string;
@@ -37,8 +38,8 @@
         
         try {
             const [ethBalance, psychoBalance] = await Promise.all([
-                getBalance($wallet, 'ETH'),
-                getBalance($wallet, 'PSYCHO')
+                getBalance($wallet, 'ETH', poolId),
+                getBalance($wallet, 'PSYCHO', poolId)
             ]);
             
             fromBalance = isEthInput ? ethBalance : psychoBalance;
@@ -80,22 +81,45 @@
         swapError = null;
 
         try {
-            const minOutput = BigInt(toAmount) * BigInt(100 - Number(slippage)) / BigInt(100);
+            // Calculate minimum output with slippage
+            const toAmountNum = Number(toAmount);
+            const slippageNum = Number(slippage);
+            const minOutputAmount = toAmountNum * (100 - slippageNum) / 100;
             
+            // Execute swap with string amounts - let the service handle the conversion
             const tx = await executeSwap(
                 $wallet,
                 fromAmount,
-                minOutput.toString(),
+                minOutputAmount.toString(),
                 pools,
                 isEthInput
             );
 
             console.log('Swap successful:', tx);
-            await updateBalances(); // Update balances after successful swap
-            handleClose();
+            await updateBalances();
+            
+            // Trigger confetti celebration
+            confetti({
+                particleCount: 200,
+                spread: 130,
+                origin: { y: 0.6 },
+                colors: ['#26a69a', '#4CAF50', '#81C784'],
+                startVelocity: 45,
+                scalar: 1.2
+            });
+
+            // Close modal after a short delay to show the confetti
+            setTimeout(() => {
+                handleClose();
+            }, 1000);
+
         } catch (error) {
             console.error('Swap error:', error);
-            swapError = 'Swap failed. Please try again.';
+            if (error instanceof Error) {
+                swapError = error.message;
+            } else {
+                swapError = 'Swap failed. Please try again.';
+            }
         } finally {
             isLoading = false;
         }
@@ -114,10 +138,7 @@
     }
 
     function handleClose() {
-        open = false;
-        fromAmount = '';
-        toAmount = '';
-        swapError = null;
+        if (isLoading) return; // Prevent closing while transaction is in progress
         dispatch('close');
     }
 
@@ -134,9 +155,13 @@
         
         const num = Number(amount);
         
-        // For ETH, show up to 6 decimal places
+        // For ETH, show up to 6 decimal places, but don't force trailing zeros
         if (token === 'ETH') {
-            return num.toFixed(6);
+            const fixed = num.toFixed(9); // Get full precision first
+            const [whole, fraction = ''] = fixed.split('.');
+            const truncatedFraction = fraction.slice(0, 6); // Limit to 6 decimal places
+            const trimmedFraction = truncatedFraction.replace(/0+$/, ''); // Remove trailing zeros
+            return trimmedFraction ? `${whole}.${trimmedFraction}` : whole;
         }
         
         // For PSYCHO, show up to 9 decimal places
@@ -149,11 +174,14 @@
 </script>
 
 {#if open}
-<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div 
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+    on:click|self={handleClose}
+>
     <div class="bg-[#1e222d] rounded-2xl w-full max-w-md shadow-xl border border-[#2B2B43] overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[#2B2B43]">
-            <h2 class="text-[#d1d4dc] font-semibold">Swap</h2>
+            <h2 class="text-[#d1d4dc] font-semibold">Swap (Powered by <a href="https://mira.ly" target="_blank">Mira.ly</a>)</h2>
             <button 
                 class="text-[#d1d4dc] hover:text-[#26a69a] transition-colors"
                 on:click={handleClose}
@@ -178,7 +206,15 @@
                 
                 <div class="flex justify-between text-sm text-[#d1d4dc]">
                     <span>From</span>
-                    <span>Balance: {formatTokenAmount(fromBalance, fromToken)}</span>
+                    <span>
+                        Balance: {formatTokenAmount(fromBalance, fromToken)} 
+                        <button 
+                            class="ml-1 text-[#26a69a] hover:text-[#26a69a]/80 transition-colors"
+                            on:click={() => fromAmount = fromBalance}
+                        >
+                            max
+                        </button>
+                    </span>
                 </div>
                 <div class="flex items-center gap-2">
                     <input 
@@ -215,7 +251,16 @@
             <div class="bg-[#131722] rounded-xl p-4 space-y-2">
                 <div class="flex justify-between text-sm text-[#d1d4dc]">
                     <span>To (estimated)</span>
-                    <span>Balance: {formatTokenAmount(toBalance, toToken)}</span>
+                    <span>
+                        Balance: {formatTokenAmount(toBalance, toToken)} 
+                        <button 
+                            class="ml-1 text-[#26a69a] hover:text-[#26a69a]/80 transition-colors"
+                            on:click={() => fromAmount = toBalance}
+                            disabled={isEthInput}
+                        >
+                            max
+                        </button>
+                    </span>
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="flex-1 text-2xl text-[#d1d4dc]">
@@ -259,21 +304,59 @@
 
             <!-- Swap Button -->
             <button 
-                class="w-full py-4 rounded-xl font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed {isLoading || ($connected && !fromAmount) ? 'bg-[#2B2B43]' : 'bg-[#26a69a] hover:bg-[#2B2B43]'}"
+                class="w-full py-4 rounded-xl font-semibold text-white transition-all relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:before:opacity-0 {isLoading || ($connected && !fromAmount) ? 'bg-[#2B2B43]' : 'bg-[#26a69a] hover:bg-[#26a69a]/90'}"
                 disabled={isLoading || ($connected && !fromAmount)} 
                 on:click={handleButtonClick}
             >
-                {#if isLoading}
-                    Loading...
-                {:else if !$connected}
-                    Connect
-                {:else if !fromAmount || !toAmount}
-                    Enter an amount
-                {:else}
-                    Swap
-                {/if}
+                <span class="relative z-10">
+                    {#if isLoading}
+                        Loading...
+                    {:else if !$connected}
+                        Connect
+                    {:else if !fromAmount || !toAmount}
+                        Enter an amount
+                    {:else}
+                        Swap
+                    {/if}
+                </span>
+                
+                <!-- Enhanced gradient animation overlay -->
+                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#26a69a]/0 via-white/40 to-[#26a69a]/0 animate-gradient-slide-1"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-[#26a69a]/0 via-white/30 to-[#26a69a]/0 animate-gradient-slide-2"></div>
+                    <div class="absolute inset-0 bg-[#26a69a] opacity-10"></div>
+                </div>
             </button>
         </div>
     </div>
 </div>
 {/if} 
+
+<style>
+    @keyframes gradient-slide-1 {
+        0% {
+            transform: translateX(-100%) skewX(-15deg);
+        }
+        100% {
+            transform: translateX(100%) skewX(-15deg);
+        }
+    }
+    
+    @keyframes gradient-slide-2 {
+        0% {
+            transform: translateX(-100%) skewX(15deg);
+        }
+        100% {
+            transform: translateX(100%) skewX(15deg);
+        }
+    }
+
+    .animate-gradient-slide-1 {
+        animation: gradient-slide-1 2s ease infinite;
+    }
+    
+    .animate-gradient-slide-2 {
+        animation: gradient-slide-2 2s ease infinite;
+        animation-delay: 0.1s;
+    }
+</style> 

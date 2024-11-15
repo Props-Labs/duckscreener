@@ -103,7 +103,7 @@
                                 on:click|preventDefault={() => isSwapModalOpen = true}
                                 class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
                             >
-                                <span class="absolute inset-0 bg-[url('/sparkles.png')] opacity-20 bg-repeat animate-sparkle"></span>
+                                <span class="absolute inset-0 opacity-20 bg-repeat animate-sparkle"></span>
                                 <span class="relative font-semibold text-white flex items-center gap-1.5">
                                     Buy $PSYCHO
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
