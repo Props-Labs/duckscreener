@@ -1,7 +1,8 @@
 import {env} from "$env/dynamic/public";
-import type {MiraAmm, ReadonlyMiraAmm} from "mira-dex-ts";
+import type {MiraAmm, ReadonlyMiraAmm, PoolId} from "mira-dex-ts";
 import {Account, Provider} from "fuels";
-import {getAllLPs} from "./data";
+import type {AssetId} from "fuels";
+// import {getAllLPs} from "./data";
 
 // Dynamically import mira-dex-ts to avoid SSR issues
 const getMiraDex = async () => {
@@ -30,15 +31,25 @@ export async function getTotalAssets() {
     return totalAssets;
 }
 
-export async function getPoolMetadata(lp: any) {
-    console.log('getPoolMetadata', lp);
+export async function getPoolMetadata(pool_id: any) {
+    console.log('getPoolMetadata', pool_id);
+    const poolIdparts = pool_id.split('_');
     const miraAmm = await getReadonlyMiraAmm();
-    const poolMetadata = await miraAmm.poolMetadata(lp.pool_id);
+
+    const poolId: PoolId = [
+        {bits: poolIdparts[0]} as AssetId,
+        {bits: poolIdparts[1]} as AssetId,
+        Boolean(poolIdparts[2])
+    ];
+    console.log('poolId', poolId);
+    //@ts-ignore
+    const poolMetadata = await miraAmm.poolMetadata(poolId);
+    console.log('poolMetadata response', poolMetadata);
     return poolMetadata;
 }
 
-export async function getPoolMetadataForAllLPs() {
-	const allLPs = await getAllLPs();
-	const poolMetadata = await Promise.all(allLPs.map(getPoolMetadata));
-	return poolMetadata;
-}
+// export async function getPoolMetadataForAllLPs() {
+// 	const allLPs = await getAllLPs();
+// 	const poolMetadata = await Promise.all(allLPs.map(getPoolMetadata));
+// 	return poolMetadata;
+// }

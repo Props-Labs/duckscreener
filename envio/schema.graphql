@@ -75,7 +75,7 @@ type MiraV1Core_MintEvent {
   transaction_id: String!
   pool_id: String!
   recipient: String!
-  liquidity: Asset!
+  liquidity: String!
   asset_0_in: BigInt!
   asset_1_in: BigInt!
 }
@@ -94,7 +94,7 @@ type MiraV1Core_BurnEvent {
   transaction_id: String!
   pool_id: String!
   recipient: String!
-  liquidity: Asset!
+  liquidity: String!
   asset_0_out: BigInt!
   asset_1_out: BigInt!
 }

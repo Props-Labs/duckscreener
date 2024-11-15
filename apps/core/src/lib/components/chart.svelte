@@ -1,9 +1,21 @@
 <script lang="ts">
-    import { onMount, onDestroy } from 'svelte';
+    import { onMount, onDestroy, tick } from 'svelte';
     import { getTradingData, convertTradingDataToChartData, type TimeFrame } from '$lib/services/data';
     import { createChart, ColorType } from 'lightweight-charts';
     import { createEventDispatcher } from 'svelte';
     
+    interface SwapEvent {
+        exchange_rate: string;
+        time: number;
+        asset_0_in: string;
+        asset_0_out: string;
+        asset_1_in: string;
+        asset_1_out: string;
+        is_buy: boolean;
+        is_sell: boolean;
+        transaction_id: string;
+    }
+
     const dispatch = createEventDispatcher();
     
     export let poolId: string;
@@ -12,6 +24,13 @@
     let selectedTimeFrame: TimeFrame = '1h';
     let chartContainer: HTMLElement;
     let isLoading = false;
+    
+    let rawData: SwapEvent[] = [];
+    let visibleData: SwapEvent[] = [];
+    let tableContainer: HTMLElement;
+    let pageSize = 20;
+    let currentPage = 0;
+    let loading = false;
     
     const timeFrameOptions: TimeFrame[] = ['1s', '1m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '12h', '24h'];
     
@@ -91,7 +110,7 @@
     async function loadChartData(timeFrame: TimeFrame) {
         try {
             isLoading = true;
-            const rawData = await getTradingData(poolId);
+            rawData = await getTradingData(poolId);
             const candlesticks = await convertTradingDataToChartData(rawData, timeFrame);
             if (candlestickSeries) {
                 candlestickSeries.setData(candlesticks);
@@ -101,13 +120,98 @@
                     dispatch('priceUpdate', candlesticks[candlesticks.length - 1].close);
                 }
             }
+            // Reset and initialize visible data
+            visibleData = [];
+            currentPage = 0;
+            await loadMoreData();
         } catch (error) {
             console.error('Error loading chart data:', error);
         } finally {
             isLoading = false;
         }
     }
-    
+
+    async function loadMoreData() {
+        if (loading) return;
+        loading = true;
+        
+        const start = currentPage * pageSize;
+        const end = start + pageSize;
+        const newData = rawData.slice(start, end);
+        
+        if (newData.length > 0) {
+            visibleData = [...visibleData, ...newData];
+            currentPage++;
+            await tick();
+        }
+        
+        loading = false;
+    }
+
+    function handleScroll(event: Event) {
+        const target = event.target as HTMLElement;
+        const bottom = target.scrollHeight - target.scrollTop - target.clientHeight < 50;
+        
+        if (bottom) {
+            loadMoreData();
+        }
+    }
+
+    function formatTime(timestamp: number): string {
+        return new Date(timestamp * 1000).toLocaleString();
+    }
+
+    function formatNumber(value: string): string {
+        const num = Number(value) / 1e18;
+        return num.toExponential(4);
+    }
+
+    async function handleTimeFrameChange(event: Event) {
+        const select = event.target as HTMLSelectElement;
+        selectedTimeFrame = select.value as TimeFrame;
+        await loadChartData(selectedTimeFrame);
+    }
+
+    function formatEthNumber(inValue: string, outValue: string, isBuy: boolean): string {
+        // For buys: ETH is asset_0, for sells: ETH is asset_1
+        if (isBuy) {
+            const ethIn = Number(inValue) / 1e18;
+            return (-ethIn).toFixed(4);
+        } else {
+            const ethOut = Number(outValue) / 1e18;
+            return ethOut.toFixed(4);
+        }
+    }
+
+    function formatTokenNumber(inValue: string, outValue: string, isBuy: boolean): string {
+        // For buys: PSYCHO is asset_1, for sells: PSYCHO is asset_0
+        if (isBuy) {
+            const tokenOut = Number(outValue) / 1e9;
+            return new Intl.NumberFormat('en-US').format(tokenOut);
+        } else {
+            const tokenIn = Number(inValue) / 1e9;
+            return new Intl.NumberFormat('en-US').format(-tokenIn);
+        }
+    }
+
+    function getPriceDirection(currentRate: string, previousRate: string): string {
+        const current = Number(currentRate);
+        const previous = Number(previousRate);
+        
+        if (current > previous) return '↑';
+        if (current < previous) return '↓';
+        return '→';
+    }
+
+    function getPriceDirectionColor(currentRate: string, previousRate: string): string {
+        const current = Number(currentRate);
+        const previous = Number(previousRate);
+        
+        if (current > previous) return 'text-[#26a69a]';
+        if (current < previous) return 'text-[#ef5350]';
+        return 'text-[#d1d4dc]';
+    }
+
     onMount(async () => {
         const { width, height } = chartContainer.getBoundingClientRect();
         const initialOptions = {
@@ -146,15 +250,9 @@
             window.removeEventListener('resize', handleResize);
         }
     });
-
-    async function handleTimeFrameChange(event: Event) {
-        const select = event.target as HTMLSelectElement;
-        selectedTimeFrame = select.value as TimeFrame;
-        await loadChartData(selectedTimeFrame);
-    }
 </script>
 
-<div class="flex flex-col w-full h-full bg-[#131722] relative">
+<div class="flex flex-col w-full h-full bg-[#131722] relative overflow-y-auto">
     {#if isLoading}
         <div class="absolute inset-0 bg-[#131722]/80 backdrop-blur-sm z-50 flex items-center justify-center">
             <div class="flex flex-col items-center">
@@ -191,10 +289,82 @@
         </select>
         <slot name="toolbar" />
     </div>
+    
     <div 
         bind:this={chartContainer} 
-        class="flex-1 w-full"
+        class="w-full h-2/3"
     ></div>
+
+    <div 
+        bind:this={tableContainer}
+        on:scroll={handleScroll}
+        class="mt-4 overflow-auto max-h-[400px] w-full border-t border-[#2B2B43]"
+    >
+        <table class="min-w-full">
+            <thead class="sticky top-0 bg-[#1e222d]">
+                <tr>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Time</th>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Wallet</th>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Type</th>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Price ($PSYCHO/$ETH)</th>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Quantity</th>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Transaction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each visibleData as event, index}
+                    <tr class="border-b border-[#2B2B43] hover:bg-[#1e222d]">
+                        <td class="px-4 py-2 text-[#d1d4dc]">{formatTime(event.time)}</td>
+                        <td class="px-4 py-2">
+                            <a 
+                                href={`https://app.fuel.network/account/${event.recipient}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-[#26a69a] hover:text-[#2196f3]"
+                            >
+                                {event?.recipient?.slice(0, 8)}...
+                            </a>
+                        </td>
+                        <td class="px-4 py-2">
+                            <span class={event.is_buy ? 'text-[#26a69a]' : 'text-[#ef5350]'}>
+                                {event.is_buy ? 'BUY' : 'SELL'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2 text-[#d1d4dc]">
+                            <span>{formatNumber(event.exchange_rate)}</span>
+                            {#if index < visibleData.length - 1}
+                                <span class={getPriceDirectionColor(event.exchange_rate, visibleData[index + 1].exchange_rate)}>
+                                    {getPriceDirection(event.exchange_rate, visibleData[index + 1].exchange_rate)}
+                                </span>
+                            {/if}
+                        </td>
+                        {#if event.is_buy}
+                            <td class="px-4 py-2 text-[#d1d4dc]">{formatTokenNumber(event.asset_0_in, event.asset_0_out, true)}</td>
+                        {:else}
+                            <td class="px-4 py-2 text-[#d1d4dc]">{formatTokenNumber(event.asset_0_in, event.asset_0_out, false)}</td>
+                        {/if}
+                       
+                        <td class="px-4 py-2">
+                            <a 
+                                href={`https://app.fuel.network/tx/${event.transaction_id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-[#26a69a] hover:text-[#2196f3]"
+                            >
+                                {event.transaction_id.slice(0, 8)}...
+                            </a>
+                        </td>
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+        
+        {#if loading}
+            <div class="p-4 text-center text-[#d1d4dc]">
+                Loading more data...
+            </div>
+        {/if}
+    </div>
 </div>
 
 <style>
@@ -220,5 +390,23 @@
             text-shadow: 0 0 10px #26a69a, 0 0 20px #26a69a, 0 0 30px #26a69a;
             transform: scale(1.05);
         }
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th {
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    td {
+        font-size: 0.875rem;
+    }
+
+    tbody tr:hover {
+        transition: background-color 0.2s ease;
     }
 </style>
