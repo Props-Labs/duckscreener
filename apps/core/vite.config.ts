@@ -20,5 +20,13 @@ export default defineConfig({
 	define: {
 		'process.env.NODE_DEBUG': 'false',
 		'global': 'globalThis'
+	},
+	build: {
+		target: 'esnext',
+		rollupOptions: {
+			output: {
+				format: 'esm'
+			}
+		}
 	}
 });
