@@ -8,9 +8,6 @@ export const GET: RequestHandler = async ({ url }) => {
   const limit: number = parseInt(url.searchParams.get('limit') || '1000');
   const offset: number = parseInt(url.searchParams.get('offset') || '0');
 
-  console.log('444pool_id', pool_id);
-  console.log('444limit', limit);
-  console.log('444offset', offset);
 
   try {
     const data = await getTradingData(pool_id, offset, limit);

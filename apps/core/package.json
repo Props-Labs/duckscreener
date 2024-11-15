@@ -32,6 +32,7 @@
 		"fuels": "^0.96.1",
 		"ioredis": "^5.4.1",
 		"lightweight-charts": "^4.2.1",
+		"lucide-svelte": "^0.459.0",
 		"mira-dex-ts": "^1.0.42"
 	}
 }

@@ -14,6 +14,7 @@
         is_buy: boolean;
         is_sell: boolean;
         transaction_id: string;
+        isNew?: boolean;
     }
 
     const dispatch = createEventDispatcher();
@@ -97,6 +98,27 @@
         },
     };
 
+    let isRefreshing = false;
+    let autoRefreshInterval: number;
+
+    let previousTransactionIds = new Set<string>();
+
+    let autoRefreshEnabled = true;
+
+    let isInitialLoad = true;
+
+    function setupAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+        }
+        
+        if (autoRefreshEnabled) {
+            autoRefreshInterval = setInterval(() => {
+                loadChartData(selectedTimeFrame, false);
+            }, 10000) as unknown as number;
+        }
+    }
+
     function handleResize() {
         if (chart && chartContainer) {
             const { width, height } = chartContainer.getBoundingClientRect();
@@ -107,10 +129,25 @@
         }
     }
 
-    async function loadChartData(timeFrame: TimeFrame) {
+    async function loadChartData(timeFrame: TimeFrame, showFullScreenLoader = true) {
         try {
-            isLoading = true;
-            rawData = await getTradingData(poolId);
+            if (showFullScreenLoader) {
+                isLoading = true;
+            }
+            isRefreshing = !showFullScreenLoader;
+            
+            const newRawData = await getTradingData(poolId);
+            
+            if (!isInitialLoad) {
+                newRawData.forEach(event => {
+                    event.isNew = !previousTransactionIds.has(event.transaction_id);
+                });
+            }
+            
+            previousTransactionIds = new Set(newRawData.map(event => event.transaction_id));
+            isInitialLoad = false;
+            
+            rawData = newRawData;
             const candlesticks = await convertTradingDataToChartData(rawData, timeFrame);
             if (candlestickSeries) {
                 candlestickSeries.setData(candlesticks);
@@ -120,7 +157,7 @@
                     dispatch('priceUpdate', candlesticks[candlesticks.length - 1].close);
                 }
             }
-            // Reset and initialize visible data
+            
             visibleData = [];
             currentPage = 0;
             await loadMoreData();
@@ -128,6 +165,7 @@
             console.error('Error loading chart data:', error);
         } finally {
             isLoading = false;
+            isRefreshing = false;
         }
     }
 
@@ -170,10 +208,10 @@
         const select = event.target as HTMLSelectElement;
         selectedTimeFrame = select.value as TimeFrame;
         await loadChartData(selectedTimeFrame);
+        setupAutoRefresh();
     }
 
     function formatEthNumber(inValue: string, outValue: string, isBuy: boolean): string {
-        // For buys: ETH is asset_0, for sells: ETH is asset_1
         if (isBuy) {
             const ethIn = Number(inValue) / 1e18;
             return (-ethIn).toFixed(4);
@@ -184,7 +222,6 @@
     }
 
     function formatTokenNumber(inValue: string, outValue: string, isBuy: boolean): string {
-        // For buys: PSYCHO is asset_1, for sells: PSYCHO is asset_0
         if (isBuy) {
             const tokenOut = Number(outValue) / 1e9;
             return new Intl.NumberFormat('en-US').format(tokenOut);
@@ -210,6 +247,11 @@
         if (current > previous) return 'text-[#26a69a]';
         if (current < previous) return 'text-[#ef5350]';
         return 'text-[#d1d4dc]';
+    }
+
+    function handleAutoRefreshToggle() {
+        autoRefreshEnabled = !autoRefreshEnabled;
+        setupAutoRefresh();
     }
 
     onMount(async () => {
@@ -240,6 +282,7 @@
         });
         
         await loadChartData(selectedTimeFrame);
+        setupAutoRefresh();
         
         window.addEventListener('resize', handleResize);
         handleResize();
@@ -248,6 +291,9 @@
     onDestroy(() => {
         if (typeof window !== 'undefined') {
             window.removeEventListener('resize', handleResize);
+        }
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
         }
     });
 </script>
@@ -278,15 +324,53 @@
     {/if}
     
     <div class="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
-        <select 
-            value={selectedTimeFrame}
-            on:change={handleTimeFrameChange}
-            class="p-2 border rounded bg-[#2B2B43] text-[#d1d4dc] border-[#2B2B43] text-sm"
-        >
-            {#each timeFrameOptions as timeFrame}
-                <option value={timeFrame}>{timeFrame}</option>
-            {/each}
-        </select>
+        <div class="flex items-center gap-2">
+            <button 
+                on:click={() => loadChartData(selectedTimeFrame, false)}
+                class="p-2 border rounded bg-[#2B2B43] text-[#d1d4dc] border-[#2B2B43] hover:bg-[#363a45] transition-colors"
+                aria-label="Refresh data"
+                disabled={isRefreshing}
+            >
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="16" 
+                    height="16" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round"
+                    class={isRefreshing ? 'animate-spin' : ''}
+                >
+                    <path d="M21 2v6h-6"></path>
+                    <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                    <path d="M3 22v-6h6"></path>
+                    <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                </svg>
+            </button>
+            
+            <label class="inline-flex items-center cursor-pointer">
+                <input
+                    type="checkbox"
+                    class="sr-only peer"
+                    bind:checked={autoRefreshEnabled}
+                    on:change={handleAutoRefreshToggle}
+                >
+                <div class="relative w-9 h-5 bg-[#2B2B43] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#26a69a]"></div>
+                <span class="ms-1 text-xs text-[#d1d4dc] opacity-80">Auto</span>
+            </label>
+            
+            <select 
+                value={selectedTimeFrame}
+                on:change={handleTimeFrameChange}
+                class="p-2 border rounded bg-[#2B2B43] text-[#d1d4dc] border-[#2B2B43] text-sm"
+            >
+                {#each timeFrameOptions as timeFrame}
+                    <option value={timeFrame}>{timeFrame}</option>
+                {/each}
+            </select>
+        </div>
         <slot name="toolbar" />
     </div>
     
@@ -313,7 +397,9 @@
             </thead>
             <tbody>
                 {#each visibleData as event, index}
-                    <tr class="border-b border-[#2B2B43] hover:bg-[#1e222d]">
+                    <tr 
+                        class="border-b border-[#2B2B43] hover:bg-[#1e222d] {event.isNew ? 'animate-new-row' : ''}"
+                    >
                         <td class="px-4 py-2 text-[#d1d4dc]">{formatTime(event.time)}</td>
                         <td class="px-4 py-2">
                             <a 
@@ -408,5 +494,51 @@
 
     tbody tr:hover {
         transition: background-color 0.2s ease;
+    }
+
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .animate-new-row {
+        animation: slideIn 0.5s ease-out;
+        background-color: rgba(38, 166, 154, 0.1);
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-new-row {
+        animation: slideIn 0.5s ease-out, highlightFade 2s ease-out;
+    }
+
+    @keyframes highlightFade {
+        0% {
+            background-color: rgba(38, 166, 154, 0.2);
+        }
+        100% {
+            background-color: transparent;
+        }
+    }
+
+    input[type="checkbox"]:checked + div {
+        box-shadow: 0 0 10px rgba(38, 166, 154, 0.3);
     }
 </style>

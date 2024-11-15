@@ -32,6 +32,9 @@ importers:
       lightweight-charts:
         specifier: ^4.2.1
         version: 4.2.1
+      lucide-svelte:
+        specifier: ^0.459.0
+        version: 0.459.0(svelte@5.1.16)
       mira-dex-ts:
         specifier: ^1.0.42
         version: 1.0.42(fuels@0.96.1)
@@ -1181,6 +1184,11 @@ packages:
 
   lru-cache@10.4.3:
     resolution: {integrity: sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==}
+
+  lucide-svelte@0.459.0:
+    resolution: {integrity: sha512-HuuvVa+sJFjMy0NLVCX/AOqVABVaujMndFXgFSYv3FG9MfLWDWeo1ZOBbdpGk0AAQ6kG9JU63vKcwQcUjyUdog==}
+    peerDependencies:
+      svelte: ^3 || ^4 || ^5.0.0-next.42
 
   magic-string@0.30.12:
     resolution: {integrity: sha512-Ea8I3sQMVXr8JhN4z+H/d8zwo+tYDgHE9+5G4Wnrwhs0gaK9fXTKx0Tw5Xwsd/bCPTTZNRAdpyzvoeORe9LYpw==}
@@ -2718,6 +2726,10 @@ snapshots:
   lodash@4.17.21: {}
 
   lru-cache@10.4.3: {}
+
+  lucide-svelte@0.459.0(svelte@5.1.16):
+    dependencies:
+      svelte: 5.1.16
 
   magic-string@0.30.12:
     dependencies:
