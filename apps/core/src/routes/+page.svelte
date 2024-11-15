@@ -2,19 +2,27 @@
     import { onMount } from 'svelte';
     import Chart from '$lib/components/chart.svelte';
     import { getPriceData } from '$lib/services/blockchain';
-    //import { getPoolMetadata } from '$lib/services/dex';
+    import Chat from '$lib/components/chat.svelte';
+    import { browser } from '$app/environment';
+    import { showWalletModal } from '$lib/stores';
+    import WalletModal from "$lib/components/wallet-modal.svelte";
+    
+    let WalletProvider: any;
+
+    onMount(async () => {
+        if (browser) {
+            const module = await import('svelte-fuels');
+            WalletProvider = module.WalletProvider;
+        }
+    });
+    
     const poolId = "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false";
 
     let ethPrice: any;
     let currentTokenPrice = 0;
     const TOTAL_SUPPLY = 1_000_000_000;
     let poolMetadata: any;
-
-    onMount(async () => {
-       // poolMetadata = await getPoolMetadata(poolId);
-    });
-
-
+    let isChatOpen = false;
 
     async function getEthPrice() {
         ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419");
@@ -39,13 +47,87 @@
     }
 
     $: getEthPrice();
-
-   
     $: marketCap = currentTokenPrice * TOTAL_SUPPLY * (ethPrice?.formattedPrice || 0);
+
+    function toggleChat() {
+        isChatOpen = !isChatOpen;
+    }
 </script>
 
-<div class="flex flex-col h-screen bg-[#131722]">
-    <div class="flex-1">
+{#if browser && WalletProvider}
+<WalletProvider>
+    <div class="flex h-screen bg-[#131722] relative">
+        <!-- Mobile Chat Toggle Button -->
+        <button
+            class="sm:hidden fixed top-0 right-4 z-20 bg-[#26a69a] text-white px-4 py-1 rounded-b-lg shadow-lg hover:bg-[#2196f3] transition-colors"
+            on:click={toggleChat}
+        >
+            Chat {isChatOpen ? '×' : '▼'}
+        </button>
+
+        <!-- Left side - Chart -->
+        <div class="flex-1 flex flex-col min-w-0">
+            <Chart {poolId} on:priceUpdate={handlePriceUpdate}>
+                <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">
+                    <div class="flex items-center space-x-2 mb-2 sm:mb-0">
+                        <div class="flex flex-col">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-xs sm:text-sm opacity-80">Market Cap:</span>
+                                <span class="text-sm sm:text-base font-semibold">{formatCurrency(marketCap)}</span>
+                            </div>
+                            <span class="text-xs opacity-60">Supply: 1B</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 mb-2 sm:mb-0 text-center">
+                        <span class="text-xs sm:text-sm opacity-80">
+                            <a href="https://mira.ly/swap/" target="_blank" class="underline text-[#ffffff] hover:opacity-80">Buy $PSYCHO on Mira.ly</a> | 
+                        </span> 
+                        <span class="text-xs sm:text-sm opacity-80">
+                            <a href="https://t.co/QEmd2tfaqm" target="_blank" class="underline text-[#26a69a] hover:opacity-80">Join us on Telegram</a>
+                        </span>
+                    </div>
+                    <div class="flex flex-col items-start sm:items-end w-full sm:w-auto">
+                        <span class="text-lg sm:text-xl font-bold text-[#26a69a]">
+                            Duckscreener
+                        </span>
+                        <span class="text-[7px] sm:text-[8px] opacity-20 mt-0.5 break-all sm:break-normal max-w-[200px] sm:max-w-none">
+                            Donate: 0x77C960337715b598Feb92AC53b3F736cA9F87c88abC42BB02B763C738e69679A
+                        </span>
+                        <span class="text-[9px] sm:text-[10px] opacity-40 mt-0.5 text-[#26a69a]">
+                            <a href="https://x.com/Bitcoinski" target="_blank" class="hover:opacity-80">Made by @Bitcoinski</a>
+                        </span>
+                    </div>
+                </div>
+            </Chart>
+        </div>
+
+        <!-- Right side - Chat (Desktop) -->
+        <div class="hidden sm:block w-80 border-l border-[#2B2B43]">
+            <Chat />
+        </div>
+
+        <!-- Mobile Chat Panel -->
+        <div
+            class="sm:hidden fixed inset-0 bg-[#131722] z-10 transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
+        >
+            <div class="h-full pt-10">
+                <Chat on:close={() => isChatOpen = false} />
+            </div>
+        </div>
+    </div>
+</WalletProvider>
+{:else}
+<div class="flex h-screen bg-[#131722] relative">
+    <!-- Mobile Chat Toggle Button -->
+    <button
+        class="sm:hidden fixed top-0 right-4 z-20 bg-[#26a69a] text-white px-4 py-1 rounded-b-lg shadow-lg hover:bg-[#2196f3] transition-colors"
+        on:click={toggleChat}
+    >
+        Chat {isChatOpen ? '×' : '▼'}
+    </button>
+
+    <!-- Left side - Chart -->
+    <div class="flex-1 flex flex-col min-w-0">
         <Chart {poolId} on:priceUpdate={handlePriceUpdate}>
             <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">
                 <div class="flex items-center space-x-2 mb-2 sm:mb-0">
@@ -58,9 +140,12 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-2 mb-2 sm:mb-0 text-center">
-                    <span class="text-xs sm:text-sm opacity-80"><a href="https://mira.ly/swap/" target="_blank" class="underline text-[#ffffff] hover:opacity-80">Buy $PSYCHO on Mira.ly</a> | </span> 
-                    <span class="text-xs sm:text-sm opacity-80"><a href="https://t.co/QEmd2tfaqm" target="_blank" class="underline text-[#26a69a] hover:opacity-80">Join us on Telegram</a></span>
-                    
+                    <span class="text-xs sm:text-sm opacity-80">
+                        <a href="https://mira.ly/swap/" target="_blank" class="underline text-[#ffffff] hover:opacity-80">Buy $PSYCHO on Mira.ly</a> | 
+                    </span> 
+                    <span class="text-xs sm:text-sm opacity-80">
+                        <a href="https://t.co/QEmd2tfaqm" target="_blank" class="underline text-[#26a69a] hover:opacity-80">Join us on Telegram</a>
+                    </span>
                 </div>
                 <div class="flex flex-col items-start sm:items-end w-full sm:w-auto">
                     <span class="text-lg sm:text-xl font-bold text-[#26a69a]">
@@ -75,6 +160,22 @@
                 </div>
             </div>
         </Chart>
-      
+    </div>
+
+    <!-- Right side - Chat (Desktop) -->
+    <div class="hidden sm:block w-80 border-l border-[#2B2B43]">
+        <Chat />
+    </div>
+
+    <!-- Mobile Chat Panel -->
+    <div
+        class="sm:hidden fixed inset-0 bg-[#131722] z-10 transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
+    >
+        <div class="h-full pt-10">
+            <Chat on:close={() => isChatOpen = false} />
+        </div>
     </div>
 </div>
+{/if}
+
+<WalletModal open={$showWalletModal} on:close={() => showWalletModal.set(false)} />
