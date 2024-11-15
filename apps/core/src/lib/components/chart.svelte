@@ -107,6 +107,8 @@
 
     let isInitialLoad = true;
 
+    let isTableExpanded = false;
+
     function setupAutoRefresh() {
         if (autoRefreshInterval) {
             clearInterval(autoRefreshInterval);
@@ -119,7 +121,7 @@
         }
     }
 
-    function handleResize() {
+    function handleChartResize() {
         if (chart && chartContainer) {
             const { width, height } = chartContainer.getBoundingClientRect();
             chart.applyOptions({ 
@@ -287,13 +289,13 @@
         await loadChartData(selectedTimeFrame);
         setupAutoRefresh();
         
-        window.addEventListener('resize', handleResize);
-        handleResize();
+        window.addEventListener('resize', handleChartResize);
+        handleChartResize();
     });
 
     onDestroy(() => {
         if (typeof window !== 'undefined') {
-            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', handleChartResize);
         }
         if (autoRefreshInterval) {
             clearInterval(autoRefreshInterval);
@@ -382,13 +384,44 @@
     
     <div 
         bind:this={chartContainer} 
-        class="w-full h-2/3 sm:h-2/3 max-h-[50vh] sm:max-h-none"
+        class="w-full transition-[height] duration-300 ease-in-out relative z-0"
+        style="height: {isTableExpanded ? '30vh' : '70vh'}"
     ></div>
+
+    <button 
+        class="w-full h-8 flex items-center justify-center bg-[#1e222d] border-y border-[#2B2B43] text-[#d1d4dc] hover:bg-[#2B2B43] transition-colors relative z-10"
+        on:click={() => {
+            isTableExpanded = !isTableExpanded;
+            if (chart) {
+                const newHeight = isTableExpanded ? '30vh' : '70vh';
+                chartContainer.style.height = newHeight;
+                
+                setTimeout(() => {
+                    const { height } = chartContainer.getBoundingClientRect();
+                    chart.applyOptions({ 
+                        height: height
+                    });
+                    chart.timeScale().fitContent();
+                }, 300);
+            }
+        }}
+    >
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            class="h-4 w-4 transform transition-transform duration-300 {isTableExpanded ? 'rotate-180' : ''}" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+        >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
 
     <div 
         bind:this={tableContainer}
         on:scroll={handleScroll}
-        class="overflow-auto h-[calc(50vh-16rem)] sm:h-[400px] w-full border-t border-[#2B2B43] bg-[#131722]"
+        class="overflow-auto w-full border-[#2B2B43] bg-[#131722] transition-[height] duration-300 ease-in-out relative z-20"
+        style="height: {isTableExpanded ? 'calc(70vh - 2rem)' : 'calc(30vh - 2rem)'};"
     >
         <table class="min-w-full">
             <thead class="sticky top-0 bg-[#1e222d]">
@@ -546,5 +579,11 @@
 
     input[type="checkbox"]:checked + div {
         box-shadow: 0 0 10px rgba(38, 166, 154, 0.3);
+    }
+
+    /* Prevent text selection while dragging */
+    .cursor-ns-resize {
+        user-select: none;
+        -webkit-user-select: none;
     }
 </style>
