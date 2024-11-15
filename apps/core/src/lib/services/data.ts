@@ -34,11 +34,10 @@ export function timeFrameToSeconds(timeFrame: TimeFrame): number {
 }
 
 export const getTradingData = async (pool_id: string, offset: number = 0, limit: number = 1000) => {
-    console.log('getTradingData::::', pool_id, offset, limit);
-    console.log(`/api/trades?pool_id=${pool_id}&offset=${offset}&limit=${limit}`)
+  
     const response = await fetch(`/api/trades?pool_id=${pool_id}&offset=${offset}&limit=${limit}`);
     const data = await response.json();
-    console.log('data', data);
+    
     return data;
 }
 

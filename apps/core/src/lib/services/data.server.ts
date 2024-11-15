@@ -35,25 +35,25 @@ export function timeFrameToSeconds(timeFrame: TimeFrame): number {
 }
 
 export const getTradingData = async (pool_id: string, offset: number = 0, limit: number = 1000) => {
-    console.log('getTradingData::::', pool_id, offset, limit);
+    
     try{
         const cachedData = await getValue(`trades_${pool_id}`);
         if(cachedData){
             console.log('Returning cached data');
             const data = JSON.parse(cachedData);
             console.log('cached data length', data.length);
-            //return JSON.parse(cachedData);
+            return JSON.parse(cachedData);
         }
     }
     catch(error){}
 
     const allResults = [];
-    console.log('offset', offset);
+   
     let currentOffset = offset || 0;
     let hasMore = true;
     
     while (hasMore) {
-        console.log('Fetching data from DB', currentOffset);
+       
         const query = `
            query MyQuery($pool_id: String = "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false", $offset: Int = 0, $limit: Int = 1000) {
                 MiraV1Core_SwapEvent(offset: $offset, where: {pool_id: {_eq: $pool_id}}, limit: $limit, order_by: {time: desc}) {
@@ -75,14 +75,14 @@ export const getTradingData = async (pool_id: string, offset: number = 0, limit:
             }
         `;
 
-        console.log('currentOffset', currentOffset);
+       
         const variables = {
             pool_id,
             offset: parseInt(currentOffset),
             limit: limit || 1000 // Keep at 1000 as this is the max supported
         };
 
-        console.log('variables', variables);
+       
 
         try {
             const response = await queryDB(query, variables);
@@ -91,7 +91,7 @@ export const getTradingData = async (pool_id: string, offset: number = 0, limit:
             if (results && results.length > 0) {
                 allResults.push(...results);
                 currentOffset = parseInt(currentOffset) + Number(results.length);
-                console.log('currentOffset2', currentOffset);
+                
                 
                 // If we got less than 1000 results, we've reached the end
                 if (results.length < 1000) {
@@ -105,12 +105,12 @@ export const getTradingData = async (pool_id: string, offset: number = 0, limit:
             await new Promise(resolve => setTimeout(resolve, 100));
             
         } catch (error) {
-            console.error('Error fetching data:', error);
+            
             hasMore = false; // Stop on error
         }
     }
 
-    console.log(`Fetched ${allResults.length} total swap events`);
+   
     await storeValue(`trades_${pool_id}`, JSON.stringify(allResults), 5); // 5 sec cache
     return allResults;
 }
