@@ -123,8 +123,8 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-3 w-full sm:w-auto">
-                    <div class="grid grid-cols-2 gap-3 w-full sm:flex sm:w-auto order-last sm:order-none px-0">
+                <div class="flex flex-col gap-3 w-auto sm:w-auto">
+                    <div class="grid grid-cols-2 gap-2 w-full  sm:w-full order-last sm:order-none px-0">
                         <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors w-full">
                             <div class="flex items-center space-x-2">
                                 <span class="text-xs sm:text-sm opacity-80">Market Cap</span>
