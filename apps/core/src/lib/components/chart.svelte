@@ -145,13 +145,16 @@
             }
             
             previousTransactionIds = new Set(newRawData.map(event => event.transaction_id));
-            isInitialLoad = false;
             
             rawData = newRawData;
             const candlesticks = await convertTradingDataToChartData(rawData, timeFrame);
             if (candlestickSeries) {
                 candlestickSeries.setData(candlesticks);
-                chart.timeScale().fitContent();
+                
+                if (isInitialLoad) {
+                    chart.timeScale().fitContent();
+                    isInitialLoad = false;
+                }
                 
                 if (candlesticks.length > 0) {
                     dispatch('priceUpdate', candlesticks[candlesticks.length - 1].close);
