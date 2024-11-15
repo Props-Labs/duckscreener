@@ -11,6 +11,9 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
+		"@adraffy/ens-normalize": "^1.11.0",
+		"@noble/curves": "^1.6.0",
+		"@noble/hashes": "^1.5.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
@@ -18,10 +21,14 @@
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
+		"@types/bn.js": "^5.1.6",
+		"aes-js": "^3.1.2",
 		"assert": "^2.1.0",
 		"autoprefixer": "^10.4.20",
 		"buffer": "^6.0.3",
 		"crypto-browserify": "^3.12.1",
+		"esm-env": "^1.1.4",
+		"fancy-canvas": "^2.1.0",
 		"process": "^0.11.10",
 		"stream-browserify": "^3.0.0",
 		"svelte": "^5.0.0",
@@ -29,13 +36,16 @@
 		"tailwindcss": "^3.4.9",
 		"typescript": "^5.0.0",
 		"util": "^0.12.5",
-		"vite": "^5.0.3"
+		"vite": "^5.0.3",
+		"vite-plugin-node-polyfills": "^0.22.0"
 	},
 	"dependencies": {
 		"@envio-dev/hyperfuel-client": "^1.2.2",
 		"@fuels/connectors": "^0.36.1",
 		"@sveltejs/adapter-node": "^5.2.9",
 		"@wagmi/core": "^2.14.6",
+		"bech32": "^2.0.0",
+		"bn.js": "^4.12.1",
 		"ethers": "^6.13.4",
 		"fuels": "^0.96.1",
 		"ioredis": "^5.4.1",
