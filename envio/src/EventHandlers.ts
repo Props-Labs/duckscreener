@@ -38,15 +38,6 @@ MiraV1Core.ReentrancyError.handler(async ({ event, context }) => {
 });
 
 MiraV1Core.SwapEvent.handler(async ({ event, context }) => {
-  // console.log("MiraV1Core.SwapEvent.handler event", event);
-  // if ( 
-  //   event.params.pool_id[0].bits === "0x9D10489921837e5ee13670832a63a5EBAb3da110Cf0aafDa184B368e12Bdb147" || 
-  //   event.params.pool_id[1].bits === "0x9D10489921837e5ee13670832a63a5EBAb3da110Cf0aafDa184B368e12Bdb147"
-  // ) {
-  //   console.log("MiraV1Core.SwapEvent.handler event.params.pool_id");
-  //   console.log("Found matching pool_id:", event.params.pool_id);
-  // }
-
   
   const is_buy = event.params.asset_1_in > 0;
   const is_sell = event.params.asset_1_out > 0;
@@ -59,7 +50,6 @@ MiraV1Core.SwapEvent.handler(async ({ event, context }) => {
     }
   }
   catch(e){
-    console.log('MiraV1Core.SwapEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
     console.log('Error calculating exchange rate', e);
   }
   
@@ -151,24 +141,22 @@ MiraV1Core.SetNameEvent.handler(async ({ event, context }) => {
   context.MiraV1Core_SetNameEvent.set(entity);
 });
 
-// MiraV1Core.MintEvent.handler(async ({ event, context }) => {
-//   const entity: MiraV1Core_MintEvent = {
-//     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
-//     time: event.block.time,
-    // block_height: event.block.height,
-    // transaction_id: event.transaction.id,
-//     pool_id: `${event.params.pool_id[0]}_${event.params.pool_id[1]}_${event.params.pool_id[2]}`,
-//     recipient: event.params.recipient.payload.bits,
-//     liquidity: {
-//       id: event.params.liquidity.id.toString(),
-//       amount: event.params.liquidity.amount
-//     },
-//     asset_0_in: event.params.asset_0_in,
-//     asset_1_in: event.params.asset_1_in,
-//   };
+MiraV1Core.MintEvent.handler(async ({ event, context }) => {
+  // console.log('MiraV1Core.MintEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+  const entity: MiraV1Core_MintEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    pool_id: `${event.params.pool_id[0].bits}_${event.params.pool_id[1].bits}_${event.params.pool_id[2]}`,
+    recipient: event.params.recipient.payload.bits,
+    liquidity: `${event.params.liquidity.id.bits}_${event.params.liquidity.amount.toString()}`,
+    asset_0_in: event.params.asset_0_in,
+    asset_1_in: event.params.asset_1_in,
+  };
 
-//   context.MiraV1Core_MintEvent.set(entity);
-// });
+  context.MiraV1Core_MintEvent.set(entity);
+});
 
 MiraV1Core.AccessError.handler(async ({ event, context }) => {
   const entity: MiraV1Core_AccessError = {
@@ -181,24 +169,21 @@ MiraV1Core.AccessError.handler(async ({ event, context }) => {
   context.MiraV1Core_AccessError.set(entity);
 });
 
-// MiraV1Core.BurnEvent.handler(async ({ event, context }) => {
-//   const entity: MiraV1Core_BurnEvent = {
-//     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
-//     time: event.block.time,
-//     block_height: event.block.height,
-//     transaction_id: event.transaction.id,
-//     pool_id: `${event.params.pool_id[0]}_${event.params.pool_id[1]}_${event.params.pool_id[2]}`,
-//     recipient: event.params.recipient.payload.bits,
-//     liquidity: {
-//       id: event.params.liquidity.id.toString(),
-//       amount: event.params.liquidity.amount
-//     },
-//     asset_0_out: event.params.asset_0_out,
-//     asset_1_out: event.params.asset_1_out,
-//   };
+MiraV1Core.BurnEvent.handler(async ({ event, context }) => {
+  const entity: MiraV1Core_BurnEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    pool_id: `${event.params.pool_id[0].bits}_${event.params.pool_id[1].bits}_${event.params.pool_id[2]}`,
+    recipient: event.params.recipient.payload.bits,
+    liquidity: `${event.params.liquidity.id.bits}_${event.params.liquidity.amount.toString()}`,
+    asset_0_out: event.params.asset_0_out,
+    asset_1_out: event.params.asset_1_out,
+  };
 
-//   context.MiraV1Core_BurnEvent.set(entity);
-// });
+  context.MiraV1Core_BurnEvent.set(entity);
+});
 
 MiraV1Core.OwnershipTransferred.handler(async ({ event, context }) => {
   const entity: MiraV1Core_OwnershipTransferred = {
