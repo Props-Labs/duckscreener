@@ -45,6 +45,7 @@
                     <span class="text-sm sm:text-base font-semibold">{formatCurrency(marketCap)}</span>
                 </div>
                 <div class="flex items-center space-x-2 mb-2 sm:mb-0 text-center">
+                    <span class="text-xs sm:text-sm opacity-80"><a href="https://mira.ly/swap/" target="_blank" class="underline text-[#ffffff] hover:opacity-80">Buy $PSYCHO on Mira.ly</a> | </span> 
                     <span class="text-xs sm:text-sm opacity-80"><a href="https://t.co/QEmd2tfaqm" target="_blank" class="underline text-[#26a69a] hover:opacity-80">Join us on Telegram</a></span>
                     
                 </div>
