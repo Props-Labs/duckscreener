@@ -1,13 +1,20 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import Chart from '$lib/components/chart.svelte';
     import { getPriceData } from '$lib/services/blockchain';
-    //import { getPoolMetadataForAllLPs } from '$lib/services/dex';
+    //import { getPoolMetadata } from '$lib/services/dex';
     const poolId = "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false";
 
     let ethPrice: any;
     let currentTokenPrice = 0;
     const TOTAL_SUPPLY = 1_000_000_000;
-    let poolMetadata: any[] = [];
+    let poolMetadata: any;
+
+    onMount(async () => {
+       // poolMetadata = await getPoolMetadata(poolId);
+    });
+
+    $: console.log('poolMetadata', poolMetadata);
 
     async function getEthPrice() {
         ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419");
@@ -32,6 +39,7 @@
     }
 
     $: getEthPrice();
+
    
     $: marketCap = currentTokenPrice * TOTAL_SUPPLY * (ethPrice?.formattedPrice || 0);
 </script>
@@ -41,8 +49,13 @@
         <Chart {poolId} on:priceUpdate={handlePriceUpdate}>
             <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">
                 <div class="flex items-center space-x-2 mb-2 sm:mb-0">
-                    <span class="text-xs sm:text-sm opacity-80">Market Cap:</span>
-                    <span class="text-sm sm:text-base font-semibold">{formatCurrency(marketCap)}</span>
+                    <div class="flex flex-col">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs sm:text-sm opacity-80">Market Cap:</span>
+                            <span class="text-sm sm:text-base font-semibold">{formatCurrency(marketCap)}</span>
+                        </div>
+                        <span class="text-xs opacity-60">Supply: 1B</span>
+                    </div>
                 </div>
                 <div class="flex items-center space-x-2 mb-2 sm:mb-0 text-center">
                     <span class="text-xs sm:text-sm opacity-80"><a href="https://t.co/QEmd2tfaqm" target="_blank" class="underline text-[#26a69a] hover:opacity-80">Join us on Telegram</a></span>

@@ -186,10 +186,10 @@
     function formatTokenNumber(inValue: string, outValue: string, isBuy: boolean): string {
         // For buys: PSYCHO is asset_1, for sells: PSYCHO is asset_0
         if (isBuy) {
-            const tokenOut = Number(outValue);
+            const tokenOut = Number(outValue) / 1e9;
             return new Intl.NumberFormat('en-US').format(tokenOut);
         } else {
-            const tokenIn = Number(inValue);
+            const tokenIn = Number(inValue) / 1e9;
             return new Intl.NumberFormat('en-US').format(-tokenIn);
         }
     }
@@ -307,7 +307,7 @@
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Wallet</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Type</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Price ($PSYCHO/$ETH)</th>
-                    <!-- <th class="px-4 py-2 text-left text-[#d1d4dc]">Quantity</th> -->
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Quantity</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Transaction</th>
                 </tr>
             </thead>
@@ -332,17 +332,17 @@
                         </td>
                         <td class="px-4 py-2 text-[#d1d4dc]">
                             <span>{formatNumber(event.exchange_rate)}</span>
-                            {#if index > 0}
+                            {#if index < visibleData.length - 1}
                                 <span class={getPriceDirectionColor(event.exchange_rate, visibleData[index + 1].exchange_rate)}>
                                     {getPriceDirection(event.exchange_rate, visibleData[index + 1].exchange_rate)}
                                 </span>
                             {/if}
                         </td>
-                        <!-- {#if event.is_buy}
-                            <td class="px-4 py-2 text-[#d1d4dc]">{formatTokenNumber(event.asset_1_in, event.asset_1_out, true)}</td>
+                        {#if event.is_buy}
+                            <td class="px-4 py-2 text-[#d1d4dc]">{formatTokenNumber(event.asset_0_in, event.asset_0_out, true)}</td>
                         {:else}
                             <td class="px-4 py-2 text-[#d1d4dc]">{formatTokenNumber(event.asset_0_in, event.asset_0_out, false)}</td>
-                        {/if} -->
+                        {/if}
                        
                         <td class="px-4 py-2">
                             <a 
