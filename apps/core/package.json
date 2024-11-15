@@ -3,12 +3,13 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev --host",
+		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"start": "node --experimental-specifier-resolution=node ./build/index.js",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"heroku-postbuild": "npm run build",
+		"start": "node build/index.js"
 	},
 	"devDependencies": {
 		"@adraffy/ens-normalize": "^1.11.0",
