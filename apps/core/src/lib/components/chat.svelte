@@ -115,6 +115,10 @@
 </script>
 
 <div class="flex flex-col h-full">
+    <div class="px-4 py-2 bg-[#1e222d] text-[#d1d4dc] text-[10px] opacity-60 text-center border-b border-[#2B2B43]">
+        *chat messages auto-delete after 36 hours
+    </div>
+
     <div class="p-4 border-b border-[#2B2B43] flex justify-between items-center">
         <div class="flex items-center gap-4">
             <h2 class="text-[#d1d4dc] font-semibold">Psycho Chat</h2>

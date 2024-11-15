@@ -90,9 +90,7 @@
                         <span class="text-lg sm:text-xl font-bold text-[#26a69a]">
                             Duckscreener
                         </span>
-                        <span class="text-[7px] sm:text-[8px] opacity-20 mt-0.5 break-all sm:break-normal max-w-[200px] sm:max-w-none">
-                            Donate: 0x77C960337715b598Feb92AC53b3F736cA9F87c88abC42BB02B763C738e69679A
-                        </span>
+                       
                         <span class="text-[9px] sm:text-[10px] opacity-40 mt-0.5 text-[#26a69a]">
                             <a href="https://x.com/Bitcoinski" target="_blank" class="hover:opacity-80">Made by @Bitcoinski</a>
                         </span>
