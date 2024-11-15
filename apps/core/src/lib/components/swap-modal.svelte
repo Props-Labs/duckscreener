@@ -295,38 +295,53 @@
                 </div>
             </div>
 
-            <!-- Error Message -->
-            {#if swapError}
-                <div class="text-[#ef5350] text-sm text-center">
-                    {swapError}
-                </div>
-            {/if}
+            <!-- Swap and Bridge Buttons -->
+            <div class="space-y-4">
+                <!-- Error Message -->
+                {#if swapError}
+                    <div class="text-[#ef5350] text-sm text-center">
+                        {swapError}
+                    </div>
+                {/if}
 
-            <!-- Swap Button -->
-            <button 
-                class="w-full py-4 rounded-xl font-semibold text-white transition-all relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:before:opacity-0 {isLoading || ($connected && !fromAmount) ? 'bg-[#2B2B43]' : 'bg-[#26a69a] hover:bg-[#26a69a]/90'}"
-                disabled={isLoading || ($connected && !fromAmount)} 
-                on:click={handleButtonClick}
-            >
-                <span class="relative z-10">
-                    {#if isLoading}
-                        Loading...
-                    {:else if !$connected}
-                        Connect
-                    {:else if !fromAmount || !toAmount}
-                        Enter an amount
-                    {:else}
-                        Swap
-                    {/if}
-                </span>
-                
-                <!-- Enhanced gradient animation overlay -->
-                <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#26a69a]/0 via-white/40 to-[#26a69a]/0 animate-gradient-slide-1"></div>
-                    <div class="absolute inset-0 bg-gradient-to-r from-[#26a69a]/0 via-white/30 to-[#26a69a]/0 animate-gradient-slide-2"></div>
-                    <div class="absolute inset-0 bg-[#26a69a] opacity-10"></div>
+                <div class="flex gap-3">
+                    <!-- Swap Button -->
+                    <button 
+                        class="flex-1 py-4 rounded-xl font-semibold text-white transition-all relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:before:opacity-0 {isLoading || ($connected && !fromAmount) ? 'bg-[#2B2B43]' : 'bg-[#26a69a] hover:bg-[#26a69a]/90'}"
+                        disabled={isLoading || ($connected && !fromAmount)} 
+                        on:click={handleButtonClick}
+                    >
+                        <span class="relative z-10">
+                            {#if isLoading}
+                                Loading...
+                            {:else if !$connected}
+                                Connect
+                            {:else if !fromAmount || !toAmount}
+                                Enter an amount
+                            {:else}
+                                Swap
+                            {/if}
+                        </span>
+                        
+                        <!-- Enhanced gradient animation overlay -->
+                        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-r from-[#26a69a]/0 via-white/40 to-[#26a69a]/0 animate-gradient-slide-1"></div>
+                            <div class="absolute inset-0 bg-gradient-to-r from-[#26a69a]/0 via-white/30 to-[#26a69a]/0 animate-gradient-slide-2"></div>
+                            <div class="absolute inset-0 bg-[#26a69a] opacity-10"></div>
+                        </div>
+                    </button>
+
+                    <!-- Bridge Button -->
+                    <a 
+                        href="https://app.fuel.network/bridge?from=eth&to=fuel"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="py-4 px-6 rounded-xl font-semibold text-white bg-[#2B2B43] hover:bg-[#2B2B43]/80 transition-colors"
+                    >
+                        Bridge
+                    </a>
                 </div>
-            </button>
+            </div>
         </div>
     </div>
 </div>
