@@ -181,7 +181,7 @@
     <div class="bg-[#1e222d] rounded-2xl w-full max-w-md shadow-xl border border-[#2B2B43] overflow-hidden">
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[#2B2B43]">
-            <h2 class="text-[#d1d4dc] font-semibold">Swap (Powered by <a href="https://mira.ly" target="_blank">Mira.ly</a>)</h2>
+            <h2 class="text-[#d1d4dc] font-semibold">Swap (Powered by <a href="https://mira.ly" target="_blank" class="text-[#26a69a]">Mira.ly</a>)</h2>
             <button 
                 class="text-[#d1d4dc] hover:text-[#26a69a] transition-colors"
                 on:click={handleClose}
