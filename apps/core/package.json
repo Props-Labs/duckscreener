@@ -2,8 +2,8 @@
 	"name": "core",
 	"version": "0.0.1",
 	"type": "module",
-	"engine": {
-		"node": ">=18.0.0",
+	"engines": {
+		"node": ">=20.x",
 		"pnpm": ">=9.4.0"
 	},
 	"scripts": {
