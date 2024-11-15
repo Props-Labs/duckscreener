@@ -323,7 +323,11 @@
         </div>
     {/if}
     
-    <div class="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
+    <div class="p-4 flex flex-col sm:flex-row items-start sm:items-center w-full gap-4">
+        <div class="flex-1">
+            <slot name="toolbar" />
+        </div>
+
         <div class="flex items-center gap-2">
             <button 
                 on:click={() => loadChartData(selectedTimeFrame, false)}
@@ -371,18 +375,17 @@
                 {/each}
             </select>
         </div>
-        <slot name="toolbar" />
     </div>
     
     <div 
         bind:this={chartContainer} 
-        class="w-full h-2/3"
+        class="w-full h-2/3 sm:h-2/3 max-h-[50vh] sm:max-h-none"
     ></div>
 
     <div 
         bind:this={tableContainer}
         on:scroll={handleScroll}
-        class="mt-4 overflow-auto max-h-[400px] w-full border-t border-[#2B2B43]"
+        class="overflow-auto h-[calc(50vh-16rem)] sm:h-[400px] w-full border-t border-[#2B2B43] bg-[#131722]"
     >
         <table class="min-w-full">
             <thead class="sticky top-0 bg-[#1e222d]">
