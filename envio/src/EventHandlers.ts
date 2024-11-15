@@ -38,7 +38,8 @@ MiraV1Core.ReentrancyError.handler(async ({ event, context }) => {
 });
 
 MiraV1Core.SwapEvent.handler(async ({ event, context }) => {
-  
+  console.log('MiraV1Core.SwapEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
   const is_buy = event.params.asset_1_in > 0;
   const is_sell = event.params.asset_1_out > 0;
   let exchange_rate = BigInt(0);
