@@ -96,10 +96,21 @@
                         </span>
                     </div>
                     <div class="flex flex-col gap-1 mt-2">
-                        <div class="flex items-center gap-2 text-[9px] sm:text-[10px]">
-                            <span class="opacity-80 hover:opacity-100 transition-opacity">
-                                <a href="https://mira.ly/swap/" target="_blank" class="text-[#ffffff] hover:text-[#26a69a] transition-colors">Buy $PSYCHO</a>
-                            </span> 
+                        <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
+                            <a 
+                                href="https://mira.ly/swap/" 
+                                target="_blank" 
+                                class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200"
+                            >
+                                <span class="absolute inset-0 bg-[url('/sparkles.png')] opacity-20 bg-repeat animate-sparkle"></span>
+                                <span class="relative font-semibold text-white flex items-center gap-1.5">
+                                    Buy $PSYCHO
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 11l5-5m0 0l5 5m-5-5v12"/>
+                                    </svg>
+                                </span>
+                                <span class="absolute -inset-x-1 bottom-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-50"></span>
+                            </a>
                             <span class="text-[#d1d4dc] opacity-40">|</span>
                             <span class="opacity-80 hover:opacity-100 transition-opacity">
                                 <a href="https://t.co/QEmd2tfaqm" target="_blank" class="text-[#26a69a] hover:text-[#2196f3] transition-colors">Telegram</a>
@@ -130,10 +141,18 @@
                                 <span class="text-xs sm:text-sm opacity-80">Pool TVL</span>
                                 <span class="text-sm sm:text-base font-semibold text-[#26a69a]">{formatCurrency(liquidityUSD)}</span>
                             </div>
-                            <div class="flex items-center mt-1">
+                            <div class="flex items-center justify-between mt-1">
                                 <span class="text-[10px] opacity-60 bg-[#26a69a]/10 px-2 py-0.5 rounded-full text-[#26a69a]">
                                     {poolMetadata ? `${(Number(poolMetadata.reserve1) / 1e9).toFixed(2)} ETH` : '0.00 ETH'}
                                 </span>
+                                <a 
+                                    href="https://mira.ly/liquidity/add/?pool=PSYCHO-ETH-volatile"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="text-[10px] opacity-60 bg-[#26a69a]/10 px-2 py-0.5 rounded-full text-[#26a69a] hover:bg-[#26a69a] hover:text-white hover:opacity-100 transition-all duration-200"
+                                >
+                                    Add LP
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -182,5 +201,18 @@
         100% {
             background-position: 0% 50%;
         }
+    }
+
+    @keyframes sparkle {
+        0% {
+            background-position: 0 0;
+        }
+        100% {
+            background-position: 100% 100%;
+        }
+    }
+
+    .animate-sparkle {
+        animation: sparkle 8s linear infinite;
     }
 </style>
