@@ -1,0 +1,23 @@
+{
+  "name": "@props-labs/duckscreener_background",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@props-labs/duckscreener_lib": "workspace:*",
+    "graphql": "^16.8.1",
+    "graphql-ws": "^5.15.0",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/ws": "^8.5.10",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+} 

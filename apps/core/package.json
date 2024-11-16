@@ -1,5 +1,5 @@
 {
-	"name": "core",
+	"name": "@props-labs/duckscreener_core",
 	"version": "0.0.1",
 	"type": "module",
 	"engines": {
