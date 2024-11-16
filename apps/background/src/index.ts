@@ -1,12 +1,10 @@
 import { PoolSyncService } from './services/pool-sync';
 import { startPoolSubscriber } from './services/pool-subscriber';
-import { getRedisClient } from './services/redis';
+import { redis } from './services/redis';
 
 async function main() {
     try {
-        // Initialize Redis
-        await getRedisClient();
-        
+       
         // Start pool sync service
         const syncService = new PoolSyncService();
         await syncService.start();
@@ -20,7 +18,6 @@ async function main() {
         process.on('SIGTERM', async () => {
             console.log('Received SIGTERM, shutting down...');
             await syncService.stop();
-            const redis = await getRedisClient();
             await redis.cleanup();
             process.exit(0);
         });

@@ -1,5 +1,5 @@
 import { config } from '../config';
-import { updatePoolCatalog } from './pool-catalog';
+import {  updateAllPools } from './pool-catalog';
 
 export class PoolSyncService {
     private syncInterval: NodeJS.Timeout | null = null;

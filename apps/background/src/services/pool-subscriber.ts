@@ -1,13 +1,5 @@
-import { createClient } from 'graphql-ws';
-import WebSocket from 'ws';
+import { subscribeToQuery } from './data';
 import { updatePoolCatalog } from './pool-catalog';
-
-const GRAPHQL_WS_URL = process.env.PUBLIC_GRAPHQL_URL?.replace('https', 'wss') || '';
-
-const wsClient = createClient({
-    url: GRAPHQL_WS_URL,
-    webSocketImpl: WebSocket,
-});
 
 const poolSubscription = `
     subscription OnCreatePool {
@@ -23,29 +15,17 @@ export async function startPoolSubscriber() {
     console.log('Starting pool subscriber...');
     
     try {
-        await wsClient.subscribe(
-            {
-                query: poolSubscription,
-            },
-            {
-                next: async (data: any) => {
-                    const pool = data.data.MiraV1Core_CreatePoolEvent;
-                    console.log('New pool created:', pool.pool_id);
-                    
-                    await updatePoolCatalog(
-                        pool.pool_id,
-                        pool.block_height,
-                        new Date(pool.time).getTime()
-                    );
-                },
-                error: (error) => {
-                    console.error('Subscription error:', error);
-                },
-                complete: () => {
-                    console.log('Subscription completed');
-                },
-            },
-        );
+
+        subscribeToQuery(poolSubscription, async(event: any) => {
+            const data = event.MiraV1Core_CreatePoolEvent;
+            console.log('MiraV1Core_CreatePoolEvent', data)
+            for(const pool of data) {
+                console.log('New pool created:', pool.pool_id);
+                
+                await updatePoolCatalog(pool);
+            }
+        });
+        
 
         console.log('Pool subscriber started successfully');
     } catch (error) {

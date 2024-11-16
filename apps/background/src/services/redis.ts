@@ -1,39 +1,48 @@
-import { createClient } from 'redis';
-import { config } from '../config';
+import 'dotenv/config';
+import Redis from 'ioredis';
 
-class RedisService {
-    private static instance: RedisService;
-    private client: ReturnType<typeof createClient>;
-
-    private constructor() {
-        this.client = createClient({
-            url: config.redis.url
-        });
-
-        this.client.on('error', (err) => console.error('Redis Client Error', err));
-        this.client.on('connect', () => console.log('Redis Client Connected'));
-    }
-
-    static async getInstance(): Promise<RedisService> {
-        if (!RedisService.instance) {
-            RedisService.instance = new RedisService();
-            await RedisService.instance.client.connect();
+class RedisSingleton {
+    constructor() {
+        //@ts-ignore
+        if (!RedisSingleton.instance) {
+            //@ts-ignore
+            RedisSingleton.instance = new Redis(process.env.REDISCLOUD_URL);
         }
-        return RedisService.instance;
     }
 
-    async get(key: string): Promise<string | null> {
-        return await this.client.get(config.redis.prefix + key);
-    }
-
-    async set(key: string, value: string, ttl?: number): Promise<void> {
-        const options = ttl ? { EX: ttl } : undefined;
-        await this.client.set(config.redis.prefix + key, value, options);
-    }
-
-    async cleanup(): Promise<void> {
-        await this.client.quit();
+    getInstance() {
+        //@ts-ignore
+        return RedisSingleton.instance;
     }
 }
 
-export const getRedisClient = RedisService.getInstance; 
+// Store a value with an expiration of 2 minutes
+export const storeValue = async (key:string, value:any, ex:number) => {
+    try {
+        await redis.set(key, value, 'EX', ex); // 'EX' sets the expiration time in seconds
+    } catch (error) {
+        console.error('Error setting value:', error);
+    }
+};
+
+// Force deletion of a value before expiration
+export const deleteValue = async (key:string) => {
+    try {
+        await redis.del(key);
+    } catch (error) {
+        console.error('Error deleting value:', error);
+    }
+};
+
+// Retrieve a value
+export const getValue = async (key:string) => {
+    try {
+        const value = await redis.get(key);
+        return value;
+    } catch (error) {
+        console.error('Error getting value:', error);
+        return null;
+    }
+};
+
+export const redis = new RedisSingleton().getInstance();
