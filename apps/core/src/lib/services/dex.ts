@@ -2,6 +2,7 @@ import {env} from "$env/dynamic/public";
 import type {MiraAmm, ReadonlyMiraAmm, PoolId} from "mira-dex-ts";
 import {Account, Provider} from "fuels";
 import type {AssetId} from "fuels";
+import type { PoolCatalogEntry } from "$lib/types";
 // import {getAllLPs} from "./data";
 
 // Dynamically import mira-dex-ts to avoid SSR issues
@@ -31,19 +32,16 @@ export async function getTotalAssets() {
     return totalAssets;
 }
 
-export async function getPoolMetadata(pool_id: any) {
-    console.log('getPoolMetadata', pool_id);
-    const poolIdparts = pool_id.split('_');
-    const miraAmm = await getReadonlyMiraAmm();
-
-    console.log('poolIdparts', poolIdparts);
-
+export async function getPoolMetadata(pool: PoolCatalogEntry) {
+    const poolIdparts = pool.id.split('_');
     const poolId: PoolId = [
         {bits: poolIdparts[0]} as AssetId,
         {bits: poolIdparts[1]} as AssetId,
         poolIdparts[2] === 'true' ? true : false
     ];
-    console.log('poolId', poolId);
+   
+    const miraAmm = await getReadonlyMiraAmm();
+
     //@ts-ignore
     const poolMetadata = await miraAmm.poolMetadata(poolId);
     console.log('poolMetadata response', poolMetadata);

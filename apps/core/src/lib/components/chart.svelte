@@ -3,7 +3,7 @@
     import { getTradingData, convertTradingDataToChartData, type TimeFrame } from '$lib/services/data';
     import { createChart, ColorType } from 'lightweight-charts';
     import { createEventDispatcher } from 'svelte';
-    
+    import type { PoolCatalogEntry } from '$lib/types';
     interface SwapEvent {
         exchange_rate: string;
         time: number;
@@ -17,9 +17,12 @@
         isNew?: boolean;
     }
 
-    const dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher<{
+        priceUpdate: number;
+        loadingChange: boolean;
+    }>();
     
-    export let poolId: string;
+    export let pool: PoolCatalogEntry;
     let chart: any;
     let candlestickSeries: any;
     let selectedTimeFrame: TimeFrame = '1h';
@@ -135,10 +138,12 @@
         try {
             if (showFullScreenLoader) {
                 isLoading = true;
+                dispatch('loadingChange', true);
             }
             isRefreshing = !showFullScreenLoader;
             
-            const newRawData = await getTradingData(poolId);
+            console.log('Loading chart data for', pool);
+            const newRawData = await getTradingData(pool.id);
             
             if (!isInitialLoad) {
                 newRawData.forEach(event => {
@@ -171,6 +176,7 @@
         } finally {
             isLoading = false;
             isRefreshing = false;
+            dispatch('loadingChange', false);
         }
     }
 
@@ -301,33 +307,13 @@
             clearInterval(autoRefreshInterval);
         }
     });
+
+    $: if (pool) {
+        loadChartData(selectedTimeFrame);
+    }
 </script>
 
 <div class="flex flex-col w-full h-full bg-[#131722] relative overflow-y-auto">
-    {#if isLoading}
-        <div class="absolute inset-0 bg-[#131722]/80 backdrop-blur-sm z-50 flex items-center justify-center">
-            <div class="flex flex-col items-center">
-                <div class="w-32 h-32 relative animate-bounce">
-                    <img 
-                        src="/duck.png" 
-                        alt="Loading..." 
-                        class="w-full h-full object-contain animate-pulse"
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#26a69a]/20 to-transparent animate-pulse"></div>
-                </div>
-                <div class="mt-4 text-[#d1d4dc] font-medium animate-pulse">
-                    Loading Chart Data...
-                </div>
-                <div class="mt-2 text-[#26a69a] font-bold tracking-wider animate-glow">
-                    #WeLikeTheDuck
-                </div>
-                <div class="mt-1 text-[#d1d4dc] text-xs opacity-60">
-                    Made by @Bitcoinski
-                </div>
-            </div>
-        </div>
-    {/if}
-    
     <div class="p-4 flex flex-col sm:flex-row items-start sm:items-center w-full gap-4">
         <div class="flex-1">
             <slot name="toolbar" />

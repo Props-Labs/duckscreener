@@ -1,5 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { getValue, storeValue } from './redis';
+import type { TradingPair } from './pairs';
+
 interface SwapEvent {
     exchange_rate: string;
     time: number;
@@ -182,3 +184,67 @@ export async function queryDB(query: string, variables: any) {
     return data;
 
   }
+
+export async function getAllPairs(): Promise<TradingPair[]> {
+    const query = `
+        query GetPools {
+            pools: MiraV1Core_CreatePoolEvent {
+                pool_id
+                decimals_0
+                decimals_1
+                time
+                block_height
+            }
+            tokens: MiraV1Core_SetSymbolEvent {
+                asset
+                symbol
+            }
+        }
+    `;
+
+    try {
+        const response = await queryDB(query, {});
+        
+        if (!response?.data?.pools) {
+            console.error('Invalid response format:', response);
+            throw new Error('Invalid response format from GraphQL');
+        }
+
+        const pools = response.data.pools;
+        const tokens = response.data.tokens || [];
+        
+        // Create a map of token addresses to their symbols
+        const tokenSymbols = new Map<string, string>();
+        tokens.forEach((token: any) => {
+            if (token.asset && token.symbol) {
+                tokenSymbols.set(token.asset, token.symbol);
+            }
+        });
+
+        console.log('Fetched pools:', pools.length);
+        
+        return pools.map((pool: any) => {
+            // Extract token addresses from pool_id
+            // pool_id format is "token0_address_token1_address_isStable"
+            const [token0Address, token1Address, isStableStr] = pool.pool_id.split('_');
+            
+            return {
+                id: pool.pool_id,
+                token0Symbol: tokenSymbols.get(token0Address) || 'Unknown',
+                token1Symbol: tokenSymbols.get(token1Address) || 'Unknown',
+                token0Address,
+                token1Address,
+                isStable: isStableStr === 'true',
+                reserve0: '0', // We'll need to fetch these from contract calls
+                reserve1: '0', // We'll need to fetch these from contract calls
+                decimals0: pool.decimals_0,
+                decimals1: pool.decimals_1,
+                volume24h: '0', // TODO: Calculate from SwapEvents
+                tvl: '0'  // TODO: Calculate from reserves and token prices
+            };
+        });
+    } catch (error) {
+        console.error('Error fetching pairs:', error);
+        throw error;
+    }
+}
