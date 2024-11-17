@@ -22,11 +22,27 @@
     let WalletProvider: any;
    
     onMount(async () => {
-        $selectedPool = $allPools[0];
         if (browser) {
+            const storedPoolId = localStorage.getItem('selectedPool');
+            if (storedPoolId) {
+                const storedPool = JSON.parse(storedPoolId);
+                // Verify the stored pool still exists in our current pool list
+                const validPool = $allPools.find(p => p.id === storedPool.id);
+                if (validPool) {
+                    $selectedPool = validPool;
+                } else {
+                    // If stored pool is no longer valid, use first available pool
+                    $selectedPool = $allPools[0];
+                }
+            } else {
+                // No stored pool, use first available pool
+                $selectedPool = $allPools[0];
+            }
+
             const module = await import('svelte-fuels');
             WalletProvider = module.WalletProvider;
         }
+        
         const totalAssets = await getTotalAssets();
         console.log('totalAssets', Number(totalAssets));
         const poolMetadata = await getPoolMetadata($selectedPool);
@@ -86,9 +102,10 @@
         isChatOpen = !isChatOpen;
     }
 
-    async function handlePoolSelect(event: CustomEvent<string>) {
+    async function handlePoolSelect(event: CustomEvent<PoolCatalogEntry>) {
         try {
             isLoading = true;
+            // The selectedPool store will automatically sync with localStorage
             $selectedPool = event.detail;
             await updatePoolData();
         } catch (error) {

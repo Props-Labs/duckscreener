@@ -21,9 +21,11 @@
     let messagesContainer: HTMLDivElement;
     let isLoading = false;
     let autoScrollToBottom = true;
+    let pollInterval: NodeJS.Timeout | null = null;
 
     async function loadMessages() {
-        console.log("loadMessages", poolId)
+        if (!poolId) return;
+        
         try {
             isLoading = true;
             const fetchedMessages = await fetchChatMessages(poolId);
@@ -42,14 +44,13 @@
         }
     }
 
-    let pollInterval: number;
-
-    onMount(() => {
-        loadMessages();
+    function startPolling() {
+        stopPolling(); // Clear any existing interval first
         
         pollInterval = setInterval(async () => {
-            try{
-                console.log("pollInterval", poolId)
+            if (!poolId) return;
+            
+            try {
                 const latestMessages = await fetchChatMessages(poolId);
                 const sortedMessages = latestMessages.sort((a, b) => a.timestamp - b.timestamp);
                 
@@ -60,18 +61,34 @@
                         scrollToBottom();
                     }
                 }
-            }
-            catch(error) {
+            } catch (error) {
                 console.error('Failed to load messages:', error);
             }
-           
-        }, 5000) as unknown as number;
+        }, 5000) as unknown as NodeJS.Timeout;
+    }
+
+    function stopPolling() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+        }
+    }
+
+    // Watch for poolId changes
+    $: if (poolId) {
+        loadMessages();
+        startPolling();
+    }
+
+    onMount(() => {
+        if (poolId) {
+            loadMessages();
+            startPolling();
+        }
     });
 
     onDestroy(() => {
-        if (pollInterval) {
-            clearInterval(pollInterval);
-        }
+        stopPolling();
     });
 
     function isAtBottom(): boolean {
@@ -90,9 +107,8 @@
     }
 
     async function handleSubmit() {
-        if (!newMessage.trim() || !$account) return;
+        if (!newMessage.trim() || !$account || !$selectedPool) return;
         
-        console.log('handleSubmit', $selectedPool, $account, newMessage.trim());
         try {
             const response = await sendChatMessage(
                 $selectedPool,
