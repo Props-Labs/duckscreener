@@ -112,6 +112,24 @@
 
     let isTableExpanded = false;
 
+    let selectedStatsTimeframe = '1H';
+
+    $: if (selectedStatsTimeframe) {
+        console.log('Calculating stats for timeframe:', selectedStatsTimeframe);
+        
+        // Example of how we'll calculate stats:
+        // const timeInMs = {
+        //     '1H': 60 * 60 * 1000,
+        //     '6H': 6 * 60 * 60 * 1000,
+        //     '24H': 24 * 60 * 60 * 1000,
+        //     '1W': 7 * 24 * 60 * 60 * 1000
+        // }[selectedStatsTimeframe];
+        
+        // const cutoffTime = Date.now() - timeInMs;
+        // const relevantTrades = rawData.filter(trade => trade.time >= cutoffTime);
+        // Calculate stats from relevantTrades...
+    }
+
     function setupAutoRefresh() {
         if (autoRefreshInterval) {
             clearInterval(autoRefreshInterval);
@@ -402,6 +420,113 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
     </button>
+
+    <div class="w-full overflow-x-auto bg-[#131722] border-y border-[#2B2B43] pt-4 py-8">
+        <div class="flex min-w-max gap-4 px-4">
+            <!-- Timeframe Selector -->
+            <div class="grid grid-cols-2 gap-2 h-fit">
+                {#each ['1H', '6H', '24H', '1W'] as timeframe}
+                    <button 
+                        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {selectedStatsTimeframe === timeframe ? 'bg-[#26a69a] text-white' : 'bg-[#1e222d] text-[#d1d4dc] hover:bg-[#26a69a]/20 border border-[#2B2B43]'}"
+                        on:click={() => selectedStatsTimeframe = timeframe}
+                    >
+                        {timeframe}
+                    </button>
+                {/each}
+            </div>
+
+            <!-- Stats Widgets -->
+            <div class="flex gap-2">
+                <!-- Price -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
+                    <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
+                    <div class="text-[#d1d4dc] font-semibold">$0.000643</div>
+                    <div class="text-[#d1d4dc] text-xs opacity-60">0.062096 WETH</div>
+                </div>
+
+                <!-- Liquidity -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
+                    <div class="text-[#d1d4dc] text-xs opacity-60">LIQUIDITY</div>
+                    <div class="text-[#d1d4dc] font-semibold flex items-center gap-1">
+                        $77K
+                        <span class="text-[#26a69a] text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-[#d1d4dc] opacity-60">FDV: $623K</span>
+                        <span class="text-[#d1d4dc] opacity-60">MKT CAP: $623K</span>
+                    </div>
+                </div>
+
+                <!-- Price Changes -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
+                    <div class="grid grid-cols-4 gap-2">
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">5M</div>
+                            <div class="text-[#26a69a] text-sm">0.14%</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">1H</div>
+                            <div class="text-[#ef5350] text-sm">-11.68%</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">6H</div>
+                            <div class="text-[#26a69a] text-sm">54.35%</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">24H</div>
+                            <div class="text-[#26a69a] text-sm">114%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[400px]">
+                    <div class="grid grid-cols-9 gap-2">
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">TXNS</div>
+                            <div class="text-[#d1d4dc] text-sm">11,121</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">BUYS</div>
+                            <div class="text-[#26a69a] text-sm">10,610</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">SELLS</div>
+                            <div class="text-[#ef5350] text-sm">511</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">VOL</div>
+                            <div class="text-[#d1d4dc] text-sm">$221K</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">BUY VOL</div>
+                            <div class="text-[#26a69a] text-sm">$117K</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">SELL VOL</div>
+                            <div class="text-[#ef5350] text-sm">$104K</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">MAKERS</div>
+                            <div class="text-[#d1d4dc] text-sm">9,848</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">BUYERS</div>
+                            <div class="text-[#26a69a] text-sm">9,755</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">SELLERS</div>
+                            <div class="text-[#ef5350] text-sm">282</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div 
         bind:this={tableContainer}
