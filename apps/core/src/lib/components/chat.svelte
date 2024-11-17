@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { showWalletModal } from '$lib/stores';
+    import { selectedPool, showWalletModal } from '$lib/stores';
     import { browser } from '$app/environment';
     import { account, connected, connect, disconnect } from "svelte-fuels";
     import { fetchChatMessages, sendChatMessage } from '$lib/services/chat';
 
     export let poolId: string;
+    
 
     interface ChatMessage {
         id: string;
@@ -83,9 +84,10 @@
     async function handleSubmit() {
         if (!newMessage.trim() || !$account) return;
         
+        console.log('handleSubmit', $selectedPool, $account, newMessage.trim());
         try {
             const response = await sendChatMessage(
-                poolId,
+                $selectedPool,
                 $account,
                 newMessage.trim()
             );
@@ -121,7 +123,7 @@
 
     <div class="p-4 border-b border-[#2B2B43] flex justify-between items-center">
         <div class="flex items-center gap-4">
-            <h2 class="text-[#d1d4dc] font-semibold">Psycho Chat</h2>
+            <h2 class="text-[#d1d4dc] font-semibold">Chat</h2>
             
             {#if browser}
                 {#if $connected && $account}

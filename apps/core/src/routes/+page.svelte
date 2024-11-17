@@ -4,32 +4,42 @@
     import { getPriceData } from '$lib/services/blockchain';
     import Chat from '$lib/components/chat.svelte';
     import { browser } from '$app/environment';
-    import { showWalletModal } from '$lib/stores';
+    import { showWalletModal, selectedPool, ethPrice, allPools } from '$lib/stores';
     import WalletModal from "$lib/components/wallet-modal.svelte";
     import { getTotalAssets, getPoolMetadata} from '$lib/services/dex';
     import SwapModal from '$lib/components/swap-modal.svelte';
-    
-    let WalletProvider: any;
-    const poolId = "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false";
+    import SearchBox from '$lib/components/search-box.svelte';
+    import LoadingOverlay from '$lib/components/loading-overlay.svelte';
+    import type { PageData } from './$types';
 
+    export let data: PageData;
+
+    // Set the allPools store with the server data
+    $: $allPools = data.pools;
+
+    $: console.log('allPools', $allPools);
+
+    let WalletProvider: any;
+   
     onMount(async () => {
+        $selectedPool = $allPools[0];
         if (browser) {
             const module = await import('svelte-fuels');
             WalletProvider = module.WalletProvider;
         }
         const totalAssets = await getTotalAssets();
         console.log('totalAssets', Number(totalAssets));
-        const poolMetadata = await getPoolMetadata(poolId);
+        const poolMetadata = await getPoolMetadata($selectedPool);
         console.log('poolMetadata', poolMetadata);
     });
     
-    let ethPrice: any;
     let currentTokenPrice = 0;
     let poolMetadata: any;
     const TOTAL_SUPPLY = 1_000_000_000;
     let isChatOpen = false;
     let liquidityUSD = 0;
     let isSwapModalOpen = false;
+    let isLoading = false;
 
     function handlePriceUpdate(event: CustomEvent<number>) {
         currentTokenPrice = event.detail;
@@ -38,27 +48,28 @@
     async function updatePoolData() {
         try {
             // Get ETH price
-            ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419");
-            if (ethPrice?.formattedPrice) {
-                ethPrice.formattedPrice = Number(ethPrice.formattedPrice);
+            $ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419");
+            if ($ethPrice?.formattedPrice) {
+                $ethPrice.formattedPrice = Number($ethPrice.formattedPrice);
             }
 
+            console.log('selectedPool:::', $selectedPool);
             // Get pool metadata
-            poolMetadata = await getPoolMetadata(poolId);
+            poolMetadata = await getPoolMetadata($selectedPool);
             
             // Calculate liquidity in USD
-            if (poolMetadata && ethPrice?.formattedPrice) {
+            if (poolMetadata && $ethPrice?.formattedPrice) {
                 const ethInPool = Number(poolMetadata.reserve1) / 1e9; // Convert from decimals
-                liquidityUSD = ethInPool * ethPrice.formattedPrice * 2; // Multiply by 2 since it's paired liquidity
+                liquidityUSD = ethInPool * $ethPrice.formattedPrice * 2; // Multiply by 2 since it's paired liquidity
             }
         } catch (error) {
             console.error('Error updating pool data:', error);
         }
     }
 
-    // Replace the existing getEthPrice reactive statement with this
+    // Replace the existing get$ethPrice reactive statement with this
     $: updatePoolData();
-    $: marketCap = currentTokenPrice * TOTAL_SUPPLY * (ethPrice?.formattedPrice || 0);
+    $: marketCap = currentTokenPrice * TOTAL_SUPPLY * ($ethPrice?.formattedPrice || 0);
 
     function formatCurrency(value: number): string {
         if (value >= 1_000_000_000) {
@@ -74,6 +85,20 @@
     function toggleChat() {
         isChatOpen = !isChatOpen;
     }
+
+    async function handlePoolSelect(event: CustomEvent<string>) {
+        try {
+            isLoading = true;
+            $selectedPool = event.detail;
+            await updatePoolData();
+        } catch (error) {
+            console.error('Error loading pool data:', error);
+        }
+    }
+
+    function handleChartLoadingChange(event: CustomEvent<boolean>) {
+        isLoading = event.detail;
+    }
 </script>
 
 <div class="flex h-screen bg-[#131722] relative">
@@ -87,14 +112,16 @@
 
     <!-- Left side - Chart -->
     <div class="flex-1 flex flex-col min-w-0">
-        <Chart {poolId} on:priceUpdate={handlePriceUpdate}>
+        <Chart bind:pool={$selectedPool} on:priceUpdate={handlePriceUpdate} on:loadingChange={handleChartLoadingChange}>
             <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">
-                <div class="flex flex-col items-start w-full sm:w-auto order-first mb-4 sm:mb-0">
-                    <div class="flex flex-col">
-                        <span class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#26a69a] via-[#2196f3] to-[#26a69a] text-transparent bg-clip-text bg-size-200 animate-gradient-x relative group">
-                            Duckscreener
-                            <span class="absolute -inset-1 bg-gradient-to-r from-[#26a69a]/20 via-[#2196f3]/20 to-[#26a69a]/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
-                            <span class="absolute -bottom-0.5 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#26a69a] to-transparent"></span>
+                <div class="flex flex-col items-start w-full sm:w-auto order-first mb-2 sm:mb-0">
+                    <div class="flex flex-row">
+                        <img src="/logo.png" class="w-6 h-6 mr-2" />
+                        <span class="text-xl sm:text-xl font-bold text-white relative group">
+                            
+                            FuelCharts.com
+                            <!-- <span class="absolute -inset-1 bg-gradient-to-r from-[#26a69a]/20 via-[#2196f3]/20 to-[#26a69a]/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+                            <span class="absolute -bottom-0.5 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#26a69a] to-transparent"></span> -->
                         </span>
                     </div>
                     <div class="flex flex-col gap-1 mt-2">
@@ -105,7 +132,7 @@
                             >
                                 <span class="absolute inset-0 opacity-20 bg-repeat animate-sparkle"></span>
                                 <span class="relative font-semibold text-white flex items-center gap-1.5">
-                                    Buy $PSYCHO
+                                    Trade {$selectedPool ? `$${$selectedPool.token0Name}/$${$selectedPool.token1Name}` : 'Token'}
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M7 11l5-5m0 0l5 5m-5-5v12"/>
                                     </svg>
@@ -113,20 +140,24 @@
                                 <span class="absolute -inset-x-1 bottom-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-50"></span>
                             </a>
                             <span class="text-[#d1d4dc] opacity-40">|</span>
-                            <span class="opacity-80 hover:opacity-100 transition-opacity">
-                                <a href="https://t.co/QEmd2tfaqm" target="_blank" class="text-[#26a69a] hover:text-[#2196f3] transition-colors">Telegram</a>
+                            <a 
+                                href="https://fuelup.fun"
+                                target="_blank"
+                            >
+                            <span class="text-xs font-bold bg-gradient-to-r from-[#26a69a] via-[#2196f3] to-[#26a69a] text-transparent bg-clip-text bg-size-200 animate-gradient-x relative group flex items-center gap-1">
+                                Launch Your Own Token on Fuel
                             </span>
-                            <span class="text-[#d1d4dc] opacity-40">|</span>
-                            <span class="opacity-40 hover:opacity-100 transition-opacity">
-                                <a href="https://x.com/Bitcoinski" target="_blank" class="text-[#26a69a] hover:text-[#2196f3] transition-colors">@Bitcoinski</a>
-                            </span>
+                            </a>
+                            
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-col gap-3 w-auto sm:w-auto">
-                    <div class="grid grid-cols-2 gap-2 w-full  sm:w-full order-last sm:order-none px-0">
-                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors w-full">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <SearchBox on:select={handlePoolSelect} />
+                    
+                    <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
+                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors">
                             <div class="flex items-center space-x-2">
                                 <span class="text-xs sm:text-sm opacity-80">Market Cap</span>
                                 <span class="text-sm sm:text-base font-semibold text-[#26a69a]">{formatCurrency(marketCap)}</span>
@@ -137,7 +168,7 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors w-full">
+                        <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors">
                             <div class="flex items-center space-x-2">
                                 <span class="text-xs sm:text-sm opacity-80">Pool TVL</span>
                                 <span class="text-sm sm:text-base font-semibold text-[#26a69a]">{formatCurrency(liquidityUSD)}</span>
@@ -164,7 +195,7 @@
 
     <!-- Right side - Chat (Desktop) -->
     <div class="hidden sm:block w-80 border-l border-[#2B2B43]">
-        <Chat {poolId} />
+        <Chat {$selectedPool} />
     </div>
 
     <!-- Mobile Chat Panel -->
@@ -172,11 +203,10 @@
         class="sm:hidden fixed inset-0 bg-[#131722] z-10 transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
     >
         <div class="h-full pt-10">
-            <Chat {poolId} on:close={() => isChatOpen = false} />
+            <Chat {$selectedPool} on:close={() => isChatOpen = false} />
         </div>
     </div>
 </div>
-
 {#if browser && WalletProvider}
     <WalletProvider>
         <WalletModal open={$showWalletModal} on:close={() => showWalletModal.set(false)} />
@@ -185,9 +215,11 @@
 
 <SwapModal 
     bind:open={isSwapModalOpen}
-    {poolId}
+    pool={$selectedPool}
     on:close={() => isSwapModalOpen = false}
 />
+
+<LoadingOverlay visible={isLoading} />
 
 <style>
     .bg-size-200 {
@@ -223,3 +255,4 @@
         animation: sparkle 8s linear infinite;
     }
 </style>
+
