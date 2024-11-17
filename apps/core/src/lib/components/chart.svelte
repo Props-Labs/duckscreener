@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy, tick } from 'svelte';
     import { getTradingData, convertTradingDataToChartData, type TimeFrame } from '$lib/services/data';
+    import { ethPrice } from '$lib/stores';
     import { createChart, ColorType } from 'lightweight-charts';
     import { createEventDispatcher } from 'svelte';
     import type { PoolCatalogEntry } from '$lib/types';
@@ -15,6 +16,36 @@
         is_sell: boolean;
         transaction_id: string;
         isNew?: boolean;
+    }
+
+    interface Stats {
+        price: {
+            usd: string;
+            eth: string;
+        };
+        liquidity: {
+            usd: number;
+            eth: number;
+            fdv: number;
+            mcap: number;
+        };
+        changes: {
+            '1H': number;
+            '6H': number;
+            '24H': number;
+            '1W': number;
+        };
+        transactions: {
+            total: number;
+            buys: number;
+            sells: number;
+            volume: number;
+            buyVolume: number;
+            sellVolume: number;
+            makers: number;
+            buyers: number;
+            sellers: number;
+        };
     }
 
     const dispatch = createEventDispatcher<{
@@ -114,6 +145,23 @@
 
     let selectedStatsTimeframe = '1H';
 
+    let stats: Stats = {
+        price: { usd: '0', eth: '0' },
+        liquidity: { usd: 0, eth: 0, fdv: 0, mcap: 0 },
+        changes: { '1H': 0, '6H': 0, '24H': 0, '1W': 0 },
+        transactions: {
+            total: 0,
+            buys: 0,
+            sells: 0,
+            volume: 0,
+            buyVolume: 0,
+            sellVolume: 0,
+            makers: 0,
+            buyers: 0,
+            sellers: 0
+        }
+    };
+
     $: if (selectedStatsTimeframe) {
         console.log('Calculating stats for timeframe:', selectedStatsTimeframe);
         
@@ -152,6 +200,67 @@
         }
     }
 
+    function calculateStats(timeframe: string) {
+        if (!rawData.length) return;
+
+        const now = Date.now();
+        const timeInMs = {
+            '1H': 60 * 60 * 1000,
+            '6H': 6 * 60 * 60 * 1000,
+            '24H': 24 * 60 * 60 * 1000,
+            '1W': 7 * 24 * 60 * 60 * 1000
+        }[timeframe];
+
+        const cutoffTime = now - timeInMs;
+        const relevantTrades = rawData.filter(trade => trade.time * 1000 >= cutoffTime);
+
+        // Calculate transactions stats
+        const buys = relevantTrades.filter(t => t.is_buy);
+        const sells = relevantTrades.filter(t => t.is_sell);
+        
+        // Calculate volumes (assuming ETH values are in wei)
+        const buyVolume = buys.reduce((sum, t) => sum + (Number(t.asset_1_in) / 1e18), 0);
+        const sellVolume = sells.reduce((sum, t) => sum + (Number(t.asset_1_out) / 1e18), 0);
+        
+        // Get unique addresses
+        const uniqueMakers = new Set(relevantTrades.map(t => t.recipient));
+        const uniqueBuyers = new Set(buys.map(t => t.recipient));
+        const uniqueSellers = new Set(sells.map(t => t.recipient));
+
+        // Calculate price changes
+        const oldestTrade = relevantTrades[0];
+        const latestTrade = relevantTrades[relevantTrades.length - 1];
+        const priceChange = oldestTrade && latestTrade ? 
+            ((Number(latestTrade.exchange_rate) - Number(oldestTrade.exchange_rate)) / Number(oldestTrade.exchange_rate)) * 100 
+            : 0;
+
+        // Update stats for the current timeframe
+        stats.changes[timeframe as keyof typeof stats.changes] = priceChange;
+
+        // Update overall stats
+        stats.transactions = {
+            total: relevantTrades.length,
+            buys: buys.length,
+            sells: sells.length,
+            volume: buyVolume + sellVolume,
+            buyVolume,
+            sellVolume,
+            makers: uniqueMakers.size,
+            buyers: uniqueBuyers.size,
+            sellers: uniqueSellers.size
+        };
+
+        // Update price if it's the shortest timeframe
+        if (timeframe === '1H' && latestTrade) {
+            const ethTokenPrice = Number(latestTrade.exchange_rate) / 1e9;
+            const usdPrice = ethTokenPrice * ($ethPrice?.formattedPrice || 0);
+            stats.price = {
+                eth: ethTokenPrice.toString(),
+                usd: usdPrice.toString()
+            };
+        }
+    }
+
     async function loadChartData(timeFrame: TimeFrame, showFullScreenLoader = true) {
         try {
             if (showFullScreenLoader) {
@@ -175,6 +284,11 @@
             const candlesticks = await convertTradingDataToChartData(rawData, timeFrame);
             if (candlestickSeries) {
                 candlestickSeries.setData(candlesticks);
+                
+                // Calculate stats for all timeframes
+                ['1H', '6H', '24H', '1W'].forEach(timeframe => {
+                    calculateStats(timeframe);
+                });
                 
                 if (isInitialLoad) {
                     chart.timeScale().fitContent();
@@ -329,6 +443,34 @@
     $: if (pool) {
         loadChartData(selectedTimeFrame);
     }
+
+    $: formattedStats = {
+        ...stats,
+        liquidity: {
+            ...stats.liquidity,
+            usd: formatCurrency(stats.liquidity.usd),
+            eth: stats.liquidity.eth.toFixed(2),
+            fdv: formatCurrency(stats.liquidity.fdv),
+            mcap: formatCurrency(stats.liquidity.mcap)
+        },
+        transactions: {
+            ...stats.transactions,
+            volume: formatCurrency(stats.transactions.volume * ($ethPrice?.formattedPrice || 0)),
+            buyVolume: formatCurrency(stats.transactions.buyVolume * ($ethPrice?.formattedPrice || 0)),
+            sellVolume: formatCurrency(stats.transactions.sellVolume * ($ethPrice?.formattedPrice || 0))
+        }
+    };
+
+    function formatCurrency(value: number): string {
+        if (value >= 1_000_000_000) {
+            return `$${(value / 1_000_000_000).toFixed(2)}B`;
+        } else if (value >= 1_000_000) {
+            return `$${(value / 1_000_000).toFixed(2)}M`;
+        } else if (value >= 1_000) {
+            return `$${(value / 1_000).toFixed(2)}K`;
+        }
+        return `$${value.toFixed(2)}`;
+    }
 </script>
 
 <div class="flex flex-col w-full h-full bg-[#131722] relative overflow-y-auto">
@@ -437,18 +579,22 @@
 
             <!-- Stats Widgets -->
             <div class="flex gap-2">
-                <!-- Price -->
+                <!-- Price in ETH -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
-                    <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
-                    <div class="text-[#d1d4dc] font-semibold">$0.000643</div>
-                    <div class="text-[#d1d4dc] text-xs opacity-60">0.062096 WETH</div>
+                    <div class="text-[#d1d4dc] text-xs opacity-60">PRICE ({pool.token1Name})</div>
+                    <div class="text-[#d1d4dc] font-semibold">
+                        {Number(stats.price.eth) < 0.000001 
+                            ? `${Number(stats.price.eth).toExponential(4)}`
+                            : `${Number(stats.price.eth).toFixed(9)}`
+                        } {pool.token1Name}
+                    </div>
                 </div>
 
                 <!-- Liquidity -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">LIQUIDITY</div>
                     <div class="text-[#d1d4dc] font-semibold flex items-center gap-1">
-                        $77K
+                        {(Number(pool.reserve1) / 1e9).toFixed(2)} {pool.token1Name}
                         <span class="text-[#26a69a] text-xs">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
@@ -456,30 +602,22 @@
                         </span>
                     </div>
                     <div class="flex justify-between items-center text-xs">
-                        <span class="text-[#d1d4dc] opacity-60">FDV: $623K</span>
-                        <span class="text-[#d1d4dc] opacity-60">MKT CAP: $623K</span>
+                        <span class="text-[#d1d4dc] opacity-60">Supply: 1B</span>
+                        <span class="text-[#d1d4dc] opacity-60">Makers: {stats.transactions.makers}</span>
                     </div>
                 </div>
 
                 <!-- Price Changes -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
                     <div class="grid grid-cols-4 gap-2">
-                        <div>
-                            <div class="text-[#d1d4dc] text-xs opacity-60">5M</div>
-                            <div class="text-[#26a69a] text-sm">0.14%</div>
-                        </div>
-                        <div>
-                            <div class="text-[#d1d4dc] text-xs opacity-60">1H</div>
-                            <div class="text-[#ef5350] text-sm">-11.68%</div>
-                        </div>
-                        <div>
-                            <div class="text-[#d1d4dc] text-xs opacity-60">6H</div>
-                            <div class="text-[#26a69a] text-sm">54.35%</div>
-                        </div>
-                        <div>
-                            <div class="text-[#d1d4dc] text-xs opacity-60">24H</div>
-                            <div class="text-[#26a69a] text-sm">114%</div>
-                        </div>
+                        {#each ['1H', '6H', '24H', '1W'] as timeframe}
+                            <div>
+                                <div class="text-[#d1d4dc] text-xs opacity-60">{timeframe}</div>
+                                <div class="text-sm {stats.changes[timeframe] >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}">
+                                    {stats.changes[timeframe].toFixed(2)}%
+                                </div>
+                            </div>
+                        {/each}
                     </div>
                 </div>
 
@@ -488,39 +626,39 @@
                     <div class="grid grid-cols-9 gap-2">
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">TXNS</div>
-                            <div class="text-[#d1d4dc] text-sm">11,121</div>
+                            <div class="text-[#d1d4dc] text-sm">{stats.transactions.total}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">BUYS</div>
-                            <div class="text-[#26a69a] text-sm">10,610</div>
+                            <div class="text-[#26a69a] text-sm">{stats.transactions.buys}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">SELLS</div>
-                            <div class="text-[#ef5350] text-sm">511</div>
+                            <div class="text-[#ef5350] text-sm">{stats.transactions.sells}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">VOL</div>
-                            <div class="text-[#d1d4dc] text-sm">$221K</div>
+                            <div class="text-[#d1d4dc] text-sm">{stats.transactions.volume.toFixed(2)}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">BUY VOL</div>
-                            <div class="text-[#26a69a] text-sm">$117K</div>
+                            <div class="text-[#26a69a] text-sm">{stats.transactions.buyVolume.toFixed(2)}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">SELL VOL</div>
-                            <div class="text-[#ef5350] text-sm">$104K</div>
+                            <div class="text-[#ef5350] text-sm">{stats.transactions.sellVolume.toFixed(2)}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">MAKERS</div>
-                            <div class="text-[#d1d4dc] text-sm">9,848</div>
+                            <div class="text-[#d1d4dc] text-sm">{stats.transactions.makers}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">BUYERS</div>
-                            <div class="text-[#26a69a] text-sm">9,755</div>
+                            <div class="text-[#26a69a] text-sm">{stats.transactions.buyers}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">SELLERS</div>
-                            <div class="text-[#ef5350] text-sm">282</div>
+                            <div class="text-[#ef5350] text-sm">{stats.transactions.sellers}</div>
                         </div>
                     </div>
                 </div>
