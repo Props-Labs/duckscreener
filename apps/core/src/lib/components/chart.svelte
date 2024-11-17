@@ -292,7 +292,7 @@
             },
         });
         
-        await loadChartData(selectedTimeFrame);
+        //await loadChartData(selectedTimeFrame);
         setupAutoRefresh();
         
         window.addEventListener('resize', handleChartResize);

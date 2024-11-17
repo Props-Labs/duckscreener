@@ -195,12 +195,14 @@
 
     <!-- Right side - Chat (Desktop) -->
     <div class="hidden sm:block w-80 border-l border-[#2B2B43]">
-        <Chat {$selectedPool} />
+        {#if $selectedPool}
+            <Chat bind:poolId={$selectedPool.id} />
+        {/if}
     </div>
 
     <!-- Mobile Chat Panel -->
     <div
-        class="sm:hidden fixed inset-0 bg-[#131722] z-10 transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
+        class="sm:hidden fixed inset-0 bg-[#131722] z-[60] transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
     >
         <div class="h-full pt-10">
             <Chat {$selectedPool} on:close={() => isChatOpen = false} />

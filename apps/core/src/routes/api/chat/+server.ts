@@ -23,6 +23,8 @@ export const GET: RequestHandler = async ({ url }) => {
 export const POST: RequestHandler = async ({ request }) => {
     const { poolId, account, message } = await request.json();
 
+    console.log("adding chat message", poolId, account, message);
+
     console.log('POST /api/chat', poolId, account, message);
     if (!poolId || !account || !message) {
         return json({ error: 'Missing required fields' }, { status: 400 });

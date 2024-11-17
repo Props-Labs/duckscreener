@@ -23,6 +23,7 @@
     let autoScrollToBottom = true;
 
     async function loadMessages() {
+        console.log("loadMessages", poolId)
         try {
             isLoading = true;
             const fetchedMessages = await fetchChatMessages(poolId);
@@ -47,16 +48,23 @@
         loadMessages();
         
         pollInterval = setInterval(async () => {
-            const latestMessages = await fetchChatMessages(poolId);
-            const sortedMessages = latestMessages.sort((a, b) => a.timestamp - b.timestamp);
-            
-            if (sortedMessages.length > messages.length) {
-                const wasAtBottom = isAtBottom();
-                messages = sortedMessages;
-                if (wasAtBottom) {
-                    scrollToBottom();
+            try{
+                console.log("pollInterval", poolId)
+                const latestMessages = await fetchChatMessages(poolId);
+                const sortedMessages = latestMessages.sort((a, b) => a.timestamp - b.timestamp);
+                
+                if (sortedMessages.length > messages.length) {
+                    const wasAtBottom = isAtBottom();
+                    messages = sortedMessages;
+                    if (wasAtBottom) {
+                        scrollToBottom();
+                    }
                 }
             }
+            catch(error) {
+                console.error('Failed to load messages:', error);
+            }
+           
         }, 5000) as unknown as number;
     });
 
