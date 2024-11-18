@@ -54,6 +54,8 @@
     }>();
     
     export let pool: PoolCatalogEntry;
+    export let liquidityUSD: number;
+    export let marketCap: number;
     let chart: any;
     let candlestickSeries: any;
     let selectedTimeFrame: TimeFrame = '1h';
@@ -579,7 +581,7 @@
 
             <!-- Stats Widgets -->
             <div class="flex gap-2">
-                <!-- Price in ETH -->
+                <!-- Price -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">PRICE ({pool.token1Name})</div>
                     <div class="text-[#d1d4dc] font-semibold">
@@ -593,17 +595,19 @@
                 <!-- Liquidity -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">LIQUIDITY</div>
-                    <div class="text-[#d1d4dc] font-semibold flex items-center gap-1">
-                        {(Number(pool.reserve1) / 1e9).toFixed(2)} {pool.token1Name}
-                        <span class="text-[#26a69a] text-xs">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </span>
+                    <div class="text-[#d1d4dc] font-semibold flex flex-col gap-1 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span>{(Number(pool.reserve0) / 1e9).toFixed(2)} {pool.token0Name}</span>
+                            
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>{(Number(pool.reserve1) / 1e9).toFixed(2)} {pool.token1Name}</span>
+                           
+                        </div>
                     </div>
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="text-[#d1d4dc] opacity-60">Supply: 1B</span>
-                        <span class="text-[#d1d4dc] opacity-60">Makers: {stats.transactions.makers}</span>
+                    <div class="flex justify-between items-center text-xs mt-1">
+                        <span class="text-[#d1d4dc] opacity-60">≈ {formatCurrency(liquidityUSD)}</span>
+                        <span class="text-[#d1d4dc] opacity-60">MCap: {formatCurrency(marketCap)}</span>
                     </div>
                 </div>
 

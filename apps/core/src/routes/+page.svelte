@@ -4,7 +4,7 @@
     import { getPriceData } from '$lib/services/blockchain';
     import Chat from '$lib/components/chat.svelte';
     import { browser } from '$app/environment';
-    import { showWalletModal, selectedPool, ethPrice, allPools } from '$lib/stores';
+    import { showWalletModal, selectedPool, ethPrice, allPools, usdtPrice, usdcPrice, usdePrice } from '$lib/stores';
     import WalletModal from "$lib/components/wallet-modal.svelte";
     import { getTotalAssets, getPoolMetadata} from '$lib/services/dex';
     import SwapModal from '$lib/components/swap-modal.svelte';
@@ -64,10 +64,24 @@
     async function updatePoolData() {
         try {
             // Get ETH price
-            $ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419");
-            if ($ethPrice?.formattedPrice) {
-                $ethPrice.formattedPrice = Number($ethPrice.formattedPrice);
-            }
+            const [ethPriceData, usdtPriceData, usdcPriceData, usdePriceData] = await Promise.all([
+                getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"),
+                getPriceData("0x3E7d1eAB13ad0104d2750B8863b489D65364e32D"),
+                getPriceData("0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6"),
+                getPriceData("0xa569d910839Ae8865Da8F8e70FfFb0cBA869F961")
+            ]);
+
+            $ethPrice = ethPriceData;
+            $usdtPrice = usdtPriceData;
+            $usdcPrice = usdcPriceData;
+            $usdePrice = usdePriceData;
+
+            // Convert all formattedPrice values to numbers
+            [$ethPrice, $usdtPrice, $usdcPrice, $usdePrice].forEach(price => {
+                if (price?.formattedPrice) {
+                    price.formattedPrice = Number(price.formattedPrice);
+                }
+            });
 
             console.log('selectedPool:::', $selectedPool);
             // Get pool metadata
@@ -129,7 +143,13 @@
 
     <!-- Left side - Chart -->
     <div class="flex-1 flex flex-col min-w-0">
-        <Chart bind:pool={$selectedPool} on:priceUpdate={handlePriceUpdate} on:loadingChange={handleChartLoadingChange}>
+        <Chart 
+            bind:pool={$selectedPool} 
+            {liquidityUSD}
+            {marketCap}
+            on:priceUpdate={handlePriceUpdate}
+            on:loadingChange={handleChartLoadingChange}
+        >
             <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">
                 <div class="flex flex-col items-start w-full sm:w-auto order-first mb-2 sm:mb-0">
                     <div class="flex flex-row">
