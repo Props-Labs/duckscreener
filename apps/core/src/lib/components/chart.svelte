@@ -90,17 +90,24 @@
                 top: 0.1,
                 bottom: 0.1,
             },
-            mode: 1,
             borderVisible: true,
             borderColor: '#2B2B43',
             textColor: '#d1d4dc',
             autoScale: true,
             alignLabels: true,
+            mode: 0,
+            visible: true,
+            entireTextOnly: false,
+            ticksVisible: true,
             formatPrice: (price: number) => {
                 if (price < 0.000001) {
-                    return price.toExponential(4);
+                    return price.toExponential(6);
                 }
-                return price.toFixed(9);
+                return price.toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 9,
+                    useGrouping: false
+                });
             },
         },
         grid: {
@@ -256,7 +263,7 @@
         if (timeframe === '1W' && latestTrade) {
             // For stablecoin pairs: price = 1 / (exchange_rate / 1e9)
             // For ETH pairs: price = (exchange_rate / 1e9) * ETH_USD_PRICE
-            const isStablecoinPair = ['USDT', 'USDC', 'USDE'].includes(pool.token1Name.toUpperCase());
+            const isStablecoinPair = ['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase());
             
             // Get raw exchange rate and convert from base units
             const exchangeRate = Number(latestTrade.exchange_rate) / 1e9;
@@ -429,16 +436,11 @@
             upColor: '#26a69a', 
             downColor: '#ef5350', 
             borderVisible: false,
-            wickUpColor: '#26a69a', 
+            wickUpColor: '#26a69a',
             wickDownColor: '#ef5350',
             priceFormat: {
-                type: 'custom',
-                formatter: (price: number) => {
-                    if (price < 0.000001) {
-                        return price.toExponential(4);
-                    }
-                    return price.toFixed(9);
-                },
+                type: 'price',
+                precision: 9,
                 minMove: 0.000000001,
             },
         });
@@ -598,21 +600,9 @@
 
     <div class="w-full overflow-x-auto bg-[#131722] border-y border-[#2B2B43] pt-4 py-8">
         <div class="flex min-w-max gap-4 px-4">
-            <!-- Timeframe Selector -->
-            <div class="grid grid-cols-2 gap-2 h-fit">
-                {#each ['1H', '6H', '24H', '1W'] as timeframe}
-                    <button 
-                        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors {selectedStatsTimeframe === timeframe ? 'bg-[#26a69a] text-white' : 'bg-[#1e222d] text-[#d1d4dc] hover:bg-[#26a69a]/20 border border-[#2B2B43]'}"
-                        on:click={() => selectedStatsTimeframe = timeframe}
-                    >
-                        {timeframe}
-                    </button>
-                {/each}
-            </div>
-
             <!-- Stats Widgets -->
             <div class="flex gap-2">
-                <!-- Price -->
+                <!-- Price USD -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
                     <div class="text-[#d1d4dc] font-semibold">
@@ -653,22 +643,26 @@
                            
                         </div>
                     </div>
-                    <div class="flex justify-between items-center text-xs mt-1">
+                  
+                    <div class="flex justify-between items-center text-xs">
                         <span class="text-[#d1d4dc] opacity-60">≈ {formatCurrency(liquidityUSD)}</span>
                         <span class="text-[#d1d4dc] opacity-60">MCap: {formatCurrency(marketCap)}</span>
                     </div>
                 </div>
 
-                <!-- Price Changes -->
+                <!-- Price Changes with integrated timeframe selection -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
                     <div class="grid grid-cols-4 gap-2">
                         {#each ['1H', '6H', '24H', '1W'] as timeframe}
-                            <div>
+                            <button
+                                class="flex flex-col items-center rounded-lg transition-all {selectedStatsTimeframe === timeframe ? 'ring-1 ring-[#26a69a]' : ''} hover:bg-[#26a69a]/10 p-1"
+                                on:click={() => selectedStatsTimeframe = timeframe}
+                            >
                                 <div class="text-[#d1d4dc] text-xs opacity-60">{timeframe}</div>
                                 <div class="text-sm {stats.changes[timeframe] >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}">
                                     {stats.changes[timeframe].toFixed(2)}%
                                 </div>
-                            </div>
+                            </button>
                         {/each}
                     </div>
                 </div>

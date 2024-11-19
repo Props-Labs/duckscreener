@@ -28,5 +28,6 @@ export const ethPrice = writable<any>();
 export const usdtPrice = writable<any>();
 export const usdcPrice = writable<any>();
 export const usdePrice = writable<any>();
+export const daiPrice = writable<any>();
 export const showWalletModal = writable(false);
 export const allPools = writable<PoolCatalogEntry[]>([]);

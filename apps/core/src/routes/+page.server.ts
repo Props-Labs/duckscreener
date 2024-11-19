@@ -25,7 +25,7 @@ export const load: PageServerLoad = async () => {
         // Filter out any null results and sort by creation date (newest first)
         const validPools = results
             .filter((pool): pool is PoolCatalogEntry => pool !== null)
-            //.filter(pool => pool.token1Name === 'ETH' )
+            .filter(pool => pool.token1Name === 'ETH' || pool.token1Name === 'USDT' || pool.token1Name === 'USDC' || pool.token1Name === 'sDAI' || pool.token1Name === 'USDe' || pool.token1Name === 'sUSDe')
             .sort((a, b) => b.createdAt - a.createdAt);
 
         console.log('validPools', validPools);

@@ -4,7 +4,7 @@
     import { getPriceData } from '$lib/services/blockchain';
     import Chat from '$lib/components/chat.svelte';
     import { browser } from '$app/environment';
-    import { showWalletModal, selectedPool, ethPrice, allPools, usdtPrice, usdcPrice, usdePrice } from '$lib/stores';
+    import { showWalletModal, selectedPool, ethPrice, allPools, usdtPrice, usdcPrice, usdePrice, daiPrice } from '$lib/stores';
     import WalletModal from "$lib/components/wallet-modal.svelte";
     import { getTotalAssets, getPoolMetadata} from '$lib/services/dex';
     import SwapModal from '$lib/components/swap-modal.svelte';
@@ -64,17 +64,21 @@
     async function updatePoolData() {
         try {
             // Get ETH price
-            const [ethPriceData, usdtPriceData, usdcPriceData, usdePriceData] = await Promise.all([
+            const [ethPriceData, usdtPriceData, usdcPriceData, usdePriceData, daiPriceData] = await Promise.all([
                 getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"),
                 getPriceData("0x3E7d1eAB13ad0104d2750B8863b489D65364e32D"),
                 getPriceData("0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6"),
-                getPriceData("0xa569d910839Ae8865Da8F8e70FfFb0cBA869F961")
+                getPriceData("0xa569d910839Ae8865Da8F8e70FfFb0cBA869F961"),
+                getPriceData("0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9")
             ]);
+
+            console.log('daiPriceData', daiPriceData);
 
             $ethPrice = ethPriceData;
             $usdtPrice = usdtPriceData;
             $usdcPrice = usdcPriceData;
             $usdePrice = usdePriceData;
+            $daiPrice = daiPriceData;
 
             // Convert all formattedPrice values to numbers
             [$ethPrice, $usdtPrice, $usdcPrice, $usdePrice].forEach(price => {
