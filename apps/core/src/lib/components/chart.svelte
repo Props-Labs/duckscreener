@@ -42,6 +42,7 @@
             volume: number;
             buyVolume: number;
             sellVolume: number;
+            volumeDelta: number;
             makers: number;
             buyers: number;
             sellers: number;
@@ -165,6 +166,7 @@
             volume: 0,
             buyVolume: 0,
             sellVolume: 0,
+            volumeDelta: 0,
             makers: 0,
             buyers: 0,
             sellers: 0
@@ -237,6 +239,7 @@
         const buyVolume = buys.reduce((acc, t) => acc + Number(t.asset_0_out) / 1e9, 0);
         const sellVolume = sells.reduce((acc, t) => acc + Number(t.asset_0_in) / 1e9, 0);
         const volume = buyVolume + sellVolume;
+        const volumeDelta = buyVolume - sellVolume;
 
         // Update stats object with new calculations
         stats.transactions = {
@@ -246,9 +249,17 @@
             volume,
             buyVolume,
             sellVolume,
+            volumeDelta,
             makers: uniqueMakers.size,
             buyers: uniqueBuyers.size,
             sellers: uniqueSellers.size
+        };
+
+         stats.changes = {
+            '1H': calculatePriceChangeForPeriod('1H'),
+            '6H': calculatePriceChangeForPeriod('6H'),
+            '24H': calculatePriceChangeForPeriod('24H'),
+            '1W': calculatePriceChangeForPeriod('1W')
         };
 
         // Calculate price if there are trades
@@ -270,6 +281,39 @@
 
             dispatch('priceUpdate', usdPrice);
         }
+    }
+
+    function calculatePriceChangeForPeriod(period: '1H' | '6H' | '24H' | '1W'): number {
+        const now = Date.now();
+        const periodMs = {
+            '1H': 60 * 60 * 1000,
+            '6H': 6 * 60 * 60 * 1000,
+            '24H': 24 * 60 * 60 * 1000,
+            '1W': 7 * 24 * 60 * 60 * 1000
+        }[period];
+
+        const cutoffTime = now - periodMs;
+        const relevantTrades = rawData.filter(trade => trade.time * 1000 >= cutoffTime);
+
+        if (relevantTrades.length < 2) return 0;
+
+        const oldestExchangeRate = Number(relevantTrades[0].exchange_rate) / 1e18;
+        const newestExchangeRate = Number(relevantTrades[relevantTrades.length - 1].exchange_rate) / 1e18;
+        const deltaExchangeRate = oldestExchangeRate - newestExchangeRate;
+        console.log("oldestExchangeRate", oldestExchangeRate)
+        console.log("newestExchangeRate", newestExchangeRate)
+        console.log("deltaExchangeRate", deltaExchangeRate)
+        console.log("------")
+
+        // Calculate percentage change
+        const percentageChange = (deltaExchangeRate / oldestExchangeRate) * 100;
+        
+        // For stablecoin pairs, we need to invert the percentage change
+        if (['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase())) {
+            return -percentageChange;
+        }
+        
+        return percentageChange;
     }
 
     async function loadChartData(timeFrame: TimeFrame, showFullScreenLoader = true) {
@@ -486,6 +530,8 @@
             case 'USDT':
             case 'USDC':
             case 'USDE':
+            case 'SUSDE':
+            case 'SDAI':
                 return 1; // Stablecoins are pegged to USD
             default:
                 return 0;
@@ -593,7 +639,7 @@
             <!-- Stats Widgets -->
             <div class="flex gap-2">
                 <!-- Price USD -->
-                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
                     <div class="text-[#d1d4dc] font-semibold">
                         ${Number(stats.price.usd).toLocaleString('en-US', {
@@ -621,7 +667,7 @@
                 </div>
 
                 <!-- Liquidity -->
-                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">LIQUIDITY</div>
                     <div class="text-[#d1d4dc] font-semibold flex flex-col gap-1 text-xs">
                         <div class="flex items-center justify-between">
@@ -644,7 +690,7 @@
                 </div>
 
                 <!-- Price Changes with integrated timeframe selection -->
-                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
                     <div class="grid grid-cols-4 gap-2">
                         {#each ['1H', '6H', '24H', '1W'] as timeframe}
                             <button
@@ -661,8 +707,8 @@
                 </div>
 
                 <!-- Transactions -->
-                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[400px]">
-                    <div class="grid grid-cols-9 gap-2">
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[400px]">
+                    <div class="grid grid-cols-10 gap-4">
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">TXNS</div>
                             <div class="text-[#d1d4dc] text-sm">{stats.transactions.total}</div>
@@ -677,15 +723,19 @@
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">VOL</div>
-                            <div class="text-[#d1d4dc] text-sm">{stats.transactions.volume.toFixed(2)}</div>
+                            <div class="text-[#d1d4dc] text-sm">{Intl.NumberFormat('en-US').format(Number(stats.transactions.volume.toFixed(2)))}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">BUY VOL</div>
-                            <div class="text-[#26a69a] text-sm">{stats.transactions.buyVolume.toFixed(2)}</div>
+                            <div class="text-[#26a69a] text-sm">{Intl.NumberFormat('en-US').format(Number(stats.transactions.buyVolume.toFixed(2)))}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">SELL VOL</div>
-                            <div class="text-[#ef5350] text-sm">{stats.transactions.sellVolume.toFixed(2)}</div>
+                            <div class="text-[#ef5350] text-sm">{Intl.NumberFormat('en-US').format(Number(stats.transactions.sellVolume.toFixed(2)))}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">VOL DELTA</div>
+                            <div class="text-sm {stats.transactions.volumeDelta >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}">{stats.transactions.volumeDelta >= 0 ? '+' : ''}{Intl.NumberFormat('en-US').format(Number(stats.transactions.volumeDelta.toFixed(2)))}</div>
                         </div>
                         <div>
                             <div class="text-[#d1d4dc] text-xs opacity-60">MAKERS</div>
