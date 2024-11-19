@@ -3,6 +3,10 @@ import { queryDB } from './data';
 import type { PoolMetadata, PoolId } from 'mira-dex-ts';
 import { getReadonlyMiraAmm, getPoolMetadata, getLPAssetInfo } from "./dex";
 import type {AssetId} from "fuels";
+import {Contract, Provider, WalletUnlocked, Wallet} from "fuels";
+import {initializeProvider} from "./provider";
+import {abi as src20Abi, getSrc20Contract} from "./src20";
+import type { JsonAbi, Interface } from 'fuels';
 
 
 export interface PoolCatalogEntry {
@@ -67,6 +71,26 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         const lpNameParts = lpName?.split('-');
         const token0Name = lpNameParts?.[0];
         const token1Name = lpNameParts?.[1].split(' ')[0];
+
+        //get token supply
+        const provider = await initializeProvider();
+        console.log("token0::", token0);
+
+        try {
+            
+            const contract = getSrc20Contract(token0, provider);
+            console.log("contract::", contract);
+
+            // Add contract to transaction scope and use call() for read operations
+            const { value } = await contract.functions
+                .total_assets()
+                .addContracts([contract]) // Add contract to transaction inputs
+                .get(); // Use call() instead of dryRun()
+            
+            console.log("totalSupply::", value);
+        } catch (error) {
+            console.error("Error calling total_assets:", error);
+        }
 
         // Create or update catalog entry
         const entry: PoolCatalogEntry = {

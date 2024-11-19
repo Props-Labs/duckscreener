@@ -195,6 +195,11 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div class="grid grid-cols-2 gap-2 w-full sm:w-auto flex items-center justify-center min-w-[400px]">
+                        <div class="border-2 border-dashed border-gray-600 rounded-lg px-6 py-3 flex items-center justify-center min-w-[300px] min-h-[60px] col-span-2">
+                            <span class="text-gray-500 text-sm">Advertise Here</span>
+                        </div>
+                    </div>
                     <SearchBox on:select={handlePoolSelect} />
                     <!--
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">

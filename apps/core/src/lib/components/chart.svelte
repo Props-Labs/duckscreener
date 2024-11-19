@@ -173,6 +173,8 @@
         }
     };
 
+    let isStatsLoading = false;
+
     $: if (selectedStatsTimeframe) {
         console.log('Calculating stats for timeframe:', selectedStatsTimeframe);
         
@@ -210,76 +212,82 @@
             });
         }
     }
+    async function calculateStats(timeframe: string) {
+        isStatsLoading = true;
+        console.log("isStatsLoading111", isStatsLoading)
+        try {
+            console.log("calculateStats:::", timeframe)
+            if (!rawData.length) return;
 
-    function calculateStats(timeframe: string) {
-        console.log("calculateStats:::", timeframe)
-        if (!rawData.length) return;
+            const now = Date.now();
+            const timeInMs = {
+                '1H': 60 * 60 * 1000,
+                '6H': 6 * 60 * 60 * 1000,
+                '24H': 24 * 60 * 60 * 1000,
+                '1W': 7 * 24 * 60 * 60 * 1000
+            }[timeframe];
 
-        const now = Date.now();
-        const timeInMs = {
-            '1H': 60 * 60 * 1000,
-            '6H': 6 * 60 * 60 * 1000,
-            '24H': 24 * 60 * 60 * 1000,
-            '1W': 7 * 24 * 60 * 60 * 1000
-        }[timeframe];
-
-        const cutoffTime = now - timeInMs;
-        const relevantTrades = rawData.filter(trade => trade.time * 1000 >= cutoffTime);
-        
-        // Calculate transactions stats for the selected timeframe
-        const buys = relevantTrades.filter(t => t.is_buy);
-        const sells = relevantTrades.filter(t => t.is_sell);
-        
-        // Get unique addresses for the selected timeframe
-        const uniqueMakers = new Set(relevantTrades.map(t => t.recipient));
-        const uniqueBuyers = new Set(buys.map(t => t.recipient));
-        const uniqueSellers = new Set(sells.map(t => t.recipient));
-
-        // Calculate volume in terms of token0 (base token)
-        const buyVolume = buys.reduce((acc, t) => acc + Number(t.asset_0_out) / 1e9, 0);
-        const sellVolume = sells.reduce((acc, t) => acc + Number(t.asset_0_in) / 1e9, 0);
-        const volume = buyVolume + sellVolume;
-        const volumeDelta = buyVolume - sellVolume;
-
-        // Update stats object with new calculations
-        stats.transactions = {
-            total: relevantTrades.length,
-            buys: buys.length,
-            sells: sells.length,
-            volume,
-            buyVolume,
-            sellVolume,
-            volumeDelta,
-            makers: uniqueMakers.size,
-            buyers: uniqueBuyers.size,
-            sellers: uniqueSellers.size
-        };
-
-         stats.changes = {
-            '1H': calculatePriceChangeForPeriod('1H'),
-            '6H': calculatePriceChangeForPeriod('6H'),
-            '24H': calculatePriceChangeForPeriod('24H'),
-            '1W': calculatePriceChangeForPeriod('1W')
-        };
-
-        // Calculate price if there are trades
-        if (relevantTrades.length && relevantTrades[relevantTrades.length - 1]) {
-            const latestTrade = relevantTrades[relevantTrades.length - 1];
-            const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
-            const isStablecoinPair = ['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase());
+            const cutoffTime = now - timeInMs;
+            const relevantTrades = rawData.filter(trade => trade.time * 1000 >= cutoffTime);
             
-            const usdPrice = isStablecoinPair 
-                ? 1 / exchangeRate
-                : exchangeRate * ($ethPrice?.formattedPrice || 0);
+            // Calculate transactions stats for the selected timeframe
+            const buys = relevantTrades.filter(t => t.is_buy);
+            const sells = relevantTrades.filter(t => t.is_sell);
+            
+            // Get unique addresses for the selected timeframe
+            const uniqueMakers = new Set(relevantTrades.map(t => t.recipient));
+            const uniqueBuyers = new Set(buys.map(t => t.recipient));
+            const uniqueSellers = new Set(sells.map(t => t.recipient));
 
-            console.log('usdPrice', usdPrice)
+            // Calculate volume in terms of token0 (base token)
+            const buyVolume = buys.reduce((acc, t) => acc + Number(t.asset_0_out) / 1e9, 0);
+            const sellVolume = sells.reduce((acc, t) => acc + Number(t.asset_0_in) / 1e9, 0);
+            const volume = buyVolume + sellVolume;
+            const volumeDelta = buyVolume - sellVolume;
 
-            stats.price = {
-                eth: exchangeRate.toString(),
-                usd: usdPrice.toString()
+            // Update stats object with new calculations
+            stats.transactions = {
+                total: relevantTrades.length,
+                buys: buys.length,
+                sells: sells.length,
+                volume,
+                buyVolume,
+                sellVolume,
+                volumeDelta,
+                makers: uniqueMakers.size,
+                buyers: uniqueBuyers.size,
+                sellers: uniqueSellers.size
             };
 
-            dispatch('priceUpdate', usdPrice);
+             stats.changes = {
+                '1H': calculatePriceChangeForPeriod('1H'),
+                '6H': calculatePriceChangeForPeriod('6H'),
+                '24H': calculatePriceChangeForPeriod('24H'),
+                '1W': calculatePriceChangeForPeriod('1W')
+            };
+
+            // Calculate price if there are trades
+            if (relevantTrades.length && relevantTrades[relevantTrades.length - 1]) {
+                const latestTrade = relevantTrades[relevantTrades.length - 1];
+                const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
+                const isStablecoinPair = ['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase());
+                
+                const usdPrice = isStablecoinPair 
+                    ? 1 / exchangeRate
+                    : exchangeRate * ($ethPrice?.formattedPrice || 0);
+
+                console.log('usdPrice', usdPrice)
+
+                stats.price = {
+                    eth: exchangeRate.toString(),
+                    usd: usdPrice.toString()
+                };
+
+                dispatch('priceUpdate', usdPrice);
+            }
+        } finally {
+            isStatsLoading = false;
+            console.log("isStatsLoading222", isStatsLoading)
         }
     }
 
@@ -635,7 +643,36 @@
     </button>
 
     <div class="w-full overflow-x-auto bg-[#131722] border-y border-[#2B2B43] pt-4 py-8">
-        <div class="flex min-w-max gap-4 px-4">
+        <div class="flex min-w-max gap-4 px-4 relative">
+            <!-- Loading Overlay for Stats -->
+            {#if isStatsLoading}
+                <div class="absolute inset-0 bg-[#131722]/80 flex items-center justify-center z-50 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <svg 
+                            class="animate-spin h-5 w-5 text-[#26a69a]" 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            fill="none" 
+                            viewBox="0 0 24 24"
+                        >
+                            <circle 
+                                class="opacity-25" 
+                                cx="12" 
+                                cy="12" 
+                                r="10" 
+                                stroke="currentColor" 
+                                stroke-width="4"
+                            ></circle>
+                            <path 
+                                class="opacity-75" 
+                                fill="currentColor" 
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
+                        <span class="text-[#d1d4dc] text-sm">Updating stats...</span>
+                    </div>
+                </div>
+            {/if}
+
             <!-- Stats Widgets -->
             <div class="flex gap-2">
                 <!-- Price USD -->

@@ -3,17 +3,13 @@ import type {MiraAmm, PoolId} from "mira-dex-ts";
 import {ReadonlyMiraAmm} from "mira-dex-ts";
 import {Account, Provider} from "fuels";
 import type {AssetId} from "fuels";
+import {initializeProvider} from "./provider";
 
 // Initialize provider and readonlyMiraAmm lazily
-let provider: Provider;
+
 let readonlyMiraAmm: ReadonlyMiraAmm;
 
-async function initializeProvider() {
-    if (!provider) {
-        provider = await Provider.create(process.env.PUBLIC_FUEL_RPC_URL);
-    }
-    return provider;
-}
+
 
 export async function getReadonlyMiraAmm() {
     if (!readonlyMiraAmm) {
