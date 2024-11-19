@@ -196,7 +196,7 @@
 
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <SearchBox on:select={handlePoolSelect} />
-                    
+                    <!--
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
                         <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors">
                             <div class="flex items-center space-x-2">
@@ -229,6 +229,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                 </div>
             </div>
         </Chart>

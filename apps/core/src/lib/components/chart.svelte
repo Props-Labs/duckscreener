@@ -617,13 +617,17 @@
                         1 {pool.token1Name} = {(Number(stats.price.eth) / Number(stats.price.usd))} {pool.token0Name}
                     </div> -->
                     {#if pool.token1Name === 'ETH'}
-                        <div class="text-[#d1d4dc] text-xs opacity-60">
+                        <div class="text-[#d1d4dc] text-xs opacity-80">
                             @ ${($ethPrice?.formattedPrice || 0).toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             })} / ETH
                         </div>
                     {/if}
+                    <div class="text-[#d1d4dc] text-xs opacity-80">
+                        <span>MCap: {formatCurrency(marketCap)}</span>
+                    </div>
+                    
                 </div>
 
                 <!-- Liquidity -->
@@ -646,7 +650,6 @@
                   
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-[#d1d4dc] opacity-60">≈ {formatCurrency(liquidityUSD)}</span>
-                        <span class="text-[#d1d4dc] opacity-60">MCap: {formatCurrency(marketCap)}</span>
                     </div>
                 </div>
 
