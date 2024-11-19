@@ -222,36 +222,27 @@
 
         const cutoffTime = now - timeInMs;
         const relevantTrades = rawData.filter(trade => trade.time * 1000 >= cutoffTime);
-
-        // Calculate transactions stats
+        
+        // Calculate transactions stats for the selected timeframe
         const buys = relevantTrades.filter(t => t.is_buy);
         const sells = relevantTrades.filter(t => t.is_sell);
         
-        // Calculate volumes (assuming ETH values are in wei)
-        const buyVolume = buys.reduce((sum, t) => sum + (Number(t.asset_1_in) / 1e18), 0);
-        const sellVolume = sells.reduce((sum, t) => sum + (Number(t.asset_1_out) / 1e18), 0);
-        
-        // Get unique addresses
+        // Get unique addresses for the selected timeframe
         const uniqueMakers = new Set(relevantTrades.map(t => t.recipient));
         const uniqueBuyers = new Set(buys.map(t => t.recipient));
         const uniqueSellers = new Set(sells.map(t => t.recipient));
 
-        // Calculate price changes
-        const oldestTrade = relevantTrades[0];
-        const latestTrade = relevantTrades[relevantTrades.length - 1];
-        const priceChange = oldestTrade && latestTrade ? 
-            ((Number(latestTrade.exchange_rate) - Number(oldestTrade.exchange_rate)) / Number(oldestTrade.exchange_rate)) * 100 
-            : 0;
+        // Calculate volume for the selected timeframe
+        const volume = relevantTrades.reduce((acc, t) => acc + Number(t.asset_1_in || t.asset_1_out) / 1e9, 0);
+        const buyVolume = buys.reduce((acc, t) => acc + Number(t.asset_1_out) / 1e9, 0);
+        const sellVolume = sells.reduce((acc, t) => acc + Number(t.asset_1_in) / 1e9, 0);
 
-        // Update stats for the current timeframe
-        stats.changes[timeframe as keyof typeof stats.changes] = priceChange;
-
-        // Update overall stats
+        // Update stats object with new calculations
         stats.transactions = {
             total: relevantTrades.length,
             buys: buys.length,
             sells: sells.length,
-            volume: buyVolume + sellVolume,
+            volume,
             buyVolume,
             sellVolume,
             makers: uniqueMakers.size,
@@ -259,30 +250,21 @@
             sellers: uniqueSellers.size
         };
 
-        // Update price
-        if (timeframe === '1W' && latestTrade) {
-            // For stablecoin pairs: price = 1 / (exchange_rate / 1e9)
-            // For ETH pairs: price = (exchange_rate / 1e9) * ETH_USD_PRICE
-            const isStablecoinPair = ['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase());
-            
-            // Get raw exchange rate and convert from base units
+        // Calculate price if there are trades
+        if (relevantTrades.length && relevantTrades[relevantTrades.length - 1]) {
+            const latestTrade = relevantTrades[relevantTrades.length - 1];
             const exchangeRate = Number(latestTrade.exchange_rate) / 1e9;
+            const isStablecoinPair = ['USDT', 'USDC', 'USDE'].includes(pool.token1Name.toUpperCase());
             
-            // Calculate price based on pair type
             const usdPrice = isStablecoinPair 
-                ? 1 / exchangeRate  // For stablecoin pairs: if rate is 447647.7678375, price is 1/447647.7678375 = 0.00000223
-                : exchangeRate / ($ethPrice?.formattedPrice || 0) / 100;  // For ETH pairs: multiply by ETH price
+                ? 1 / exchangeRate
+                : exchangeRate * ($ethPrice?.formattedPrice || 0);
 
-
-            console.log('usdPrice', usdPrice);
-
-            // Store both the token price in terms of the pair token and the USD price
             stats.price = {
-                eth: exchangeRate,
+                eth: exchangeRate.toString(),
                 usd: usdPrice.toString()
             };
 
-            // Also dispatch the price update with the correct USD value
             dispatch('priceUpdate', usdPrice);
         }
     }
@@ -505,6 +487,11 @@
             default:
                 return 0;
         }
+    }
+
+    // Add this reactive statement to recalculate stats when timeframe changes
+    $: if (selectedStatsTimeframe && rawData.length) {
+        calculateStats(selectedStatsTimeframe);
     }
 </script>
 
