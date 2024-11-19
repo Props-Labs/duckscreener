@@ -252,8 +252,8 @@
             sellers: uniqueSellers.size
         };
 
-        // Update price if it's the shortest timeframe
-        if (timeframe === '1H' && latestTrade) {
+        // Update price
+        if (timeframe === '1W' && latestTrade) {
             // For stablecoin pairs: price = 1 / (exchange_rate / 1e9)
             // For ETH pairs: price = (exchange_rate / 1e9) * ETH_USD_PRICE
             const isStablecoinPair = ['USDT', 'USDC', 'USDE'].includes(pool.token1Name.toUpperCase());
@@ -261,31 +261,21 @@
             // Get raw exchange rate and convert from base units
             const exchangeRate = Number(latestTrade.exchange_rate) / 1e9;
             
-            console.log("exchangeRate:::", exchangeRate);
-            console.log("isStablecoinPair:::", isStablecoinPair);   
-
             // Calculate price based on pair type
-            const usdPrice = isStablecoinPair
+            const usdPrice = isStablecoinPair 
                 ? 1 / exchangeRate  // For stablecoin pairs: if rate is 447647.7678375, price is 1/447647.7678375 = 0.00000223
-                : exchangeRate / 100 / ($ethPrice?.formattedPrice || 0);  // For ETH pairs: multiply by ETH price
+                : exchangeRate / ($ethPrice?.formattedPrice || 0) / 100;  // For ETH pairs: multiply by ETH price
 
-            //const ethPrice = $ethPrice?.formattedPrice || 0;
-            console.log("usdPrice:::", usdPrice);   
-            console.log("ethPrice:::", $ethPrice?.formattedPrice);
+
+            console.log('usdPrice', usdPrice);
+
+            // Store both the token price in terms of the pair token and the USD price
             stats.price = {
-                eth: ($ethPrice?.formattedPrice || 0).toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }),
+                eth: exchangeRate,
                 usd: usdPrice.toString()
             };
 
-            // Add these console logs to debug
-            console.log("Raw ETH price:", $ethPrice);
-            console.log("Formatted ETH price:", $ethPrice?.formattedPrice);
-            console.log("Final ETH price display:", stats.price.eth);
-
-            // Dispatch the correct USD price
+            // Also dispatch the price update with the correct USD value
             dispatch('priceUpdate', usdPrice);
         }
     }
@@ -632,9 +622,18 @@
                             useGrouping: false
                         })}
                     </div>
-                    <div class="text-[#d1d4dc] text-xs opacity-60">
-                        ${stats.price.eth} {pool.token1Name}
-                    </div>
+                    <!-- <div class="text-[#d1d4dc] text-xs">
+                        {Number(stats.price.usd)} / {Number(stats.price.eth)}
+                        1 {pool.token1Name} = {(Number(stats.price.eth) / Number(stats.price.usd))} {pool.token0Name}
+                    </div> -->
+                    {#if pool.token1Name === 'ETH'}
+                        <div class="text-[#d1d4dc] text-xs opacity-60">
+                            @ ${($ethPrice?.formattedPrice || 0).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })} / ETH
+                        </div>
+                    {/if}
                 </div>
 
                 <!-- Liquidity -->
