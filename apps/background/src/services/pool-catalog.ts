@@ -79,13 +79,12 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         try {
             
             const contract = getSrc20Contract(token0, provider);
-            console.log("contract::", contract);
-
+            
             // Add contract to transaction scope and use call() for read operations
             const { value } = await contract.functions
                 .total_assets()
-                .addContracts([contract]) // Add contract to transaction inputs
-                .get(); // Use call() instead of dryRun()
+                .addContracts([contract])
+                .get(); 
             
             console.log("totalSupply::", value);
         } catch (error) {
