@@ -210,6 +210,7 @@
     }
 
     function calculateStats(timeframe: string) {
+        console.log("calculateStats:::", timeframe)
         if (!rawData.length) return;
 
         const now = Date.now();
@@ -296,9 +297,9 @@
                 candlestickSeries.setData(candlesticks);
                 
                 // Calculate stats for all timeframes
-                ['1H', '6H', '24H', '1W'].forEach(timeframe => {
-                    calculateStats(timeframe);
-                });
+                // ['1H', '6H', '24H', '1W'].forEach(timeframe => {
+                //     calculateStats(timeframe);
+                // });
                 
                 if (isInitialLoad) {
                     chart.timeScale().fitContent();
