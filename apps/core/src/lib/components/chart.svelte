@@ -1,12 +1,12 @@
 <script lang="ts">
     import { onMount, onDestroy, tick } from 'svelte';
     import { getTradingData, convertTradingDataToChartData, type TimeFrame } from '$lib/services/data';
-    import { ethPrice } from '$lib/stores';
+    import { ethPrice, usdtPrice, usdcPrice, usdePrice } from '$lib/stores';
     import { createChart, ColorType } from 'lightweight-charts';
     import { createEventDispatcher } from 'svelte';
     import type { PoolCatalogEntry } from '$lib/types';
     interface SwapEvent {
-        exchange_rate: string;
+        exchange_rate: string;dd
         time: number;
         asset_0_in: string;
         asset_0_out: string;
@@ -254,12 +254,39 @@
 
         // Update price if it's the shortest timeframe
         if (timeframe === '1H' && latestTrade) {
-            const ethTokenPrice = Number(latestTrade.exchange_rate) / 1e9;
-            const usdPrice = ethTokenPrice * ($ethPrice?.formattedPrice || 0);
+            // For stablecoin pairs: price = 1 / (exchange_rate / 1e9)
+            // For ETH pairs: price = (exchange_rate / 1e9) * ETH_USD_PRICE
+            const isStablecoinPair = ['USDT', 'USDC', 'USDE'].includes(pool.token1Name.toUpperCase());
+            
+            // Get raw exchange rate and convert from base units
+            const exchangeRate = Number(latestTrade.exchange_rate) / 1e9;
+            
+            console.log("exchangeRate:::", exchangeRate);
+            console.log("isStablecoinPair:::", isStablecoinPair);   
+
+            // Calculate price based on pair type
+            const usdPrice = isStablecoinPair
+                ? 1 / exchangeRate  // For stablecoin pairs: if rate is 447647.7678375, price is 1/447647.7678375 = 0.00000223
+                : exchangeRate / 100 / ($ethPrice?.formattedPrice || 0);  // For ETH pairs: multiply by ETH price
+
+            //const ethPrice = $ethPrice?.formattedPrice || 0;
+            console.log("usdPrice:::", usdPrice);   
+            console.log("ethPrice:::", $ethPrice?.formattedPrice);
             stats.price = {
-                eth: ethTokenPrice.toString(),
+                eth: ($ethPrice?.formattedPrice || 0).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }),
                 usd: usdPrice.toString()
             };
+
+            // Add these console logs to debug
+            console.log("Raw ETH price:", $ethPrice);
+            console.log("Formatted ETH price:", $ethPrice?.formattedPrice);
+            console.log("Final ETH price display:", stats.price.eth);
+
+            // Dispatch the correct USD price
+            dispatch('priceUpdate', usdPrice);
         }
     }
 
@@ -426,7 +453,7 @@
             },
         });
         
-        //await loadChartData(selectedTimeFrame);
+        await loadChartData(selectedTimeFrame);
         setupAutoRefresh();
         
         window.addEventListener('resize', handleChartResize);
@@ -457,9 +484,9 @@
         },
         transactions: {
             ...stats.transactions,
-            volume: formatCurrency(stats.transactions.volume * ($ethPrice?.formattedPrice || 0)),
-            buyVolume: formatCurrency(stats.transactions.buyVolume * ($ethPrice?.formattedPrice || 0)),
-            sellVolume: formatCurrency(stats.transactions.sellVolume * ($ethPrice?.formattedPrice || 0))
+            volume: formatCurrency(stats.transactions.volume * getCounterPartyTokenPrice(pool.token1Name)),
+            buyVolume: formatCurrency(stats.transactions.buyVolume * getCounterPartyTokenPrice(pool.token1Name)),
+            sellVolume: formatCurrency(stats.transactions.sellVolume * getCounterPartyTokenPrice(pool.token1Name))
         }
     };
 
@@ -472,6 +499,20 @@
             return `$${(value / 1_000).toFixed(2)}K`;
         }
         return `$${value.toFixed(2)}`;
+    }
+
+    // Helper function to get counter-party token price
+    function getCounterPartyTokenPrice(token1Name: string): number {
+        switch (token1Name.toUpperCase()) {
+            case 'ETH':
+                return $ethPrice?.formattedPrice || 0;
+            case 'USDT':
+            case 'USDC':
+            case 'USDE':
+                return 1; // Stablecoins are pegged to USD
+            default:
+                return 0;
+        }
     }
 </script>
 
@@ -583,12 +624,16 @@
             <div class="flex gap-2">
                 <!-- Price -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors min-w-[200px]">
-                    <div class="text-[#d1d4dc] text-xs opacity-60">PRICE ({pool.token1Name})</div>
+                    <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
                     <div class="text-[#d1d4dc] font-semibold">
-                        {Number(stats.price.eth) < 0.000001 
-                            ? `${Number(stats.price.eth).toExponential(4)}`
-                            : `${Number(stats.price.eth).toFixed(9)}`
-                        } {pool.token1Name}
+                        ${Number(stats.price.usd).toLocaleString('en-US', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 9,
+                            useGrouping: false
+                        })}
+                    </div>
+                    <div class="text-[#d1d4dc] text-xs opacity-60">
+                        ${stats.price.eth} {pool.token1Name}
                     </div>
                 </div>
 
@@ -597,7 +642,11 @@
                     <div class="text-[#d1d4dc] text-xs opacity-60">LIQUIDITY</div>
                     <div class="text-[#d1d4dc] font-semibold flex flex-col gap-1 text-xs">
                         <div class="flex items-center justify-between">
-                            <span>{(Number(pool.reserve0) / 1e9).toFixed(2)} {pool.token0Name}</span>
+                            <span>
+                                {(Number(pool.reserve0) / 1e9).toLocaleString('en-US', {
+                                    maximumFractionDigits: 0
+                                })} {pool.token0Name}
+                            </span>
                             
                         </div>
                         <div class="flex items-center justify-between">
