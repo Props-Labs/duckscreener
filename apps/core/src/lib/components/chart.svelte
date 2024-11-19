@@ -232,10 +232,10 @@
         const uniqueBuyers = new Set(buys.map(t => t.recipient));
         const uniqueSellers = new Set(sells.map(t => t.recipient));
 
-        // Calculate volume for the selected timeframe
-        const volume = relevantTrades.reduce((acc, t) => acc + Number(t.asset_1_in || t.asset_1_out) / 1e9, 0);
-        const buyVolume = buys.reduce((acc, t) => acc + Number(t.asset_1_out) / 1e9, 0);
-        const sellVolume = sells.reduce((acc, t) => acc + Number(t.asset_1_in) / 1e9, 0);
+        // Calculate volume in terms of token0 (base token)
+        const buyVolume = buys.reduce((acc, t) => acc + Number(t.asset_0_out) / 1e9, 0);
+        const sellVolume = sells.reduce((acc, t) => acc + Number(t.asset_0_in) / 1e9, 0);
+        const volume = buyVolume + sellVolume;
 
         // Update stats object with new calculations
         stats.transactions = {
@@ -253,12 +253,14 @@
         // Calculate price if there are trades
         if (relevantTrades.length && relevantTrades[relevantTrades.length - 1]) {
             const latestTrade = relevantTrades[relevantTrades.length - 1];
-            const exchangeRate = Number(latestTrade.exchange_rate) / 1e9;
-            const isStablecoinPair = ['USDT', 'USDC', 'USDE'].includes(pool.token1Name.toUpperCase());
+            const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
+            const isStablecoinPair = ['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase());
             
             const usdPrice = isStablecoinPair 
                 ? 1 / exchangeRate
                 : exchangeRate * ($ethPrice?.formattedPrice || 0);
+
+            console.log('usdPrice', usdPrice)
 
             stats.price = {
                 eth: exchangeRate.toString(),
