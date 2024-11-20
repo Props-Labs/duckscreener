@@ -1,0 +1,18 @@
+{
+  "name": "@fuel-bridge/message-predicates",
+  "version": "1.0.0",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "files": [
+    "./dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "devDependencies": {
+    "@fuel-bridge/esbuild-bin-loader": "workspace:../esbuild-bin-loader",
+    "@fuel-bridge/solidity-contracts": "workspace:*"
+  }
+}
