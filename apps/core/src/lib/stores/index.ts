@@ -24,6 +24,8 @@ function createSelectedPoolStore() {
 
 export const selectedPool = createSelectedPoolStore();
 export const allPairs = writable<PoolCatalogEntry[]>([]);
+export const allNativeAssets = writable<any[]>([]);
+export const selectedCounterPartyToken = writable<any>();
 export const ethPrice = writable<any>();
 export const usdtPrice = writable<any>();
 export const usdcPrice = writable<any>();

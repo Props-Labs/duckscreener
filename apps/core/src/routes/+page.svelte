@@ -4,20 +4,23 @@
     import { getPriceData } from '$lib/services/blockchain';
     import Chat from '$lib/components/chat.svelte';
     import { browser } from '$app/environment';
-    import { showWalletModal, selectedPool, ethPrice, allPools, usdtPrice, usdcPrice, usdePrice, daiPrice } from '$lib/stores';
+    import { showWalletModal, selectedPool, selectedCounterPartyToken, ethPrice, allPools, allNativeAssets, usdtPrice, usdcPrice, usdePrice, daiPrice } from '$lib/stores';
     import WalletModal from "$lib/components/wallet-modal.svelte";
     import { getTotalAssets, getPoolMetadata} from '$lib/services/dex';
     import SwapModal from '$lib/components/swap-modal.svelte';
     import SearchBox from '$lib/components/search-box.svelte';
     import LoadingOverlay from '$lib/components/loading-overlay.svelte';
     import type { PageData } from './$types';
+    import { getBaseAssetPrice } from '$lib/services/price';
 
     export let data: PageData;
 
     // Set the allPools store with the server data
     $: $allPools = data.pools;
+    $: $allNativeAssets = data.nativeAssets;
 
     $: console.log('allPools', $allPools);
+    $: console.log('allNativeAssets', $allNativeAssets);
 
     let WalletProvider: any;
    
@@ -64,37 +67,19 @@
     async function updatePoolData() {
         try {
             // Get ETH price
-            const [ethPriceData, usdtPriceData, usdcPriceData, usdePriceData, daiPriceData] = await Promise.all([
-                getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"),
-                getPriceData("0x3E7d1eAB13ad0104d2750B8863b489D65364e32D"),
-                getPriceData("0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6"),
-                getPriceData("0xa569d910839Ae8865Da8F8e70FfFb0cBA869F961"),
-                getPriceData("0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9")
-            ]);
-
-            console.log('daiPriceData', daiPriceData);
-
-            $ethPrice = ethPriceData;
-            $usdtPrice = usdtPriceData;
-            $usdcPrice = usdcPriceData;
-            $usdePrice = usdePriceData;
-            $daiPrice = daiPriceData;
-
-            // Convert all formattedPrice values to numbers
-            [$ethPrice, $usdtPrice, $usdcPrice, $usdePrice].forEach(price => {
-                if (price?.formattedPrice) {
-                    price.formattedPrice = Number(price.formattedPrice);
-                }
-            });
+            
+            const counterPartyToken = await getBaseAssetPrice($selectedPool.token1Address);
+            $selectedCounterPartyToken = counterPartyToken;
+            console.log('counterPartyTokenUSDPrice', $selectedCounterPartyToken.priceUSD);
 
             console.log('selectedPool:::', $selectedPool);
             // Get pool metadata
             poolMetadata = await getPoolMetadata($selectedPool);
             
             // Calculate liquidity in USD
-            if (poolMetadata && $ethPrice?.formattedPrice) {
+            if (poolMetadata && $selectedCounterPartyToken.priceUSD) {
                 const ethInPool = Number(poolMetadata.reserve1) / 1e9; // Convert from decimals
-                liquidityUSD = ethInPool * $ethPrice.formattedPrice * 2; // Multiply by 2 since it's paired liquidity
+                liquidityUSD = ethInPool * $selectedCounterPartyToken.priceUSD * 2; // Multiply by 2 since it's paired liquidity
             }
         } catch (error) {
             console.error('Error updating pool data:', error);
@@ -103,7 +88,7 @@
 
     // Replace the existing get$ethPrice reactive statement with this
     $: updatePoolData();
-    $: marketCap = currentTokenPrice * TOTAL_SUPPLY * ($ethPrice?.formattedPrice || 0);
+    $: marketCap = $selectedCounterPartyToken?.priceUSD ? currentTokenPrice * TOTAL_SUPPLY * ($selectedCounterPartyToken.priceUSD || 0) : 0;
 
     function formatCurrency(value: number): string {
         if (value >= 1_000_000_000) {

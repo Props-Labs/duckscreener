@@ -32,21 +32,21 @@ export async function getLPAssetInfo(poolId: PoolId) {
 }
 
 export async function getPoolMetadata(pool_id: any) {
-    console.log('getPoolMetadata', pool_id);
+   // console.log('getPoolMetadata', pool_id);
     const poolIdparts = pool_id.split('_');
     const miraAmm = await getReadonlyMiraAmm();
 
-    console.log('poolIdparts', poolIdparts);
+    //console.log('poolIdparts', poolIdparts);
 
     const poolId: PoolId = [
         {bits: poolIdparts[0]} as AssetId,
         {bits: poolIdparts[1]} as AssetId,
         poolIdparts[2] === 'true' ? true : false
     ];
-    console.log('poolId', poolId);
+    //console.log('poolId', poolId);
     //@ts-ignore
     const poolMetadata = await miraAmm.poolMetadata(poolId);
-    console.log('poolMetadata response', poolMetadata);
+    //console.log('poolMetadata response', poolMetadata);
     return {
         ...poolMetadata,
         reserve0: Number(poolMetadata?.reserve0),

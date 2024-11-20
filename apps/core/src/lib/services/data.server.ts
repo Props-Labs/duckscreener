@@ -1,6 +1,8 @@
 import { env } from '$env/dynamic/private';
 import { getValue, storeValue } from './redis';
 import type { TradingPair } from './pairs';
+import * as cheerio from 'cheerio'
+import {getPriceData} from './blockchain';
 
 interface SwapEvent {
     exchange_rate: string;
@@ -34,6 +36,77 @@ export function timeFrameToSeconds(timeFrame: TimeFrame): number {
         '24h': 86400
     };
     return timeFrameMap[timeFrame];
+}
+
+export const scrapeAssetPrice = async (asset_address: string) => {
+
+    console.log("scrapeAssetPrice::", asset_address);
+
+    try{
+        const cachedData = await getValue(`price_${asset_address}`);
+        console.log('cachedData::', cachedData);
+        if(cachedData){
+            console.log('Returning cached data');
+            const data = JSON.parse(cachedData);
+            console.log('cached data length', data.length);
+            return JSON.parse(cachedData);
+        }
+    }
+    catch(error){}
+
+    console.log("Fetching asset price");
+    //No cached data, fetch
+    const fuel_assets = await getValue(`fuel_assets`);
+    const fuel_asset_data = JSON.parse(fuel_assets);
+    const token = fuel_asset_data.find((asset: any) => 
+        asset.networks.some((network: any) => 
+            network.type === 'fuel' && network.assetId === asset_address
+        )
+    );
+
+    console.log('token::', token);
+
+    if(token.name === 'Ethereum'){
+        const ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419")
+        return {priceUSD: Number(ethPrice.formattedPrice)};
+    }
+    // Get the Ethereum address from the token's Ethereum network entry
+    const ethereumNetwork = token?.networks.find((network: any) => 
+        network.type === 'ethereum' && network.chainId === 1
+    );
+    const address = ethereumNetwork?.address;
+
+    console.log('eth asset address::', address);
+
+    try {
+        let response = await fetch(`https://www.coingecko.com/en/coins/${address}`)
+        let html = await response.text()
+        let $ = cheerio.load(html)
+        let priceText = $('span[data-converter-target="price"]').first().text()
+        console.log('Price', priceText)
+
+        if(!priceText){
+            let formattedName;
+            if(token.name === 'SolvBTC.BBN'){
+                formattedName = 'solv-protocol-solvbtc-bbn'
+            }
+            else{
+                formattedName = token.name.replace(/ /g, '-').toLowerCase();
+            }
+            
+            response = await fetch(`https://www.coingecko.com/en/coins/${formattedName}`)
+            html = await response.text()
+            $ = cheerio.load(html)
+            priceText = $('span[data-converter-target="price"]').first().text()
+            console.log('Price2', priceText)
+        }
+        const convertedPrice = parseFloat(priceText.replace(/[$,]/g, ''))  // Remove both $ and commas
+        await storeValue(`price_${asset_address}`, JSON.stringify({priceUSD: convertedPrice}), 10); // 10 sec cache
+        return {priceUSD: convertedPrice};
+    } catch (error) {
+        console.error('Error fetching pairs:', error);
+        return { error: 'Failed to fetch asset price', token };
+    }
 }
 
 export const getTradingData = async (pool_id: string, offset: number = 0, limit: number = 1000) => {

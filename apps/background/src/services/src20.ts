@@ -1,11 +1,15 @@
+import 'dotenv/config';
+
 import type {
     Provider,
     InvokeFunction,
     BN,
     JsonAbi,
-    Account
+    Account,
+    Asset,
+    AssetFuel
 } from 'fuels';
-import { Contract, Interface } from 'fuels';
+import { assets, CHAIN_IDS, getAssetFuel, Contract, Interface } from 'fuels';
 
 export const abi = {
     programType: "contract",
@@ -491,9 +495,54 @@ export const abi = {
 }
 
 
-
 export function getSrc20Contract(address: string, providerOrWallet: Provider | Account) {
     // Create interface first
     const contract = new Contract(address, abi, providerOrWallet);
     return contract
 }
+
+export async function getSrc20ContractData(address: string, providerOrWallet: Provider | Account){
+    console.log(assets);
+    const assetEth: Asset = assets.find((asset) => asset.symbol === 'mBTC')!;
+    const chainId: number = CHAIN_IDS.fuel.mainnet;
+    const assetEthOnFuel: AssetFuel = getAssetFuel(assetEth, chainId)!;
+
+    console.log('assetEthOnFuel', assetEthOnFuel)
+
+    // const src20abi: JsonAbi = abi;
+    // const contract = new Contract(bytecode, abi, providerOrWallet);
+    //console.log('getsrc20 contract', contract)
+    //const invocationScope = contract.functions.main(0);
+}
+
+// export async function getSrc20ContractData(address: string){
+
+//     const QUERY = `
+//         query MyQuery($id: String!) {
+//             contract(id: $id) {
+//                 id
+//                 bytecode
+//                 salt
+//             }
+//         }`
+//     ;
+
+//     const QUERY_PARAMS = {
+//         id: address
+//     }
+
+//     const response = await fetch(process.env.PUBLIC_FUEL_RPC_URL, {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Accept: 'application/json',
+//         },
+//         body: JSON.stringify({
+//           query: QUERY,
+//           variables: QUERY_PARAMS,
+//         }),
+//       });
+//       const json: any = await response.json();
+//       console.log('getSrc20ContractData', json)
+//       return json.data.contract
+// }

@@ -1,12 +1,12 @@
 <script lang="ts">
     import { onMount, onDestroy, tick } from 'svelte';
     import { getTradingData, convertTradingDataToChartData, type TimeFrame } from '$lib/services/data';
-    import { ethPrice, usdtPrice, usdcPrice, usdePrice } from '$lib/stores';
+    import { selectedCounterPartyToken } from '$lib/stores';
     import { createChart, ColorType } from 'lightweight-charts';
     import { createEventDispatcher } from 'svelte';
     import type { PoolCatalogEntry } from '$lib/types';
     interface SwapEvent {
-        exchange_rate: string;dd
+        exchange_rate: string;
         time: number;
         asset_0_in: string;
         asset_0_out: string;
@@ -22,6 +22,7 @@
         price: {
             usd: string;
             eth: string;
+            lastTradeIsBuy: boolean;
         };
         liquidity: {
             usd: number;
@@ -175,21 +176,6 @@
 
     let isStatsLoading = false;
 
-    $: if (selectedStatsTimeframe) {
-        console.log('Calculating stats for timeframe:', selectedStatsTimeframe);
-        
-        // Example of how we'll calculate stats:
-        // const timeInMs = {
-        //     '1H': 60 * 60 * 1000,
-        //     '6H': 6 * 60 * 60 * 1000,
-        //     '24H': 24 * 60 * 60 * 1000,
-        //     '1W': 7 * 24 * 60 * 60 * 1000
-        // }[selectedStatsTimeframe];
-        
-        // const cutoffTime = Date.now() - timeInMs;
-        // const relevantTrades = rawData.filter(trade => trade.time >= cutoffTime);
-        // Calculate stats from relevantTrades...
-    }
 
     function setupAutoRefresh() {
         if (autoRefreshInterval) {
@@ -266,29 +252,27 @@
                 '1W': calculatePriceChangeForPeriod('1W')
             };
 
-            // Calculate price if there are trades
-            if (relevantTrades.length && relevantTrades[relevantTrades.length - 1]) {
-                const latestTrade = relevantTrades[relevantTrades.length - 1];
-                const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
-                const isStablecoinPair = ['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase());
-                
-                const usdPrice = isStablecoinPair 
-                    ? 1 / exchangeRate
-                    : exchangeRate * ($ethPrice?.formattedPrice || 0);
-
-                console.log('usdPrice', usdPrice)
-
-                stats.price = {
-                    eth: exchangeRate.toString(),
-                    usd: usdPrice.toString()
-                };
-
-                dispatch('priceUpdate', usdPrice);
-            }
         } finally {
             isStatsLoading = false;
             console.log("isStatsLoading222", isStatsLoading)
         }
+    }
+
+    function calculatePrice() {
+        const latestTrade = rawData[0];
+        const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
+            
+        const _usdPrice = exchangeRate * ($selectedCounterPartyToken?.priceUSD || 0);
+
+        console.log('usdPrice:::11', _usdPrice)
+
+        stats.price = {
+            eth: exchangeRate.toString(),
+            usd: _usdPrice.toString(),
+            lastTradeIsBuy: latestTrade.is_buy
+        };
+
+        dispatch('priceUpdate', _usdPrice);
     }
 
     function calculatePriceChangeForPeriod(period: '1H' | '6H' | '24H' | '1W'): number {
@@ -308,18 +292,15 @@
         const oldestExchangeRate = Number(relevantTrades[0].exchange_rate) / 1e18;
         const newestExchangeRate = Number(relevantTrades[relevantTrades.length - 1].exchange_rate) / 1e18;
         const deltaExchangeRate = oldestExchangeRate - newestExchangeRate;
-        console.log("oldestExchangeRate", oldestExchangeRate)
-        console.log("newestExchangeRate", newestExchangeRate)
-        console.log("deltaExchangeRate", deltaExchangeRate)
-        console.log("------")
+       
 
         // Calculate percentage change
         const percentageChange = (deltaExchangeRate / oldestExchangeRate) * 100;
         
         // For stablecoin pairs, we need to invert the percentage change
-        if (['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase())) {
-            return -percentageChange;
-        }
+        // if (['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase())) {
+        //     return -percentageChange;
+        // }
         
         return percentageChange;
     }
@@ -513,9 +494,9 @@
         },
         transactions: {
             ...stats.transactions,
-            volume: formatCurrency(stats.transactions.volume * getCounterPartyTokenPrice(pool.token1Name)),
-            buyVolume: formatCurrency(stats.transactions.buyVolume * getCounterPartyTokenPrice(pool.token1Name)),
-            sellVolume: formatCurrency(stats.transactions.sellVolume * getCounterPartyTokenPrice(pool.token1Name))
+            volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
+            buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
+            sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
         }
     };
 
@@ -530,25 +511,14 @@
         return `$${value.toFixed(2)}`;
     }
 
-    // Helper function to get counter-party token price
-    function getCounterPartyTokenPrice(token1Name: string): number {
-        switch (token1Name.toUpperCase()) {
-            case 'ETH':
-                return $ethPrice?.formattedPrice || 0;
-            case 'USDT':
-            case 'USDC':
-            case 'USDE':
-            case 'SUSDE':
-            case 'SDAI':
-                return 1; // Stablecoins are pegged to USD
-            default:
-                return 0;
-        }
-    }
-
     // Add this reactive statement to recalculate stats when timeframe changes
     $: if (selectedStatsTimeframe && rawData.length) {
+        console.log("calculatestats::::11")
         calculateStats(selectedStatsTimeframe);
+    }
+
+    $: if(rawData.length){
+        calculatePrice()
     }
 </script>
 
@@ -691,7 +661,7 @@
                     </div> -->
                     {#if pool.token1Name === 'ETH'}
                         <div class="text-[#d1d4dc] text-xs opacity-80">
-                            @ ${($ethPrice?.formattedPrice || 0).toLocaleString('en-US', {
+                            @ ${($selectedCounterPartyToken?.priceUSD || 0).toLocaleString('en-US', {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2
                             })} / ETH

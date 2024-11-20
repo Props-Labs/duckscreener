@@ -5,7 +5,7 @@ import { getReadonlyMiraAmm, getPoolMetadata, getLPAssetInfo } from "./dex";
 import type {AssetId} from "fuels";
 import {Contract, Provider, WalletUnlocked, Wallet} from "fuels";
 import {initializeProvider} from "./provider";
-import {abi as src20Abi, getSrc20Contract} from "./src20";
+import {abi as src20Abi, getSrc20Contract, getSrc20ContractData} from "./src20";
 import type { JsonAbi, Interface } from 'fuels';
 
 
@@ -29,14 +29,14 @@ export interface PoolCatalogEntry {
 
 const POOL_KEY_PREFIX = 'pool:';
 const POOL_IDS_KEY = 'pool_ids';
-const POOL_METADATA_TTL = 60 * 60 * 24 * 365 * 10; //
+export const POOL_METADATA_TTL = 60 * 60 * 24 * 365 * 10; //
 
 function getPoolKey(poolId: string): string {
     return `${POOL_KEY_PREFIX}${poolId}`;
 }
 
 export async function updatePoolCatalog(pool: any): Promise<void> {
-    console.log('Updating pool catalog for', pool);
+    //console.log('Updating pool catalog for', pool);
     try {
         // Parse pool ID components
         const [token0Address, token1Address, isStableStr] = pool.pool_id.split('_');
@@ -44,7 +44,7 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         // Get pool metadata from Mira SDK
         const metadata = await getPoolMetadata(`${token0Address}_${token1Address}_${isStableStr === 'true'}`);
 
-        console.log('metadata', metadata);
+        //console.log('metadata', metadata);
         if (!metadata) {
             console.error(`Failed to get metadata for pool ${pool.pool_id}`);
             return;
@@ -62,7 +62,7 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         }
 
         const lpInfo = await getLPAssetInfo(assetId);
-        console.log('lpInfo::', lpInfo);
+        //console.log('lpInfo::', lpInfo);
 
         // Get token symbols from events using the correct addresses
         // const symbols = await getTokenSymbols([token0, token1]);
@@ -76,20 +76,29 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         const provider = await initializeProvider();
         console.log("token0::", token0);
 
-        try {
+        // try {
+
+        //     const contractData = await getSrc20ContractData(token0, provider);
+
+        //     console.log("contractData::", contractData);
+        //     if(contractData){
+        //         console.log('--------------------------------------')
+        //         console.log(contractData.id)
+        //         console.log('--------------------------------------')
+        //     }
             
-            const contract = getSrc20Contract(token0, provider);
+        //     const contract = getSrc20Contract(token0, provider);
             
-            // Add contract to transaction scope and use call() for read operations
-            const { value } = await contract.functions
-                .total_assets()
-                .addContracts([contract])
-                .get(); 
+        //     // Add contract to transaction scope and use call() for read operations
+        //     const { value } = await contract.functions
+        //         .total_assets()
+        //         .addContracts([contract])
+        //         .get(); 
             
-            console.log("totalSupply::", value);
-        } catch (error) {
-            console.error("Error calling total_assets:", error);
-        }
+        //     console.log("totalSupply::", value);
+        // } catch (error) {
+        //     console.error("Error calling total_assets:", error);
+        // }
 
         // Create or update catalog entry
         const entry: PoolCatalogEntry = {
