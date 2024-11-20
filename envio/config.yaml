@@ -41,3 +41,35 @@ networks:
       logId: '2161305517876418151'
     - name: SetDecimalsEvent
       logId: '18149631459970394923'
+  - name: BridgeFungibleToken
+    address:
+    - 0x4ea6ccef1215d9479f1024dff70fc055ca538215d2c8c348beddffd54583d0e8
+    abi_file_path: abis/bridgefungibletoken-abi.json
+    handler: src/EventHandlers.ts
+    events:
+    - name: ClaimRefundEvent
+      logId: '4873341570055982168'
+    - name: BridgeFungibleTokenError
+      logId: '797431737660767716'
+    - name: RefundRegisteredEvent
+      logId: '5994656859013025846'
+    - name: WithdrawalEvent
+      logId: '5416159340904421156'
+    - name: SetMetadataEvent
+      logId: '17415926155927968170'
+    - name: SetSymbolEvent
+      logId: '12152039456660331088'
+    - name: ReentrancyError
+      logId: '5557842539076482339'
+    - name: SetDecimalsEvent
+      logId: '18149631459970394923'
+    - name: TotalSupplyEvent
+      logId: '17462098202904023478'
+    - name: DepositEvent
+      logId: '12590297951544646752'
+    - name: SetNameEvent
+      logId: '7845998088195677205'
+    - name: Transfer
+    - name: Mint
+    - name: Burn
+    - name: Call
