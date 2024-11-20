@@ -4,7 +4,7 @@
     import { getPriceData } from '$lib/services/blockchain';
     import Chat from '$lib/components/chat.svelte';
     import { browser } from '$app/environment';
-    import { showWalletModal, selectedPool, selectedCounterPartyToken, ethPrice, allPools, allNativeAssets, usdtPrice, usdcPrice, usdePrice, daiPrice } from '$lib/stores';
+    import { showWalletModal, selectedPool, selectedCounterPartyToken, selectedPrimaryToken, allPools, allNativeAssets} from '$lib/stores';
     import WalletModal from "$lib/components/wallet-modal.svelte";
     import { getTotalAssets, getPoolMetadata} from '$lib/services/dex';
     import SwapModal from '$lib/components/swap-modal.svelte';
@@ -12,6 +12,7 @@
     import LoadingOverlay from '$lib/components/loading-overlay.svelte';
     import type { PageData } from './$types';
     import { getBaseAssetPrice } from '$lib/services/price';
+    import { getBaseAssetSupply } from '$lib/services/supply';
 
     export let data: PageData;
 
@@ -52,25 +53,35 @@
         console.log('poolMetadata', poolMetadata);
     });
     
-    let currentTokenPrice = 0;
     let poolMetadata: any;
-    const TOTAL_SUPPLY = 1_000_000_000;
     let isChatOpen = false;
     let liquidityUSD = 0;
     let isSwapModalOpen = false;
     let isLoading = false;
-
-    function handlePriceUpdate(event: CustomEvent<number>) {
-        currentTokenPrice = event.detail;
-    }
 
     async function updatePoolData() {
         try {
             // Get ETH price
             
             const counterPartyToken = await getBaseAssetPrice($selectedPool.token1Address);
+            const counterPartyTokenSupply = await getBaseAssetSupply($selectedPool.token1Address);
+            const token0Supply = await getBaseAssetSupply($selectedPool.token0Address);
+            console.log('token0Supply::::', token0Supply);
+            let primaryTokenSupply;
+            if (token0Supply?.supply <= 0) {
+                primaryTokenSupply = 1000000000;
+            } else {
+                primaryTokenSupply = token0Supply.supply / 1e9;
+            }
+            console.log('primaryTokenSupply::::', primaryTokenSupply);
+            $selectedPrimaryToken = {
+                supply: primaryTokenSupply
+            };
+            console.log('selectedPrimaryToken:::::', $selectedPrimaryToken);
             $selectedCounterPartyToken = counterPartyToken;
-            console.log('counterPartyTokenUSDPrice', $selectedCounterPartyToken.priceUSD);
+            $selectedCounterPartyToken['supply'] = counterPartyTokenSupply.supply / 1e9;
+            console.log('selectedCounterPartyToken:::', $selectedCounterPartyToken);
+            //console.log('counterPartyTokenSupply', $counterPartyTokenSupply);
 
             console.log('selectedPool:::', $selectedPool);
             // Get pool metadata
@@ -88,18 +99,7 @@
 
     // Replace the existing get$ethPrice reactive statement with this
     $: updatePoolData();
-    $: marketCap = $selectedCounterPartyToken?.priceUSD ? currentTokenPrice * TOTAL_SUPPLY * ($selectedCounterPartyToken.priceUSD || 0) : 0;
-
-    function formatCurrency(value: number): string {
-        if (value >= 1_000_000_000) {
-            return `$${(value / 1_000_000_000).toFixed(2)}B`;
-        } else if (value >= 1_000_000) {
-            return `$${(value / 1_000_000).toFixed(2)}M`;
-        } else if (value >= 1_000) {
-            return `$${(value / 1_000).toFixed(2)}K`;
-        }
-        return `$${value.toFixed(2)}`;
-    }
+   
 
     function toggleChat() {
         isChatOpen = !isChatOpen;
@@ -135,8 +135,6 @@
         <Chart 
             bind:pool={$selectedPool} 
             {liquidityUSD}
-            {marketCap}
-            on:priceUpdate={handlePriceUpdate}
             on:loadingChange={handleChartLoadingChange}
         >
             <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">

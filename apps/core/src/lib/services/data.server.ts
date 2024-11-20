@@ -109,6 +109,24 @@ export const scrapeAssetPrice = async (asset_address: string) => {
     }
 }
 
+export const getSupply = async (asset_address: string) => {
+    const query = `
+        query MyQuery($asset: String!) {
+            BridgeFungibleToken_TotalSupplyEvent(where: {asset: {_eq: $asset}}, limit: 1, order_by: {block_height: desc, time: desc}) {
+                supply
+            }
+        }
+
+    `;
+
+    const variables = {
+        asset: asset_address
+    }
+
+    const response = await queryDB(query, variables);
+    return response.data.BridgeFungibleToken_TotalSupplyEvent?.[0] || {supply: 0};
+}
+
 export const getTradingData = async (pool_id: string, offset: number = 0, limit: number = 1000) => {
     
     try{

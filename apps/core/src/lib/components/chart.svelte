@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy, tick } from 'svelte';
     import { getTradingData, convertTradingDataToChartData, type TimeFrame } from '$lib/services/data';
-    import { selectedCounterPartyToken } from '$lib/stores';
+    import { selectedCounterPartyToken, selectedPrimaryToken } from '$lib/stores';
     import { createChart, ColorType } from 'lightweight-charts';
     import { createEventDispatcher } from 'svelte';
     import type { PoolCatalogEntry } from '$lib/types';
@@ -200,9 +200,9 @@
     }
     async function calculateStats(timeframe: string) {
         isStatsLoading = true;
-        console.log("isStatsLoading111", isStatsLoading)
+        //console.log("isStatsLoading111", isStatsLoading)
         try {
-            console.log("calculateStats:::", timeframe)
+            //console.log("calculateStats:::", timeframe)
             if (!rawData.length) return;
 
             const now = Date.now();
@@ -254,18 +254,19 @@
 
         } finally {
             isStatsLoading = false;
-            console.log("isStatsLoading222", isStatsLoading)
+            //console.log("isStatsLoading222", isStatsLoading)
         }
     }
 
     let isCalculatingPrice = false;
 
     function calculatePrice() {
+        console.log("calculatePrice():::")
         isCalculatingPrice = true;
         const latestTrade = rawData[0];
-        console.log("latestTrade:::", latestTrade)
+        //console.log("latestTrade:::", latestTrade)
         const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
-        console.log("$selectedCounterPartyToken", $selectedCounterPartyToken)
+        //console.log("$selectedCounterPartyToken", $selectedCounterPartyToken)
         const _usdPrice = exchangeRate * ($selectedCounterPartyToken?.priceUSD || 0);
 
         console.log('usdPrice:::11', _usdPrice)
@@ -318,7 +319,7 @@
             }
             isRefreshing = !showFullScreenLoader;
             
-            console.log('Loading chart data for', pool);
+            //console.log('Loading chart data for', pool);
             const newRawData = await getTradingData(pool.id);
             
             if (!isInitialLoad) {
@@ -531,13 +532,17 @@
 
     // Add this reactive statement to recalculate stats when timeframe changes
     $: if (selectedStatsTimeframe && rawData.length) {
-        console.log("calculatestats::::11")
+        //console.log("calculatestats::::11")
         calculateStats(selectedStatsTimeframe);
     }
 
     $: if(rawData.length){
         calculatePrice()
     }
+
+    $: marketCap = $selectedCounterPartyToken?.priceUSD && $selectedPrimaryToken?.supply ? Number(stats.price.usd) * Number($selectedPrimaryToken.supply) : 0;
+    $: console.log('currentTokenPrice:::::', stats.price.usd)
+    $: console.log('marketCap:::::', marketCap)
 </script>
 
 <div class="flex flex-col w-full h-full bg-[#131722] relative overflow-y-auto">
@@ -634,7 +639,7 @@
         <div class="flex min-w-max gap-4 px-4 relative">
             <!-- Loading Overlay for Stats -->
             {#if isStatsLoading}
-                <div class="absolute inset-0 bg-[#131722]/80 flex items-center justify-center z-50 rounded-lg">
+                <div class="relativeinset-0 bg-[#131722]/80 flex items-center justify-center z-50 rounded-lg">
                     <div class="flex items-center gap-2">
                         <svg 
                             class="animate-spin h-5 w-5 text-[#26a69a]" 
@@ -667,11 +672,20 @@
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
                     <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
-                        ${Number(stats.price.usd).toLocaleString('en-US', {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 9,
-                            useGrouping: false
-                        })}
+                        {#if Number(stats.price.usd) < 1}
+                            ${Number(stats.price.usd).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 9,
+                                useGrouping: true
+                            })}
+                        {:else}
+                            ${Number(stats.price.usd).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 4,
+                                useGrouping: true
+                            })}
+                        {/if}
+                        
                         {#if isCalculatingPrice}
                             <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
@@ -701,11 +715,59 @@
                         })} / {pool.token1Name}
                     </div>
                    
-                    <div class="text-[#d1d4dc] text-xs opacity-80">
-                        <span>MCap: {formatCurrency(marketCap)}</span>
+                </div>
+
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
+                    <div class="text-[#d1d4dc] text-xs opacity-60">Market Cap</div>
+                    <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
+                        {formatCurrency(marketCap)}*
+                        {#if isCalculatingPrice}
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="12" 
+                                height="12" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                stroke-width="2" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round"
+                                class="animate-spin"
+                            >
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                            </svg>
+                        {/if}
+                    </div>
+                    <!-- <div class="text-[#d1d4dc] text-xs">
+                        {Number(stats.price.usd)} / {Number(stats.price.eth)}
+                        1 {pool.token1Name} = {(Number(stats.price.eth) / Number(stats.price.usd))} {pool.token0Name}
+                    </div> -->
+                   
+                    
+                    <div class="text-[#d1d4dc] text-[9px] opacity-80">
+                        <span>*Based on total supply on Fuel</span>
+                    </div>
+                    <div class="text-[#d1d4dc] text-[9px] opacity-80">
+                        <span>*Please consider liquidity when analyzing market cap</span>
                     </div>
                     
                 </div>
+
+                {#if $selectedPrimaryToken}
+                    <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
+                        <div class="text-[#d1d4dc] text-xs opacity-60">Supply</div>
+                        <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
+                            {($selectedPrimaryToken.supply).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2
+                            })}
+                        </div>
+                        <div class="text-[#d1d4dc] text-[9px] opacity-80">
+                            <span>*Supply on Fuel</span>
+                        </div>
+                        
+                    </div>
+                {/if}
 
                 <!-- Liquidity -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
