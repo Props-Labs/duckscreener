@@ -258,10 +258,14 @@
         }
     }
 
+    let isCalculatingPrice = false;
+
     function calculatePrice() {
+        isCalculatingPrice = true;
         const latestTrade = rawData[0];
+        console.log("latestTrade:::", latestTrade)
         const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
-            
+        console.log("$selectedCounterPartyToken", $selectedCounterPartyToken)
         const _usdPrice = exchangeRate * ($selectedCounterPartyToken?.priceUSD || 0);
 
         console.log('usdPrice:::11', _usdPrice)
@@ -273,6 +277,7 @@
         };
 
         dispatch('priceUpdate', _usdPrice);
+        isCalculatingPrice = false;
     }
 
     function calculatePriceChangeForPeriod(period: '1H' | '6H' | '24H' | '1W'): number {
@@ -409,13 +414,26 @@
     }
 
     function formatTokenNumber(inValue: string, outValue: string, isBuy: boolean): string {
-        if (isBuy) {
-            const tokenOut = Number(outValue) / 1e9;
-            return new Intl.NumberFormat('en-US').format(tokenOut);
-        } else {
-            const tokenIn = Number(inValue) / 1e9;
-            return new Intl.NumberFormat('en-US').format(-tokenIn);
+        const value = isBuy 
+            ? Number(outValue) / 1e9 
+            : -(Number(inValue) / 1e9);
+
+        let maxDigits = 2;
+        // Handle very small numbers
+        if (Math.abs(value) < 0.000001) {
+            maxDigits = 16;
+            //return value.toExponential(6);
         }
+        else{
+
+        }
+        
+        // Handle regular numbers
+        return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: maxDigits,
+            useGrouping: true
+        }).format(value);
     }
 
     function getPriceDirection(currentRate: string, previousRate: string): string {
@@ -648,25 +666,41 @@
                 <!-- Price USD -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
                     <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
-                    <div class="text-[#d1d4dc] font-semibold">
+                    <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
                         ${Number(stats.price.usd).toLocaleString('en-US', {
                             minimumFractionDigits: 0,
                             maximumFractionDigits: 9,
                             useGrouping: false
                         })}
+                        {#if isCalculatingPrice}
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="12" 
+                                height="12" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                stroke-width="2" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round"
+                                class="animate-spin"
+                            >
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                            </svg>
+                        {/if}
                     </div>
                     <!-- <div class="text-[#d1d4dc] text-xs">
                         {Number(stats.price.usd)} / {Number(stats.price.eth)}
                         1 {pool.token1Name} = {(Number(stats.price.eth) / Number(stats.price.usd))} {pool.token0Name}
                     </div> -->
-                    {#if pool.token1Name === 'ETH'}
-                        <div class="text-[#d1d4dc] text-xs opacity-80">
-                            @ ${($selectedCounterPartyToken?.priceUSD || 0).toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })} / ETH
-                        </div>
-                    {/if}
+                    
+                    <div class="text-[#d1d4dc] text-xs opacity-80">
+                        @ ${($selectedCounterPartyToken?.priceUSD || 0).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })} / {pool.token1Name}
+                    </div>
+                   
                     <div class="text-[#d1d4dc] text-xs opacity-80">
                         <span>MCap: {formatCurrency(marketCap)}</span>
                     </div>

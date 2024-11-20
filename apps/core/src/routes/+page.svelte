@@ -180,11 +180,13 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div class="grid grid-cols-2 gap-2 w-full sm:w-auto flex items-center justify-center min-w-[400px]">
-                        <div class="border-2 border-dashed border-gray-600 rounded-lg px-6 py-3 flex items-center justify-center min-w-[300px] min-h-[60px] col-span-2">
-                            <span class="text-gray-500 text-sm">Advertise Here</span>
+                    <a href="https://f3oesm92wa8.typeform.com/to/dPoPJ003" target="_blank" rel="noopener noreferrer" class="text-[#2B2B43] opacity-75 hover:opacity-100 hover:text-[#26a69a] transition-opacity duration-200">
+                        <div class="grid grid-cols-2 gap-2 w-full sm:w-auto flex items-center justify-center min-w-[400px]">
+                            <div class="border-2 border-dashed border-[#2B2B43] rounded-lg px-6 py-3 flex items-center justify-center min-w-[300px] min-h-[60px] col-span-2">
+                                <span class="text-sm">Advertise Here</span>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                     <SearchBox on:select={handlePoolSelect} />
                     <!--
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
