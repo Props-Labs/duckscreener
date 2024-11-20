@@ -69,7 +69,3 @@ networks:
       logId: '12590297951544646752'
     - name: SetNameEvent
       logId: '7845998088195677205'
-    - name: Transfer
-    - name: Mint
-    - name: Burn
-    - name: Call
