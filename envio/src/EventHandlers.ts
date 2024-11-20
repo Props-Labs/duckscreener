@@ -1,6 +1,7 @@
 /*
  * Please refer to https://docs.envio.dev for a thorough guide on all Envio indexer features
  */
+
 import {
   MiraV1Core,
   MiraV1Core_ReentrancyError,
