@@ -19,13 +19,172 @@ import {
   MiraV1Core_OwnershipSet,
   MiraV1Core_InitializationError,
   MiraV1Core_SetDecimalsEvent,
-  MiraV1Core_Transfer,
-  MiraV1Core_Mint,
-  MiraV1Core_Burn,
-  MiraV1Core_Call,
+  BridgeFungibleToken,
+  BridgeFungibleToken_SetMetadataEvent,
+  BridgeFungibleToken_SetNameEvent,
+  BridgeFungibleToken_RefundRegisteredEvent,
+  BridgeFungibleToken_DepositEvent,
+  BridgeFungibleToken_SetSymbolEvent,
+  BridgeFungibleToken_ClaimRefundEvent,
+  BridgeFungibleToken_WithdrawalEvent,
+  BridgeFungibleToken_TotalSupplyEvent,
+  BridgeFungibleToken_SetDecimalsEvent
+
 } from "generated";
 
 import * as util from 'util';
+
+BridgeFungibleToken.SetMetadataEvent.handler(async ({ event, context }) => {
+  //console.log('BridgeFungibleToken.SetMetadataEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  // Convert BigInt to string if metadata contains BigInt
+  //@ts-ignore
+  const metadata = event.params.metadata.payload.case === 'Int' ? { case: event.params.metadata.payload.case, payload: event.params.metadata.payload.payload.toString() } : event.params.metadata.payload;
+
+  const entity: BridgeFungibleToken_SetMetadataEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    asset: event.params.asset.bits,
+    metadata: JSON.stringify(metadata),
+    key: event.params.key,
+    sender: event.params.sender.payload.bits
+  };
+
+  context.BridgeFungibleToken_SetMetadataEvent.set(entity);
+});
+
+BridgeFungibleToken.SetNameEvent.handler(async ({ event, context }) => {
+  //console.log('BridgeFungibleToken.SetNameEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_SetNameEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    asset: event.params.asset.bits,
+    name: event.params.name.payload as string || '',
+    sender: event.params.sender.payload.bits
+  };
+
+  context.BridgeFungibleToken_SetNameEvent.set(entity);
+});
+
+BridgeFungibleToken.RefundRegisteredEvent.handler(async ({ event, context }) => {
+  console.log('BridgeFungibleToken.RefundRegisteredEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_RefundRegisteredEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    from: '',
+    token_address: '',
+    token_id: '',
+    amount: BigInt(0),
+  };
+
+  context.BridgeFungibleToken_RefundRegisteredEvent.set(entity);
+});
+
+
+BridgeFungibleToken.DepositEvent.handler(async ({ event, context }) => {
+  //console.log('BridgeFungibleToken.DepositEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_DepositEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    to: event.params.to.payload.bits,
+    from: event.params.from,
+    amount: event.params.amount
+  };
+
+  context.BridgeFungibleToken_DepositEvent.set(entity);
+});
+
+BridgeFungibleToken.SetSymbolEvent.handler(async ({ event, context }) => {
+  //console.log('BridgeFungibleToken.SetSymbolEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_SetSymbolEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    asset: event.params.asset.bits,
+    symbol: event.params.symbol.payload as string || '',
+    sender: event.params.sender.payload.bits
+  };
+
+  context.BridgeFungibleToken_SetSymbolEvent.set(entity);
+});
+
+BridgeFungibleToken.ClaimRefundEvent.handler(async ({ event, context }) => {
+  console.log('BridgeFungibleToken.ClaimRefundEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_ClaimRefundEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    amount: event.params.amount,
+    from: '',
+    token_address: '',
+    token_id: ''
+  };
+
+  context.BridgeFungibleToken_ClaimRefundEvent.set(entity);
+});
+
+BridgeFungibleToken.WithdrawalEvent.handler(async ({ event, context }) => {
+  console.log('BridgeFungibleToken.WithdrawalEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_WithdrawalEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    amount: event.params.amount,
+    to: event.params.to,
+    from: event.params.from.payload.bits
+  };
+
+  context.BridgeFungibleToken_WithdrawalEvent.set(entity);
+});
+
+BridgeFungibleToken.TotalSupplyEvent.handler(async ({ event, context }) => {
+  console.log('BridgeFungibleToken.TotalSupplyEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_TotalSupplyEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    asset: event.params.asset.bits,
+    supply: event.params.supply,
+    sender: event.params.sender.payload.bits
+  };
+
+  context.BridgeFungibleToken_TotalSupplyEvent.set(entity);
+});
+
+BridgeFungibleToken.SetDecimalsEvent.handler(async ({ event, context }) => {
+  console.log('BridgeFungibleToken.SetDecimalsEvent.handler event', util.inspect(event, false, null, true /* enable colors */));
+
+  const entity: BridgeFungibleToken_SetDecimalsEvent = {
+    id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
+    time: event.block.time,
+    block_height: event.block.height,
+    transaction_id: event.transaction.id,
+    asset: event.params.asset.bits,
+    decimals: event.params.decimals,
+    sender: event.params.sender.payload.bits
+  };
+
+  context.BridgeFungibleToken_SetDecimalsEvent.set(entity);
+});
 
 MiraV1Core.ReentrancyError.handler(async ({ event, context }) => {
   const entity: MiraV1Core_ReentrancyError = {
@@ -247,62 +406,3 @@ MiraV1Core.SetDecimalsEvent.handler(async ({ event, context }) => {
 
   context.MiraV1Core_SetDecimalsEvent.set(entity);
 });
-
-// MiraV1Core.Transfer.handler(async ({ event, context }) => {
-//   const entity: MiraV1Core_Transfer = {
-//     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
-//     time: event.block.time,
-    // block_height: event.block.height,
-    // transaction_id: event.transaction.id,
-//     from: event.params.sender.payload.bits,
-//     to: event.params.recipient.payload.bits,
-//     asset: event.params.assetId.toString(),
-//     amount: event.params.amount,
-//   };
-
-//   context.MiraV1Core_Transfer.set(entity);
-// });
-
-// MiraV1Core.Mint.handler(async ({ event, context }) => {
-//   const entity: MiraV1Core_Mint = {
-//     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
-//     time: event.block.time,
-    // block_height: event.block.height,
-    // transaction_id: event.transaction.id,
-//     to: event.params.recipient.payload.bits,
-//     asset: event.params.assetId.toString(),
-//     amount: event.params.amount,
-//   };
-
-//   context.MiraV1Core_Mint.set(entity);
-// });
-
-// MiraV1Core.Burn.handler(async ({ event, context }) => {
-//   const entity: MiraV1Core_Burn = {
-//     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
-//     time: event.block.time,
-    // block_height: event.block.height,
-    // transaction_id: event.transaction.id,
-//     from: event.params.sender.payload.bits,
-//     asset: event.params.assetId.toString(),
-//     amount: event.params.amount,
-//   };
-
-//   context.MiraV1Core_Burn.set(entity);
-// });
-
-// MiraV1Core.Call.handler(async ({ event, context }) => {
-//   const entity: MiraV1Core_Call = {
-//     id: `${event.chainId}_${event.block.height}_${event.logIndex}`,
-//     time: event.block.time,
-    // block_height: event.block.height,
-    // transaction_id: event.transaction.id,
-//     from: event.params.sender.payload.bits,
-//     to: event.params.recipient.payload.bits,
-//     amount: event.params.amount,
-//     asset: event.params.assetId.toString(),
-//     data: event.params.calldata?.toString(),
-//   };
-
-//   context.MiraV1Core_Call.set(entity);
-// });

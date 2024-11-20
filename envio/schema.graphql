@@ -189,3 +189,98 @@ type Asset {
   amount: BigInt!
 }
 
+type BridgeFungibleToken_SetMetadataEvent {
+  id: ID!
+  asset: String!
+  metadata: String!
+  key: String!
+  sender: String!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_SetNameEvent {
+  id: ID!
+  asset: String!
+  name: String!
+  sender: String!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_RefundRegisteredEvent {
+  id: ID!
+  from: String!
+  token_address: String!
+  token_id: String!
+  amount: BigInt!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_DepositEvent {
+  id: ID!
+  to: String!
+  from: String!
+  amount: BigInt!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_SetSymbolEvent {
+  id: ID!
+  asset: String!
+  symbol: String!
+  sender: String!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_ClaimRefundEvent {
+  id: ID!
+  amount: BigInt!
+  from: String!
+  token_address: String!
+  token_id: String!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_WithdrawalEvent {
+  id: ID!
+  to: String!
+  from: String!
+  amount: BigInt!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_TotalSupplyEvent {
+  id: ID!
+  asset: String!
+  supply: BigInt!
+  sender: String!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+type BridgeFungibleToken_SetDecimalsEvent {
+  id: ID!
+  asset: String!
+  decimals: Int!
+  sender: String!
+  time: Int!
+  block_height: Int!
+  transaction_id: String!
+}
+
+
+
