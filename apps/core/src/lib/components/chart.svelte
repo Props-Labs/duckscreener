@@ -636,6 +636,7 @@
     </button>
 
     <div class="w-full overflow-x-auto bg-[#131722] border-y border-[#2B2B43] pt-4 py-8">
+        {#if pool}
         <div class="flex min-w-max gap-4 px-4 relative">
             <!-- Loading Overlay for Stats -->
             {#if isStatsLoading}
@@ -712,7 +713,7 @@
                         @ ${($selectedCounterPartyToken?.priceUSD || 0).toLocaleString('en-US', {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
-                        })} / {pool.token1Name}
+                        })} / {#if pool}{pool.token1Name}{/if}
                     </div>
                    
                 </div>
@@ -856,6 +857,7 @@
                 </div>
             </div>
         </div>
+        {/if}
     </div>
 
     <div 
