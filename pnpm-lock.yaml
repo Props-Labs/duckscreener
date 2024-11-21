@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@types/node':
+        specifier: ^20.17.6
+        version: 20.17.6
+      typescript:
+        specifier: ^5.6.3
+        version: 5.6.3
     devDependencies:
       turbo:
         specifier: ^2.2.3
