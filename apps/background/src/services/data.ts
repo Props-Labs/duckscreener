@@ -1,14 +1,21 @@
-import 'dotenv/config'; 
-import * as GraphQL from 'graphql-request';
+import 'dotenv/config';
 import { createClient } from 'graphql-ws';
 import WebSocket from 'ws';
 import { config } from '../config';
 
-export const graphQLClient = new GraphQL.GraphQLClient(config.graphql.url, {
-  // headers: {
-  // 	'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET
-  // }
-});
+let graphQLClient: any = null;
+
+async function getGraphQLClient() {
+  if (!graphQLClient) {
+    const GraphQL = await import('graphql-request');
+    graphQLClient = new GraphQL.GraphQLClient(config.graphql.url, {
+      // headers: {
+      // 	'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET
+      // }
+    });
+  }
+  return graphQLClient;
+}
 
 export const wsClient = createClient({
   url: config.graphql.wsUrl,
@@ -40,5 +47,6 @@ export function subscribeToQuery(query: string, callback: (data: any) => void) {
 }
 
 export async function queryDB(query: string, variables: any) {
-  return await graphQLClient.request(query, variables);
+  const client = await getGraphQLClient();
+  return await client.request(query, variables);
 }

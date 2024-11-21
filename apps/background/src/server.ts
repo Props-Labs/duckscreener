@@ -1,11 +1,10 @@
-import throng from 'throng';
-import type { WorkerFunction } from 'throng';
-import { PoolSyncService } from './services/pool-sync.js';
-import { startPoolSubscriber } from './services/pool-subscriber.js';
-import { loadAssetData } from './services/assets.js';
-import { redis } from './services/redis.js';
+import throng from "throng";
+import { PoolSyncService } from './services/pool-sync';
+import { startPoolSubscriber } from './services/pool-subscriber';
+import { loadAssetData } from './services/assets';
+import { redis } from './services/redis';
 
-const start: WorkerFunction = async (id: number) => {
+const start = async (id: number) => {
   try {
     console.log(`Worker ${id} starting...`);
     await loadAssetData();
