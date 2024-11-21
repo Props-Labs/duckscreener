@@ -176,8 +176,9 @@ async function getTokenSymbols(addresses: string[]): Promise<Record<string, stri
     try {
         const response = await queryDB(query, { addresses });
         const symbols: Record<string, string> = {};
-        
+        //@ts-ignore
         if (response?.data?.MiraV1Core_SetSymbolEvent) {
+            //@ts-ignore
             response.data.MiraV1Core_SetSymbolEvent.forEach((event: any) => {
                 symbols[event.asset] = event.symbol;
             });
@@ -203,6 +204,7 @@ export async function updateAllPools(): Promise<void> {
 
     try {
         const response = await queryDB(query, {});
+        //@ts-ignore
         const pools = response?.data?.MiraV1Core_CreatePoolEvent || [];
 
         console.log(`Syncing ${pools.length} existing pools...`);
