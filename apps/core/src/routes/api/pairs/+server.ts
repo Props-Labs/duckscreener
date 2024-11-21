@@ -7,6 +7,6 @@ export async function GET() {
         return json(pairs);
     } catch (error) {
         console.error('Error fetching pairs:', error);
-        return json({ error: 'Failed to fetch pairs' }, { status: 500 });
+        return json({ error: 'Failed to fetch pairs::' }, { status: 500 });
     }
 } 

@@ -3,6 +3,11 @@ import { getValue, storeValue } from './redis';
 import type { TradingPair } from './pairs';
 import * as cheerio from 'cheerio'
 import {getPriceData} from './blockchain';
+import {usdfTokenSwayABI} from './abis';
+import { initializeProvider} from './data';
+import { Wallet, Contract, type AssetId } from 'fuels';
+import { SingleSrc20Asset} from './src_20';
+
 
 interface SwapEvent {
     exchange_rate: string;
@@ -65,51 +70,58 @@ export const scrapeAssetPrice = async (asset_address: string) => {
     );
 
     console.log('token::', token);
+    if(token){
 
-    if(token.name === 'Ethereum'){
-        const ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419")
-        return {priceUSD: Number(ethPrice.formattedPrice)};
-    }
-    // Get the Ethereum address from the token's Ethereum network entry
-    const ethereumNetwork = token?.networks.find((network: any) => 
-        network.type === 'ethereum' && network.chainId === 1
-    );
-    const address = ethereumNetwork?.address;
-
-    console.log('eth asset address::', address);
-
-    try {
-        let response = await fetch(`https://www.coingecko.com/en/coins/${address}`)
-        let html = await response.text()
-        let $ = cheerio.load(html)
-        let priceText = $('span[data-converter-target="price"]').first().text()
-        console.log('Price', priceText)
-
-        if(!priceText){
-            let formattedName;
-            if(token.name === 'SolvBTC.BBN'){
-                formattedName = 'solv-protocol-solvbtc-bbn'
-            }
-            else{
-                formattedName = token.name.replace(/ /g, '-').toLowerCase();
-            }
-            
-            response = await fetch(`https://www.coingecko.com/en/coins/${formattedName}`)
-            html = await response.text()
-            $ = cheerio.load(html)
-            priceText = $('span[data-converter-target="price"]').first().text()
-            console.log('Price2', priceText)
+        if(token?.name === 'Ethereum'){
+            const ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419")
+            return {priceUSD: Number(ethPrice.formattedPrice)};
         }
-        const convertedPrice = parseFloat(priceText.replace(/[$,]/g, ''))  // Remove both $ and commas
-        await storeValue(`price_${asset_address}`, JSON.stringify({priceUSD: convertedPrice}), 10); // 10 sec cache
-        return {priceUSD: convertedPrice};
-    } catch (error) {
-        console.error('Error fetching pairs:', error);
-        return { error: 'Failed to fetch asset price', token };
+        // Get the Ethereum address from the token's Ethereum network entry
+        const ethereumNetwork = token?.networks.find((network: any) => 
+            network.type === 'ethereum' && network.chainId === 1
+        );
+        const address = ethereumNetwork?.address;
+
+        console.log('eth asset address::', address);
+
+        try {
+            let response = await fetch(`https://www.coingecko.com/en/coins/${address}`)
+            let html = await response.text()
+            let $ = cheerio.load(html)
+            let priceText = $('span[data-converter-target="price"]').first().text()
+            console.log('Price', priceText)
+
+            if(!priceText){
+                let formattedName;
+                if(token.name === 'SolvBTC.BBN'){
+                    formattedName = 'solv-protocol-solvbtc-bbn'
+                }
+                else{
+                    formattedName = token.name.replace(/ /g, '-').toLowerCase();
+                }
+                
+                response = await fetch(`https://www.coingecko.com/en/coins/${formattedName}`)
+                html = await response.text()
+                $ = cheerio.load(html)
+                priceText = $('span[data-converter-target="price"]').first().text()
+                console.log('Price2', priceText)
+            }
+            const convertedPrice = parseFloat(priceText.replace(/[$,]/g, ''))  // Remove both $ and commas
+            await storeValue(`price_${asset_address}`, JSON.stringify({priceUSD: convertedPrice}), 10); // 10 sec cache
+            return {priceUSD: convertedPrice};
+        } catch (error) {
+            console.error('Error fetching pairs:', error);
+            return { error: 'Failed to fetch asset price', token };
+        }
+    }
+    else{
+        // assume a stable coin
+        return {priceUSD: 1.00};
     }
 }
 
 export const getSupply = async (asset_address: string) => {
+    console.log('getSupply::', asset_address);
     const query = `
         query MyQuery($asset: String!) {
             BridgeFungibleToken_TotalSupplyEvent(where: {asset: {_eq: $asset}}, limit: 1, order_by: {block_height: desc, time: desc}) {
@@ -123,8 +135,108 @@ export const getSupply = async (asset_address: string) => {
         asset: asset_address
     }
 
-    const response = await queryDB(query, variables);
-    return response.data.BridgeFungibleToken_TotalSupplyEvent?.[0] || {supply: 0};
+    let response: any;
+    try{
+        response = await queryDB(query, variables);
+    }
+    catch(error){
+        console.log('Error fetching supply queryDB:', error);
+    }
+    
+
+    //find supply elsewhere
+    if(!response?.data?.BridgeFungibleToken_TotalSupplyEvent?.[0]){
+        console.log('No supply found');
+
+        const provider = await initializeProvider();
+        
+        const wallet = Wallet.generate();
+        wallet.connect(provider);
+        
+        try{
+ //USDF
+            let contractAddress = '0x33a6d90877f12c7954cca6d65587c25e9214c7bed2231c188981c7114c1bdb78';
+
+            //USDF
+            if(asset_address === '0x33a6d90877f12c7954cca6d65587c25e9214c7bed2231c188981c7114c1bdb78'){
+                contractAddress = '0x32deed96558e9572abce544aaf256724aee60517eeb1fabe76e86e4790c888b0';
+            }
+
+
+            const contract = new SingleSrc20Asset(
+                contractAddress,
+                wallet
+            );
+            //const contract = new Contract(asset_address, usdfTokenSwayABI, wallet);
+            
+            const assetId: AssetId = {
+                bits: asset_address
+            };
+
+            console.log('calling contract1:::')
+            const {supply} = await getContractSupply(contractAddress, asset_address)
+
+            console.log('returned supply::', supply);
+
+            if(Number(supply) > 0){
+                return {supply};
+            }
+
+            //try fuel up contract
+
+            console.log('calling fuel up contract:::')
+
+            contractAddress = '0x81d5964bfbb24fd994591cc7d0a4137458d746ac0eb7ececb9a9cf2ae966d942';
+            const {supply: fuelUpSupply} = await getContractSupply(contractAddress, asset_address)
+           
+            console.log('getSupply supply1::', fuelUpSupply);
+            console.log('getSupply supply2::', {supply: fuelUpSupply || '0'});
+            return {supply: fuelUpSupply || '0'};
+        }
+        catch(error){
+            console.log('Try Error fetching supply:', error);
+            return {supply: '0'};
+            
+        }
+        
+    }
+    else{
+        console.log('getSupply supply found in db::', response.data.BridgeFungibleToken_TotalSupplyEvent?.[0]);
+        return response.data.BridgeFungibleToken_TotalSupplyEvent?.[0] || {supply: '0'};
+    }
+}
+
+export const getContractSupply = async (contract_address: string, asset_address: string) => {
+    const provider = await initializeProvider();
+        
+    const wallet = Wallet.generate();
+    wallet.connect(provider);
+    
+    try{
+//USDF
+       
+        const contract = new SingleSrc20Asset(
+            contract_address,
+            wallet
+        );
+        //const contract = new Contract(asset_address, usdfTokenSwayABI, wallet);
+        
+        const assetId: AssetId = {
+            bits: asset_address
+        };
+
+        console.log('calling contract1:::')
+        //@ts-ignore
+        const {value} = await contract.functions.total_supply(assetId).addContracts([contract]).get();
+        console.log('getSupply supply1::', value);
+        console.log('getSupply supply2::', {supply: value?.Some?.toString() || '0'});
+        return {supply: value?.Some?.toString() || '0'};
+    }
+    catch(error){
+        console.log('Error fetching supply:', error);
+       
+        return {supply: '0'};
+    }
 }
 
 export const getTradingData = async (pool_id: string, offset: number = 0, limit: number = 1000) => {

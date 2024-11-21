@@ -57,7 +57,8 @@
     
     export let pool: PoolCatalogEntry;
     export let liquidityUSD: number;
-    export let marketCap: number;
+    export let poolMetadata: any;
+    let marketCap: number;
     let chart: any;
     let candlestickSeries: any;
     let selectedTimeFrame: TimeFrame = '1h';
@@ -264,10 +265,16 @@
         console.log("calculatePrice():::")
         isCalculatingPrice = true;
         const latestTrade = rawData[0];
-        //console.log("latestTrade:::", latestTrade)
+        console.log("latestTrade:::", latestTrade)
         const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
-        //console.log("$selectedCounterPartyToken", $selectedCounterPartyToken)
-        const _usdPrice = exchangeRate * ($selectedCounterPartyToken?.priceUSD || 0);
+        console.log("exchangeRate:::", exchangeRate)
+        console.log("$selectedCounterPartyToken", $selectedCounterPartyToken)
+        console.log("pool", pool)
+        let reducer = 1;
+        if($selectedCounterPartyToken.priceUSD == 1){
+            reducer = 1000;
+        }
+        const _usdPrice = exchangeRate * ($selectedCounterPartyToken?.priceUSD || 0) / reducer;
 
         console.log('usdPrice:::11', _usdPrice)
 
@@ -487,7 +494,7 @@
             
         }
         setupAutoRefresh();
-        
+
         window.addEventListener('resize', handleChartResize);
         handleChartResize();
     });
@@ -523,14 +530,20 @@
     };
 
     function formatCurrency(value: number): string {
-        if (value >= 1_000_000_000) {
-            return `$${(value / 1_000_000_000).toFixed(2)}B`;
-        } else if (value >= 1_000_000) {
-            return `$${(value / 1_000_000).toFixed(2)}M`;
-        } else if (value >= 1_000) {
-            return `$${(value / 1_000).toFixed(2)}K`;
+        try{
+            if (value >= 1_000_000_000) {
+                return `$${(value / 1_000_000_000).toFixed(2)}B`;
+            } else if (value >= 1_000_000) {
+                return `$${(value / 1_000_000).toFixed(2)}M`;
+            } else if (value >= 1_000) {
+                return `$${(value / 1_000).toFixed(2)}K`;
+            }
+            return `$${value.toFixed(2)}`;
         }
-        return `$${value.toFixed(2)}`;
+        catch(e){
+            return '$0.00'
+        }
+       
     }
 
     // Add this reactive statement to recalculate stats when timeframe changes
@@ -543,7 +556,19 @@
         calculatePrice()
     }
 
-    $: marketCap = $selectedCounterPartyToken?.priceUSD && $selectedPrimaryToken?.supply ? Number(stats.price.usd) * Number($selectedPrimaryToken.supply) : 0;
+
+    function calculateMarketCap(){
+        console.log('calculateMarketCap():::::')
+        console.log('$selectedCounterPartyToken?.priceUSD', $selectedCounterPartyToken?.priceUSD)
+        console.log('$selectedPrimaryToken?.supply', $selectedPrimaryToken?.supply)
+        console.log('Number(stats.price.usd)', Number(stats.price.usd))
+        marketCap = Number(stats.price.usd) * Number($selectedPrimaryToken.supply);
+        console.log('marketCap:::::', marketCap)
+    }
+
+    $: if(stats?.price?.usd &&$selectedCounterPartyToken?.priceUSD && $selectedPrimaryToken?.supply){
+        calculateMarketCap()
+    }
     $: console.log('currentTokenPrice:::::', stats.price.usd)
     $: console.log('marketCap:::::', marketCap)
 </script>
@@ -674,7 +699,7 @@
             <div class="flex gap-2">
                 <!-- Price USD -->
                 <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
-                    <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
+                    <div class="text-[#d1d4dc] text-xs opacity-60">LAST PRICE USD</div>
                     <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
                         {#if Number(stats.price.usd) < 1}
                             ${Number(stats.price.usd).toLocaleString('en-US', {
@@ -875,7 +900,7 @@
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Time</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Wallet</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Type</th>
-                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Price ($PSYCHO/$ETH)</th>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Price (${pool.token0Name}/{pool.token1Name})</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Quantity</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Transaction</th>
                 </tr>
