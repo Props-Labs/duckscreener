@@ -72,6 +72,9 @@ importers:
       svelte-fuels:
         specifier: 0.94.9-next.1
         version: 0.94.9-next.1(@wagmi/connectors@5.5.0(@wagmi/core@2.15.0(react@18.3.1)(typescript@5.6.3)(use-sync-external-store@1.2.0(react@18.3.1))(viem@2.10.2(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.22.4)))(bufferutil@4.0.8)(ioredis@5.4.1)(react-native@0.76.2(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(bufferutil@4.0.8)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.6.3)(utf-8-validate@5.0.10)(viem@2.10.2(bufferutil@4.0.8)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4))(bufferutil@4.0.8)(react@18.3.1)(svelte@5.2.7)(typescript@5.6.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+      svelte-seo:
+        specifier: ^1.6.1
+        version: 1.6.1(typescript@5.6.3)
     devDependencies:
       '@adraffy/ens-normalize':
         specifier: ^1.11.0
@@ -5753,6 +5756,11 @@ packages:
   scheduler@0.24.0-canary-efb381bbf-20230505:
     resolution: {integrity: sha512-ABvovCDe/k9IluqSh4/ISoq8tIJnW8euVAWYt5j/bg6dRnqwQwiGO1F/V4AyK96NGF/FB04FhOUDuWj8IKfABA==}
 
+  schema-dts@1.1.2:
+    resolution: {integrity: sha512-MpNwH0dZJHinVxk9bT8XUdjKTxMYrA5bLtrrGmFA6PTLwlOKnhi67XoRd6/ty+Djt6ZC0slR57qFhZDNMI6DhQ==}
+    peerDependencies:
+      typescript: '>=4.1.0'
+
   scrypt-js@3.0.1:
     resolution: {integrity: sha512-cdwTTnqPu0Hyvf5in5asVdZocVDTNRmR7XEcJuIzMjJeSHybHl7vpB66AzwTaIg6CLSbtjcxc8fqcySfnTkccA==}
 
@@ -6020,6 +6028,9 @@ packages:
     resolution: {integrity: sha512-/fkX8uoPx2Y1TrAmbb/e1H715BQrR+3gLZcT8iy+Wrl4huO256wglNbLSuap1Ncv6M6HD8cApU2+dWbCPzGIFA==}
     peerDependencies:
       svelte: ^4.0.0
+
+  svelte-seo@1.6.1:
+    resolution: {integrity: sha512-vTKvOA0rl3HVhgbyoMhwz0P1s+18ldOT+lHlTlrQn7Mn0SBx7Ia7MB+llF4O/mYoiV5idmNu8i3xWsam8COsbw==}
 
   svelte@5.2.7:
     resolution: {integrity: sha512-cEhPGuLHiH2+Z8B1FwQgiZJgA39uUmJR4516TKrM5zrp0/cuwJkfhUfcTxhAkznanAF5fXUKzvYR4o+Ksx3ZCQ==}
@@ -14316,6 +14327,10 @@ snapshots:
     dependencies:
       loose-envify: 1.4.0
 
+  schema-dts@1.1.2(typescript@5.6.3):
+    dependencies:
+      typescript: 5.6.3
+
   scrypt-js@3.0.1: {}
 
   secp256k1@4.0.4:
@@ -14624,6 +14639,12 @@ snapshots:
       - utf-8-validate
       - vue
       - zod
+
+  svelte-seo@1.6.1(typescript@5.6.3):
+    dependencies:
+      schema-dts: 1.1.2(typescript@5.6.3)
+    transitivePeerDependencies:
+      - typescript
 
   svelte@5.2.7:
     dependencies:

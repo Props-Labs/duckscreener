@@ -60,6 +60,7 @@
 		"lightweight-charts": "^4.2.1",
 		"lucide-svelte": "^0.459.0",
 		"mira-dex-ts": "^1.0.42",
-		"svelte-fuels": "0.94.9-next.1"
+		"svelte-fuels": "0.94.9-next.1",
+		"svelte-seo": "^1.6.1"
 	}
 }
