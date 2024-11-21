@@ -1,0 +1,29 @@
+[[package]]
+name = "core"
+source = "path+from-root-2AB5BCE55EAAEFF4"
+
+[[package]]
+name = "multi_src20_asset"
+source = "member"
+dependencies = [
+    "standards",
+    "std",
+]
+
+[[package]]
+name = "single_src20_asset"
+source = "member"
+dependencies = [
+    "standards",
+    "std",
+]
+
+[[package]]
+name = "standards"
+source = "path+from-root-1B220BCB5DC48A05"
+dependencies = ["std"]
+
+[[package]]
+name = "std"
+source = "git+https://github.com/fuellabs/sway?tag=v0.62.0#efda0397c7bee77de73bd726ec0b732d57614973"
+dependencies = ["core"]
