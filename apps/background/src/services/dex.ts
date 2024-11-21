@@ -1,6 +1,5 @@
 import 'dotenv/config';
-import type { MiraAmm, PoolId } from "./mira-wrapper";
-import { ReadonlyMiraAmm } from "./mira-wrapper";
+import {MiraAmm, PoolId, ReadonlyMiraAmm} from "mira-dex-ts";
 import {Account, Provider} from "fuels";
 import type {AssetId} from "fuels";
 import {initializeProvider} from "./provider";

@@ -10,14 +10,15 @@
   "packageManager": "pnpm@9.4.0",
   "scripts": {
     "build": "turbo run build --cache-dir=.turbo --filter=./apps/* --concurrency=1",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "cd apps/background && npm start",
+    "heroku-postbuild": "pnpm build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/node": "^20.17.6",
-    "typescript": "^5.6.3"
+    "@types/node": "^20.14.2",
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "turbo": "^2.2.3"

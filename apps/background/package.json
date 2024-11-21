@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "main": "index.js",
+  "type": "module",
   "engines": {
     "node": ">=20.x",
     "pnpm": ">=9.4.0"
@@ -10,7 +11,7 @@
   "packageManager": "pnpm@9.4.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node --experimental-specifier-resolution=node build/index.js"
   },
   "dependencies": {
@@ -27,16 +28,9 @@
   "devDependencies": {
     "@types/node": "^20.11.24",
     "@types/throng": "^5.0.7",
-    "@types/ws": "^8.5.10",
+    "@types/ws": "^8.5.13",
+    "tsc-alias": "^1.8.8",
     "tsx": "^4.7.1",
-    "typescript": "^5.3.3",
-    "tsc-alias": "^1.8.8"
-  },
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": "./build/index.js",
-      "require": "./build/index.js"
-    }
+    "typescript": "^5.3.3"
   }
 }

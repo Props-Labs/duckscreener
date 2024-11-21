@@ -1,22 +1,27 @@
 {
-	"compilerOptions": {
-	  "rootDir": "./src",
-	  "outDir": "./build",
-	  "target": "es2020",
-	  "module": "ESNext",
-	  "moduleResolution": "Bundler",
-	  "esModuleInterop": true,
-	  "forceConsistentCasingInFileNames": true,
-	  "strict": true,
-	  "skipLibCheck": true,
-	  "allowJs": true,
-	  "resolveJsonModule": true,
-	  "baseUrl": ".",
-	  "paths": {
-	    "*": ["node_modules/*"]
-	  }
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules"]
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "outDir": "./build",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/*"]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }
-  

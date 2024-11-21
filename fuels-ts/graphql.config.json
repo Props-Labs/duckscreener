@@ -1,4 +1,0 @@
-{
-  "schema": "./packages/account/src/providers/fuel-core-schema.graphql",
-  "documents": "./packages/account/src/providers/operations.graphql"
-}

@@ -1,6 +1,6 @@
 import { getValue, storeValue, deleteValue } from './redis';
 import { queryDB } from './data';
-import type { PoolId, PoolMetadata } from './mira-wrapper';
+import type { PoolMetadata, PoolId } from 'mira-dex-ts';
 import { getReadonlyMiraAmm, getPoolMetadata, getLPAssetInfo } from "./dex";
 import type {AssetId} from "fuels";
 import {Contract, Provider, WalletUnlocked, Wallet} from "fuels";
@@ -43,7 +43,7 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         
         // Get pool metadata from Mira SDK
         const metadata = await getPoolMetadata(`${token0Address}_${token1Address}_${isStableStr === 'true'}`);
-        
+        console.log('metadata', metadata);
         //console.log('metadata', metadata);
         if (!metadata) {
             console.error(`Failed to get metadata for pool ${pool.pool_id}`);
