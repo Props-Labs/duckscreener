@@ -1,5 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { page } from '$app/stores';
+    import SvelteSeo from 'svelte-seo';
     import Chart from '$lib/components/chart.svelte';
     import { getPriceData } from '$lib/services/blockchain';
     import Chat from '$lib/components/chat.svelte';
@@ -125,6 +127,37 @@
     }
 </script>
 
+<SvelteSeo
+	title="SwaySwap - Chart and trade tokens on Fuel with ETH & SOL."
+	description="SwaySwap is a token screener for the Fuel blockchain. Trade without leaving your charts."
+	canonical={`${$page.url.protocol}//${$page.url.host}/`}
+	keywords="Fuel, Meme Coins, SwaySwap, Chart, Trade, Token, DEX, Fuel blockchain"
+	openGraph={{
+		title: 'SwaySwap - Chart and trade tokens on Fuel with ETH & SOL.',
+		description:
+			'SwaySwap is a token screener for the Fuel blockchain. Trade without leaving your charts.',
+		url: $page.url.href,
+		type: 'website',
+		images: [
+			{
+				url: `${$page.url.protocol}//${$page.url.host}/seo.jpg`,
+				width: 1200,
+				height: 630,
+				alt: 'SwaySwap - Chart and trade tokens on Fuel with ETH & SOL.'
+			}
+		],
+		site_name: 'SwaySwap - Chart and trade tokens on Fuel with ETH & SOL.'
+	}}
+	twitter={{
+		card: 'summary_large_image',
+		site: '@props',
+		title: "SwaySwap - Chart and trade tokens on Fuel with ETH & SOL.",
+		description:
+			'SwaySwap is a token screener for the Fuel blockchain. Trade without leaving your charts.',
+		image: `${$page.url.protocol}//${$page.url.host}/seo.jpg`
+	}}
+/>
+
 <div class="flex h-screen bg-[#131722] relative">
     <!-- Mobile Chat Toggle Button -->
     <button
@@ -147,7 +180,7 @@
                         <img src="/logo.png" class="w-6 h-6 mr-2" />
                         <span class="text-xl sm:text-xl font-bold text-white relative group">
                             
-                            FuelCharts.com
+                            SwaySwap
                             <!-- <span class="absolute -inset-1 bg-gradient-to-r from-[#26a69a]/20 via-[#2196f3]/20 to-[#26a69a]/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
                             <span class="absolute -bottom-0.5 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#26a69a] to-transparent"></span> -->
                         </span>
