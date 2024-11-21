@@ -1,3 +1,15 @@
+import {Provider} from "fuels";
+import { env } from '$env/dynamic/public';
+
+let provider: Provider;
+export async function initializeProvider() {
+    if (!provider) {
+        //@ts-ignore
+        provider = await Provider.create(env.PUBLIC_FUEL_RPC_URL);
+    }
+    return provider;
+}
+
 
 interface SwapEvent {
     exchange_rate: string;
