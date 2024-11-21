@@ -35,6 +35,9 @@ importers:
       mira-dex-ts:
         specifier: ^1.0.42
         version: 1.0.42(fuels@0.96.1)
+      throng:
+        specifier: ^5.0.0
+        version: 5.0.0
       ws:
         specifier: ^8.18.0
         version: 8.18.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -5988,6 +5991,10 @@ packages:
 
   throat@5.0.0:
     resolution: {integrity: sha512-fcwX4mndzpLQKBS1DVYhGAcYaYt7vsHNIvQV+WXMvnow5cgjPphq5CaayLaGsjRdSCKZFNGt7/GYAuXaNOiYCA==}
+
+  throng@5.0.0:
+    resolution: {integrity: sha512-nrq7+qQhn/DL8yW/wiwImTepfi6ynOCAe7moSwgoYN1F32yQMdBkuFII40oAkb3cDfaL6q5BIoFTDCHdMWQ8Pw==}
+    engines: {node: '>= 10'}
 
   through2@2.0.5:
     resolution: {integrity: sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==}
@@ -14447,6 +14454,10 @@ snapshots:
       real-require: 0.1.0
 
   throat@5.0.0: {}
+
+  throng@5.0.0:
+    dependencies:
+      lodash: 4.17.21
 
   through2@2.0.5:
     dependencies:

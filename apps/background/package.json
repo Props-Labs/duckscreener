@@ -2,8 +2,9 @@
   "name": "@props-labs/duckscreener_background",
   "version": "0.0.1",
   "private": true,
-  "engine": {
-    "node": ">=18.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.x",
     "pnpm": ">=9.4.0"
   },
   "packageManager": "pnpm@9.4.0",
@@ -20,6 +21,7 @@
     "graphql-ws": "^5.16.0",
     "ioredis": "^5.4.1",
     "mira-dex-ts": "^1.0.42",
+    "throng": "^5.0.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {

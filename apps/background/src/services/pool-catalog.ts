@@ -43,7 +43,7 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         
         // Get pool metadata from Mira SDK
         const metadata = await getPoolMetadata(`${token0Address}_${token1Address}_${isStableStr === 'true'}`);
-
+        
         //console.log('metadata', metadata);
         if (!metadata) {
             console.error(`Failed to get metadata for pool ${pool.pool_id}`);

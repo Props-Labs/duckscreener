@@ -1,9 +1,10 @@
+import throng from "throng";
 import { PoolSyncService } from './services/pool-sync';
 import { startPoolSubscriber } from './services/pool-subscriber';
 import { loadAssetData } from './services/assets';
 import { redis } from './services/redis';
 
-async function main() {
+async function start() {
     try {
        
         await loadAssetData();
@@ -31,4 +32,5 @@ async function main() {
     }
 }
 
-main(); 
+const workers = process.env.WEB_CONCURRENCY || 1;
+throng({ workers: workers, lifetime: Infinity, start });
