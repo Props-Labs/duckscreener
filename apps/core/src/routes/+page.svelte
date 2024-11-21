@@ -40,12 +40,12 @@
                 if (validPool) {
                     $selectedPool = validPool;
                 } else {
-                    // If stored pool is no longer valid, use first available pool
-                    $selectedPool = $allPools[0];
+                    // If stored pool is no longer valid, use psycho ducky
+                    $selectedPool = $allPools.find(p => p.id === "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false");
                 }
             } else {
-                // No stored pool, use first available pool
-                $selectedPool = $allPools[0];
+                // No stored pool, use psycho ducky
+                $selectedPool = $allPools.find(p => p.id === "0x86fa05e9fef64f76fa61c03f5906c87a03cb9148120b6171910566173d36fc9e_0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07_false");
             }
 
             
