@@ -27,7 +27,12 @@
    
     onMount(async () => {
         if (browser) {
+
+            const module = await import('svelte-fuels');
+            WalletProvider = module.WalletProvider;
+
             const storedPoolId = localStorage.getItem('selectedPool');
+            console.log('storedPoolId', storedPoolId);
             if (storedPoolId) {
                 const storedPool = JSON.parse(storedPoolId);
                 // Verify the stored pool still exists in our current pool list
@@ -43,8 +48,7 @@
                 $selectedPool = $allPools[0];
             }
 
-            const module = await import('svelte-fuels');
-            WalletProvider = module.WalletProvider;
+            
         }
         
         const totalAssets = await getTotalAssets();
@@ -98,7 +102,7 @@
     }
 
     // Replace the existing get$ethPrice reactive statement with this
-    $: updatePoolData();
+    $: $selectedPool ? updatePoolData() : null;
    
 
     function toggleChat() {
