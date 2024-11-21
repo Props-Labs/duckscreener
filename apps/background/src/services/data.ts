@@ -1,17 +1,22 @@
-import 'dotenv/config'; 
-
-// @ts-ignore
-import * as GraphQL from 'graphql-request';
+import 'dotenv/config';
 import { createClient } from 'graphql-ws';
-import { WebSocket} from 'ws';
+import { WebSocket } from 'ws';
 
+// Create the client after dynamic import
+let graphQLClient: any = null;
 
-//@ts-ignore
-export const graphQLClient = new GraphQL.GraphQLClient(process.env.GRAPHQL_WS_URL, {
-	// headers: {
-	// 	'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET
-	// }
-})
+// Initialize the GraphQL client
+const initGraphQLClient = async () => {
+  const GraphQL = await import('graphql-request');
+  graphQLClient = new GraphQL.GraphQLClient(process.env.GRAPHQL_WS_URL, {
+    // headers: {
+    //   'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET
+    // }
+  });
+};
+
+// Initialize client immediately
+initGraphQLClient();
 
 export const wsClient = createClient({
   //@ts-ignore
@@ -46,5 +51,8 @@ export function subscribeToQuery(query: string, callback: (data: any) => void) {
   }
 
 export async function queryDB(query: string, variables: any) {
+    if (!graphQLClient) {
+        await initGraphQLClient();
+    }
     return await graphQLClient.request(query, variables);
 }
