@@ -7,6 +7,7 @@ let graphQLClient: any = null;
 
 // Initialize the GraphQL client
 const initGraphQLClient = async () => {
+  //@ts-ignore
   const GraphQL = await import('graphql-request');
   graphQLClient = new GraphQL.GraphQLClient(process.env.GRAPHQL_WS_URL, {
     // headers: {
