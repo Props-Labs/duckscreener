@@ -10,8 +10,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node build/index.js",
-    "typecheck": "tsc --noEmit"
+    "start": "node build/index.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
