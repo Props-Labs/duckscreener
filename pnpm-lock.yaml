@@ -45,6 +45,9 @@ importers:
       '@types/node':
         specifier: ^20.11.24
         version: 20.17.6
+      '@types/throng':
+        specifier: ^5.0.7
+        version: 5.0.7
       '@types/ws':
         specifier: ^8.5.10
         version: 8.5.13
@@ -2567,6 +2570,9 @@ packages:
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
+
+  '@types/throng@5.0.7':
+    resolution: {integrity: sha512-O8TBC55LPTOYPXak2Ft7meBksgHituuw49xx7gZy1+BcCO1tRGGD8Eqp2bFDFcLp0vKrsOg/Y077dmHjGiOmWQ==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -9594,6 +9600,8 @@ snapshots:
       '@types/node': 20.17.6
 
   '@types/stack-utils@2.0.3': {}
+
+  '@types/throng@5.0.7': {}
 
   '@types/trusted-types@2.0.7': {}
 
