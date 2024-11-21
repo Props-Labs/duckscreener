@@ -9,6 +9,7 @@ let graphQLClient: any = null;
 const initGraphQLClient = async () => {
   //@ts-ignore
   const GraphQL = await import('graphql-request');
+  //@ts-ignore
   graphQLClient = new GraphQL.GraphQLClient(process.env.GRAPHQL_WS_URL, {
     // headers: {
     //   'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET
