@@ -63,6 +63,7 @@ function parseAmount(amount: string | number, decimals: number): bigint {
 
 // Helper to create pool ID from string
 export function createPoolId(poolIdString: string, swapOrder: boolean = false): PoolId {
+    console.log('createPoolId', poolIdString)
     const [asset0, asset1, isStable] = poolIdString.split('_');
     // If swapOrder is true, swap the assets
     return swapOrder ? [
