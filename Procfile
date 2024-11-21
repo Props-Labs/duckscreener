@@ -1,2 +1,2 @@
 web: cd apps/core && npm start
-worker: cd apps/background && npm start
+worker: cd apps/worker && npm start

@@ -1,9 +1,0 @@
-[workspace]
-members = [
-  "./contracts/mira_amm_contract",
-  "./contracts/mira_validation_hook",
-  "./contracts/mocks/mock_token",
-  "./libraries/interfaces",
-  "./libraries/utils",
-  "./libraries/math",
-]

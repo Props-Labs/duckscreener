@@ -1,1 +1,0 @@
-./packages/fuels/CHANGELOG.md

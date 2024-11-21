@@ -7,8 +7,8 @@ let graphQLClient: any = null;
 
 async function getGraphQLClient() {
   if (!graphQLClient) {
-    const GraphQL = await import('graphql-request');
-    graphQLClient = new GraphQL.GraphQLClient(config.graphql.url, {
+    const { GraphQLClient } = await import('graphql-request');
+    graphQLClient = new GraphQLClient(config.graphql.url, {
       // headers: {
       // 	'x-hasura-admin-secret': process.env.HASURA_ADMIN_SECRET
       // }
@@ -48,5 +48,11 @@ export function subscribeToQuery(query: string, callback: (data: any) => void) {
 
 export async function queryDB(query: string, variables: any) {
   const client = await getGraphQLClient();
-  return await client.request(query, variables);
+  try{
+    return await client.request(query, variables);
+  }
+  catch(e){
+    console.log(e);
+  }
+  
 }

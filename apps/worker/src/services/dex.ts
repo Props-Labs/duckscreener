@@ -1,17 +1,19 @@
 import 'dotenv/config';
-import {MiraAmm, PoolId, ReadonlyMiraAmm} from "mira-dex-ts";
+
 import {Account, Provider} from "fuels";
 import type {AssetId} from "fuels";
 import {initializeProvider} from "./provider";
 
 // Initialize provider and readonlyMiraAmm lazily
 
-let readonlyMiraAmm: ReadonlyMiraAmm;
+let readonlyMiraAmm:any, MiraAmm:any;
 
 export async function getReadonlyMiraAmm() {
     if (!readonlyMiraAmm) {
+        // Import the entire module as a namespace
+        const MiraDexTs = await import('mira-dex-ts');
         const provider = await initializeProvider();
-        readonlyMiraAmm = new ReadonlyMiraAmm(provider);
+        readonlyMiraAmm = new MiraDexTs.ReadonlyMiraAmm(provider);
     }
     return readonlyMiraAmm;
 }
@@ -22,7 +24,7 @@ export async function getTotalAssets() {
     return totalAssets;
 }
 
-export async function getLPAssetInfo(poolId: PoolId) {
+export async function getLPAssetInfo(poolId: any) {
     const miraAmm = await getReadonlyMiraAmm();
     //@ts-ignore
     const assetInfo = await miraAmm.lpAssetInfo(poolId);
@@ -36,7 +38,7 @@ export async function getPoolMetadata(pool_id: any) {
 
     //console.log('poolIdparts', poolIdparts);
 
-    const poolId: PoolId = [
+    const poolId = [
         {bits: poolIdparts[0]} as AssetId,
         {bits: poolIdparts[1]} as AssetId,
         poolIdparts[2] === 'true' ? true : false
