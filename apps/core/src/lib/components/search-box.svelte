@@ -3,7 +3,7 @@
     import { debounce } from '$lib/utils/debounce';
     import type { PoolCatalogEntry } from '$lib/types';
     import { allPools, selectedPool } from '$lib/stores';
-
+    import { ga } from '@beyonk/svelte-google-analytics';
     const dispatch = createEventDispatcher();
 
     let searchTerm = '';
@@ -45,6 +45,9 @@
         searchTerm = `${pool.token0Name}-${pool.token1Name}`;
         showDropdown = false;
         dispatch('select', pool);
+        ga.addEvent('pool_selected', {
+            pool_name: `${pool.lpName}-${pool.id}`
+        });
     };
 
     // Close dropdown when clicking outside

@@ -4,7 +4,7 @@
     import { browser } from '$app/environment';
     import { account, connected, connect, disconnect } from "svelte-fuels";
     import { fetchChatMessages, sendChatMessage } from '$lib/services/chat';
-
+    import { ga } from '@beyonk/svelte-google-analytics';
     export let poolId: string;
     
 
@@ -120,6 +120,14 @@
             newMessage = '';
             
             setTimeout(scrollToBottom, 0);
+
+            ga.addEvent('chat_message', {
+                pool_name: $selectedPool?.lpName,
+                pool_id: $selectedPool?.id,
+                token0: $selectedPool?.token0Name,
+                token1: $selectedPool?.token1Name,
+            });
+            
         } catch (error) {
             console.error('Failed to send message:', error);
         }
