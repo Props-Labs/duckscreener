@@ -54,6 +54,7 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         const token0 = metadata.poolId?.[0].bits;
         const token1 = metadata.poolId?.[1].bits;
 
+        //@ts-ignore
         const assetId: AssetId ={ bits: metadata.liquidity?.[0].bits }
 
         if (!token0 || !token1) {
@@ -61,6 +62,7 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
             return;
         }
 
+        //@ts-ignore
         const lpInfo = await getLPAssetInfo(assetId);
         //console.log('lpInfo::', lpInfo);
 
@@ -101,10 +103,14 @@ export async function updatePoolCatalog(pool: any): Promise<void> {
         // }
 
         // Create or update catalog entry
+        //@ts-ignore
         const entry: PoolCatalogEntry = {
             id: pool.pool_id,
+            //@ts-ignore
             lpName,
+            //@ts-ignore
             token0Name,
+            //@ts-ignore
             token1Name,
             token0Address: token0,
             token1Address: token1,

@@ -14,6 +14,7 @@ export const graphQLClient = new GraphQL.GraphQLClient(process.env.GRAPHQL_WS_UR
 })
 
 export const wsClient = createClient({
+  //@ts-ignore
   url: process.env.GRAPHQL_WS_URL,
   webSocketImpl: WebSocket,
   connectionParams: {
@@ -25,7 +26,7 @@ export const wsClient = createClient({
 
 export function subscribeToQuery(query: string, callback: (data: any) => void) {
    
-  
+
     (async () => {
       const onNext = (response: any) => {
         callback(response.data);

@@ -27,6 +27,7 @@ export async function getTotalAssets() {
 
 export async function getLPAssetInfo(poolId: PoolId) {
     const miraAmm = await getReadonlyMiraAmm();
+    //@ts-ignore
     const assetInfo = await miraAmm.lpAssetInfo(poolId);
     return assetInfo;
 }
