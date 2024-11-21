@@ -6,9 +6,8 @@
 .vercel
 /.svelte-kit
 /build
-apps/background/build
-apps/background/dist
-apps/core/build
+**/build
+**/dist
 
 # OS
 .DS_Store
