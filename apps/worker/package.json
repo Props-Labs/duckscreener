@@ -9,9 +9,10 @@
   "packageManager": "pnpm@9.4.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "vite build",
     "start": "node dist/server.cjs",
-    "dev": "NODE_ENV=development tsx watch src/server.ts"
+    "dev": "NODE_ENV=development tsx watch src/server.ts",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
