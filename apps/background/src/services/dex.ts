@@ -6,19 +6,31 @@ import {initializeProvider} from "./provider";
 
 // Initialize provider and readonlyMiraAmm lazily
 let readonlyMiraAmm: any;
-let MiraDex: any;
 
-const initMiraDex = async () => {
-    MiraDex = await import('mira-dex-ts');
+// Try importing from specific paths
+const getMiraDex = async () => {
+    try {
+        // Try different import paths
+        const module = await import('mira-dex-ts/dist/sdk/readonly-mira-amm.js');
+        return module.ReadonlyMiraAmm;
+    } catch (error) {
+        console.error('Failed to import from mira-dex-ts/dist/sdk/readonly-mira-amm.js');
+        try {
+            // Fallback to another potential path
+            const module = await import('mira-dex-ts/dist/index.js');
+            return module.ReadonlyMiraAmm;
+        } catch (error) {
+            console.error('Failed to import ReadonlyMiraAmm:', error);
+            throw error;
+        }
+    }
 };
 
 export async function getReadonlyMiraAmm() {
-    if (!MiraDex) {
-        await initMiraDex();
-    }
     if (!readonlyMiraAmm) {
+        const ReadonlyMiraAmm = await getMiraDex();
         const provider = await initializeProvider();
-        readonlyMiraAmm = new MiraDex.ReadonlyMiraAmm(provider);
+        readonlyMiraAmm = new ReadonlyMiraAmm(provider);
     }
     return readonlyMiraAmm;
 }
