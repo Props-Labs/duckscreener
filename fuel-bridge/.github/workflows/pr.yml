@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit-deps:
+    name: Audit Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: FuelLabs/github-actions/setups/node@master
+        with:
+          node-version: 20.16.0
+          pnpm-version: 9.0.6
+      - run: pnpm audit --prod --audit-level high
+
+  check-packages-changed:
+    needs: audit-deps
+    name: Check if packages have change
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.packages-changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check external packages changes
+        id: packages-changed
+        uses: tj-actions/changed-files@v22.2
+        with:
+          files: |
+            **/packages/**
+
+  changesets:
+    name: Changeset Checks
+    needs: [audit-deps, check-packages-changed]
+    if: ${{ github.head_ref != 'changeset-release/main' && needs.check-packages-changed.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # need this to get full git-history/clone in order to build changelogs and check changesets
+          fetch-depth: 0
+      - uses: FuelLabs/github-actions/setups/node@master
+        with:
+          node-version: 20.16.0
+          pnpm-version: 9.0.6
+      - run: pnpm changeset:check
+
+  validate:
+    runs-on: buildjet-4vcpu-ubuntu-2204
+    needs: audit-deps
+    steps:
+      - uses: actions/checkout@v3
+      - uses: FuelLabs/github-actions/setups/node@master
+        with:
+          node-version: 20.16.0
+          pnpm-version: 9.0.6
+      - uses: FuelLabs/github-actions/setups/docker@master
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: ./.github/actions/setup-rust
+
+      - name: Build projects
+        run: pnpm build
+
+      - name: Check projects formatting
+        run: pnpm check
+
+      - name: Test projects
+        run: pnpm test
+
+      # TODO issue 115: https://github.com/FuelLabs/fuel-bridge/issues/115
+      # Run test again to ensure it works with node that already has transactions/messages
+      # - name: Test projects Again
+      #   run: pnpm --filter @fuel-bridge/integration-tests test

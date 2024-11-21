@@ -28,5 +28,10 @@ export default defineConfig({
 				format: 'esm'
 			}
 		}
+	},
+	server: {
+		fs: {
+			allow: ['.']
+		}
 	}
 });

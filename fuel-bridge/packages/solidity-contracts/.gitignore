@@ -1,0 +1,20 @@
+node_modules
+.env
+.vscode
+.openzeppelin/unknown*
+
+# local deployments
+deployments/localhost
+deployments/deployments.local.json
+
+coverage
+coverage.json
+
+# Hardhat files
+cache
+artifacts
+
+typechain
+yarn-error.log
+
+bin

@@ -1,0 +1,34 @@
+{{header}}
+
+import { Contract, ContractFactory, decompressBytecode } from "fuels";
+import type { Provider, Account, DeployContractOptions, DeployContractResult } from "fuels";
+
+import { {{capitalizedName}} } from "./{{capitalizedName}}";
+
+const bytecode = decompressBytecode("{{compressedBytecode}}");
+
+export class {{capitalizedName}}Factory extends ContractFactory {
+
+  static readonly bytecode = bytecode;
+
+  constructor(accountOrProvider: Account | Provider) {
+    super(bytecode, {{capitalizedName}}.abi, accountOrProvider);
+  }
+
+  override deploy<TContract extends Contract = Contract>(
+    deployOptions?: DeployContractOptions
+  ): Promise<DeployContractResult<TContract>> {
+    return super.deploy({
+      storageSlots: {{capitalizedName}}.storageSlots,
+      ...deployOptions,
+    });
+  }
+
+  static async deploy (
+    wallet: Account,
+    options: DeployContractOptions = {}
+  ): Promise<DeployContractResult<{{capitalizedName}}>> {
+    const factory = new {{capitalizedName}}Factory(wallet);
+    return factory.deploy(options);
+  }
+}

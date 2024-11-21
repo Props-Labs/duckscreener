@@ -1,0 +1,34 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "tasks": {
+    "preinstall": {
+      "outputLogs": "new-only"
+    },
+    "prebuild": {
+      "dependsOn": ["^prebuild", "preinstall"],
+      "outputLogs": "new-only"
+    },
+    "build": {
+      "dependsOn": ["^build", "prebuild"],
+      "outputs": ["dist/**"],
+      "outputLogs": "new-only"
+    },
+    "postbuild": {
+      "dependsOn": ["^postbuild", "build"],
+      "outputLogs": "new-only"
+    },
+    "pretest": {
+      "outputLogs": "errors-only",
+      "inputs": [
+        "**/test/fixtures/forc-projects/Forc.toml",
+        "**/test/fixtures/forc-projects/**/src/*.sw",
+        "**/test/fixtures/forc-projects/**/Forc.toml"
+      ],
+      "outputs": ["**/test/fixtures/forc-projects/**/out/release/**"]
+    },
+    "test": {
+      "dependsOn": ["^test", "pretest"],
+      "outputLogs": "new-only"
+    }
+  }
+}

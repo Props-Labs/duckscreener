@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy, tick } from 'svelte';
     import { getTradingData, convertTradingDataToChartData, type TimeFrame } from '$lib/services/data';
+    import { selectedCounterPartyToken, selectedPrimaryToken } from '$lib/stores';
     import { createChart, ColorType } from 'lightweight-charts';
     import { createEventDispatcher } from 'svelte';
     import type { PoolCatalogEntry } from '$lib/types';
@@ -17,12 +18,46 @@
         isNew?: boolean;
     }
 
+    interface Stats {
+        price: {
+            usd: string;
+            eth: string;
+            lastTradeIsBuy: boolean;
+        };
+        liquidity: {
+            usd: number;
+            eth: number;
+            fdv: number;
+            mcap: number;
+        };
+        changes: {
+            '1H': number;
+            '6H': number;
+            '24H': number;
+            '1W': number;
+        };
+        transactions: {
+            total: number;
+            buys: number;
+            sells: number;
+            volume: number;
+            buyVolume: number;
+            sellVolume: number;
+            volumeDelta: number;
+            makers: number;
+            buyers: number;
+            sellers: number;
+        };
+    }
+
     const dispatch = createEventDispatcher<{
         priceUpdate: number;
         loadingChange: boolean;
     }>();
     
     export let pool: PoolCatalogEntry;
+    export let liquidityUSD: number;
+    export let marketCap: number;
     let chart: any;
     let candlestickSeries: any;
     let selectedTimeFrame: TimeFrame = '1h';
@@ -57,17 +92,24 @@
                 top: 0.1,
                 bottom: 0.1,
             },
-            mode: 1,
             borderVisible: true,
             borderColor: '#2B2B43',
             textColor: '#d1d4dc',
             autoScale: true,
             alignLabels: true,
+            mode: 0,
+            visible: true,
+            entireTextOnly: false,
+            ticksVisible: true,
             formatPrice: (price: number) => {
                 if (price < 0.000001) {
-                    return price.toExponential(4);
+                    return price.toExponential(6);
                 }
-                return price.toFixed(9);
+                return price.toLocaleString('en-US', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 9,
+                    useGrouping: false
+                });
             },
         },
         grid: {
@@ -112,6 +154,29 @@
 
     let isTableExpanded = false;
 
+    let selectedStatsTimeframe = '1H';
+
+    let stats: Stats = {
+        price: { usd: '0', eth: '0' },
+        liquidity: { usd: 0, eth: 0, fdv: 0, mcap: 0 },
+        changes: { '1H': 0, '6H': 0, '24H': 0, '1W': 0 },
+        transactions: {
+            total: 0,
+            buys: 0,
+            sells: 0,
+            volume: 0,
+            buyVolume: 0,
+            sellVolume: 0,
+            volumeDelta: 0,
+            makers: 0,
+            buyers: 0,
+            sellers: 0
+        }
+    };
+
+    let isStatsLoading = false;
+
+
     function setupAutoRefresh() {
         if (autoRefreshInterval) {
             clearInterval(autoRefreshInterval);
@@ -133,6 +198,118 @@
             });
         }
     }
+    async function calculateStats(timeframe: string) {
+        isStatsLoading = true;
+        //console.log("isStatsLoading111", isStatsLoading)
+        try {
+            //console.log("calculateStats:::", timeframe)
+            if (!rawData.length) return;
+
+            const now = Date.now();
+            const timeInMs = {
+                '1H': 60 * 60 * 1000,
+                '6H': 6 * 60 * 60 * 1000,
+                '24H': 24 * 60 * 60 * 1000,
+                '1W': 7 * 24 * 60 * 60 * 1000
+            }[timeframe];
+
+            const cutoffTime = now - timeInMs;
+            const relevantTrades = rawData.filter(trade => trade.time * 1000 >= cutoffTime);
+            
+            // Calculate transactions stats for the selected timeframe
+            const buys = relevantTrades.filter(t => t.is_buy);
+            const sells = relevantTrades.filter(t => t.is_sell);
+            
+            // Get unique addresses for the selected timeframe
+            const uniqueMakers = new Set(relevantTrades.map(t => t.recipient));
+            const uniqueBuyers = new Set(buys.map(t => t.recipient));
+            const uniqueSellers = new Set(sells.map(t => t.recipient));
+
+            // Calculate volume in terms of token0 (base token)
+            const buyVolume = buys.reduce((acc, t) => acc + Number(t.asset_0_out) / 1e9, 0);
+            const sellVolume = sells.reduce((acc, t) => acc + Number(t.asset_0_in) / 1e9, 0);
+            const volume = buyVolume + sellVolume;
+            const volumeDelta = buyVolume - sellVolume;
+
+            // Update stats object with new calculations
+            stats.transactions = {
+                total: relevantTrades.length,
+                buys: buys.length,
+                sells: sells.length,
+                volume,
+                buyVolume,
+                sellVolume,
+                volumeDelta,
+                makers: uniqueMakers.size,
+                buyers: uniqueBuyers.size,
+                sellers: uniqueSellers.size
+            };
+
+             stats.changes = {
+                '1H': calculatePriceChangeForPeriod('1H'),
+                '6H': calculatePriceChangeForPeriod('6H'),
+                '24H': calculatePriceChangeForPeriod('24H'),
+                '1W': calculatePriceChangeForPeriod('1W')
+            };
+
+        } finally {
+            isStatsLoading = false;
+            //console.log("isStatsLoading222", isStatsLoading)
+        }
+    }
+
+    let isCalculatingPrice = false;
+
+    function calculatePrice() {
+        console.log("calculatePrice():::")
+        isCalculatingPrice = true;
+        const latestTrade = rawData[0];
+        //console.log("latestTrade:::", latestTrade)
+        const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
+        //console.log("$selectedCounterPartyToken", $selectedCounterPartyToken)
+        const _usdPrice = exchangeRate * ($selectedCounterPartyToken?.priceUSD || 0);
+
+        console.log('usdPrice:::11', _usdPrice)
+
+        stats.price = {
+            eth: exchangeRate.toString(),
+            usd: _usdPrice.toString(),
+            lastTradeIsBuy: latestTrade.is_buy
+        };
+
+        dispatch('priceUpdate', _usdPrice);
+        isCalculatingPrice = false;
+    }
+
+    function calculatePriceChangeForPeriod(period: '1H' | '6H' | '24H' | '1W'): number {
+        const now = Date.now();
+        const periodMs = {
+            '1H': 60 * 60 * 1000,
+            '6H': 6 * 60 * 60 * 1000,
+            '24H': 24 * 60 * 60 * 1000,
+            '1W': 7 * 24 * 60 * 60 * 1000
+        }[period];
+
+        const cutoffTime = now - periodMs;
+        const relevantTrades = rawData.filter(trade => trade.time * 1000 >= cutoffTime);
+
+        if (relevantTrades.length < 2) return 0;
+
+        const oldestExchangeRate = Number(relevantTrades[0].exchange_rate) / 1e18;
+        const newestExchangeRate = Number(relevantTrades[relevantTrades.length - 1].exchange_rate) / 1e18;
+        const deltaExchangeRate = oldestExchangeRate - newestExchangeRate;
+       
+
+        // Calculate percentage change
+        const percentageChange = (deltaExchangeRate / oldestExchangeRate) * 100;
+        
+        // For stablecoin pairs, we need to invert the percentage change
+        // if (['USDT', 'USDC', 'USDE', 'SDAI', 'SUSDE'].includes(pool.token1Name.toUpperCase())) {
+        //     return -percentageChange;
+        // }
+        
+        return percentageChange;
+    }
 
     async function loadChartData(timeFrame: TimeFrame, showFullScreenLoader = true) {
         try {
@@ -142,7 +319,7 @@
             }
             isRefreshing = !showFullScreenLoader;
             
-            console.log('Loading chart data for', pool);
+            //console.log('Loading chart data for', pool);
             const newRawData = await getTradingData(pool.id);
             
             if (!isInitialLoad) {
@@ -157,6 +334,11 @@
             const candlesticks = await convertTradingDataToChartData(rawData, timeFrame);
             if (candlestickSeries) {
                 candlestickSeries.setData(candlesticks);
+                
+                // Calculate stats for all timeframes
+                // ['1H', '6H', '24H', '1W'].forEach(timeframe => {
+                //     calculateStats(timeframe);
+                // });
                 
                 if (isInitialLoad) {
                     chart.timeScale().fitContent();
@@ -233,13 +415,26 @@
     }
 
     function formatTokenNumber(inValue: string, outValue: string, isBuy: boolean): string {
-        if (isBuy) {
-            const tokenOut = Number(outValue) / 1e9;
-            return new Intl.NumberFormat('en-US').format(tokenOut);
-        } else {
-            const tokenIn = Number(inValue) / 1e9;
-            return new Intl.NumberFormat('en-US').format(-tokenIn);
+        const value = isBuy 
+            ? Number(outValue) / 1e9 
+            : -(Number(inValue) / 1e9);
+
+        let maxDigits = 2;
+        // Handle very small numbers
+        if (Math.abs(value) < 0.000001) {
+            maxDigits = 16;
+            //return value.toExponential(6);
         }
+        else{
+
+        }
+        
+        // Handle regular numbers
+        return new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: maxDigits,
+            useGrouping: true
+        }).format(value);
     }
 
     function getPriceDirection(currentRate: string, previousRate: string): string {
@@ -278,16 +473,11 @@
             upColor: '#26a69a', 
             downColor: '#ef5350', 
             borderVisible: false,
-            wickUpColor: '#26a69a', 
+            wickUpColor: '#26a69a',
             wickDownColor: '#ef5350',
             priceFormat: {
-                type: 'custom',
-                formatter: (price: number) => {
-                    if (price < 0.000001) {
-                        return price.toExponential(4);
-                    }
-                    return price.toFixed(9);
-                },
+                type: 'price',
+                precision: 9,
                 minMove: 0.000000001,
             },
         });
@@ -311,6 +501,48 @@
     $: if (pool) {
         loadChartData(selectedTimeFrame);
     }
+
+    $: formattedStats = {
+        ...stats,
+        liquidity: {
+            ...stats.liquidity,
+            usd: formatCurrency(stats.liquidity.usd),
+            eth: stats.liquidity.eth.toFixed(2),
+            fdv: formatCurrency(stats.liquidity.fdv),
+            mcap: formatCurrency(stats.liquidity.mcap)
+        },
+        transactions: {
+            ...stats.transactions,
+            volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
+            buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
+            sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
+        }
+    };
+
+    function formatCurrency(value: number): string {
+        if (value >= 1_000_000_000) {
+            return `$${(value / 1_000_000_000).toFixed(2)}B`;
+        } else if (value >= 1_000_000) {
+            return `$${(value / 1_000_000).toFixed(2)}M`;
+        } else if (value >= 1_000) {
+            return `$${(value / 1_000).toFixed(2)}K`;
+        }
+        return `$${value.toFixed(2)}`;
+    }
+
+    // Add this reactive statement to recalculate stats when timeframe changes
+    $: if (selectedStatsTimeframe && rawData.length) {
+        //console.log("calculatestats::::11")
+        calculateStats(selectedStatsTimeframe);
+    }
+
+    $: if(rawData.length){
+        calculatePrice()
+    }
+
+    $: marketCap = $selectedCounterPartyToken?.priceUSD && $selectedPrimaryToken?.supply ? Number(stats.price.usd) * Number($selectedPrimaryToken.supply) : 0;
+    $: console.log('currentTokenPrice:::::', stats.price.usd)
+    $: console.log('marketCap:::::', marketCap)
 </script>
 
 <div class="flex flex-col w-full h-full bg-[#131722] relative overflow-y-auto">
@@ -402,6 +634,229 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
     </button>
+
+    <div class="w-full overflow-x-auto bg-[#131722] border-y border-[#2B2B43] pt-4 py-8">
+        <div class="flex min-w-max gap-4 px-4 relative">
+            <!-- Loading Overlay for Stats -->
+            {#if isStatsLoading}
+                <div class="relativeinset-0 bg-[#131722]/80 flex items-center justify-center z-50 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <svg 
+                            class="animate-spin h-5 w-5 text-[#26a69a]" 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            fill="none" 
+                            viewBox="0 0 24 24"
+                        >
+                            <circle 
+                                class="opacity-25" 
+                                cx="12" 
+                                cy="12" 
+                                r="10" 
+                                stroke="currentColor" 
+                                stroke-width="4"
+                            ></circle>
+                            <path 
+                                class="opacity-75" 
+                                fill="currentColor" 
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                        </svg>
+                        <span class="text-[#d1d4dc] text-sm">Updating stats...</span>
+                    </div>
+                </div>
+            {/if}
+
+            <!-- Stats Widgets -->
+            <div class="flex gap-2">
+                <!-- Price USD -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
+                    <div class="text-[#d1d4dc] text-xs opacity-60">PRICE USD</div>
+                    <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
+                        {#if Number(stats.price.usd) < 1}
+                            ${Number(stats.price.usd).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 9,
+                                useGrouping: true
+                            })}
+                        {:else}
+                            ${Number(stats.price.usd).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 4,
+                                useGrouping: true
+                            })}
+                        {/if}
+                        
+                        {#if isCalculatingPrice}
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="12" 
+                                height="12" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                stroke-width="2" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round"
+                                class="animate-spin"
+                            >
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                            </svg>
+                        {/if}
+                    </div>
+                    <!-- <div class="text-[#d1d4dc] text-xs">
+                        {Number(stats.price.usd)} / {Number(stats.price.eth)}
+                        1 {pool.token1Name} = {(Number(stats.price.eth) / Number(stats.price.usd))} {pool.token0Name}
+                    </div> -->
+                    
+                    <div class="text-[#d1d4dc] text-xs opacity-80">
+                        @ ${($selectedCounterPartyToken?.priceUSD || 0).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })} / {pool.token1Name}
+                    </div>
+                   
+                </div>
+
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
+                    <div class="text-[#d1d4dc] text-xs opacity-60">Market Cap</div>
+                    <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
+                        {formatCurrency(marketCap)}*
+                        {#if isCalculatingPrice}
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                width="12" 
+                                height="12" 
+                                viewBox="0 0 24 24" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                stroke-width="2" 
+                                stroke-linecap="round" 
+                                stroke-linejoin="round"
+                                class="animate-spin"
+                            >
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                            </svg>
+                        {/if}
+                    </div>
+                    <!-- <div class="text-[#d1d4dc] text-xs">
+                        {Number(stats.price.usd)} / {Number(stats.price.eth)}
+                        1 {pool.token1Name} = {(Number(stats.price.eth) / Number(stats.price.usd))} {pool.token0Name}
+                    </div> -->
+                   
+                    
+                    <div class="text-[#d1d4dc] text-[9px] opacity-80">
+                        <span>*Based on total supply on Fuel</span>
+                    </div>
+                    <div class="text-[#d1d4dc] text-[9px] opacity-80">
+                        <span>*Please consider liquidity when analyzing market cap</span>
+                    </div>
+                    
+                </div>
+
+                {#if $selectedPrimaryToken}
+                    <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
+                        <div class="text-[#d1d4dc] text-xs opacity-60">Supply</div>
+                        <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
+                            {($selectedPrimaryToken.supply).toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2
+                            })}
+                        </div>
+                        <div class="text-[#d1d4dc] text-[9px] opacity-80">
+                            <span>*Supply on Fuel</span>
+                        </div>
+                        
+                    </div>
+                {/if}
+
+                <!-- Liquidity -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
+                    <div class="text-[#d1d4dc] text-xs opacity-60">LIQUIDITY</div>
+                    <div class="text-[#d1d4dc] font-semibold flex flex-col gap-1 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span>
+                                {(Number(pool.reserve0) / 1e9).toLocaleString('en-US', {
+                                    maximumFractionDigits: 0
+                                })} {pool.token0Name}
+                            </span>
+                            
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span>{(Number(pool.reserve1) / 1e9).toFixed(2)} {pool.token1Name}</span>
+                           
+                        </div>
+                    </div>
+                  
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-[#d1d4dc] opacity-60">≈ {formatCurrency(liquidityUSD)}</span>
+                    </div>
+                </div>
+
+                <!-- Price Changes with integrated timeframe selection -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[200px]">
+                    <div class="grid grid-cols-4 gap-2">
+                        {#each ['1H', '6H', '24H', '1W'] as timeframe}
+                            <button
+                                class="flex flex-col items-center rounded-lg transition-all {selectedStatsTimeframe === timeframe ? 'ring-1 ring-[#26a69a]' : ''} hover:bg-[#26a69a]/10 p-1"
+                                on:click={() => selectedStatsTimeframe = timeframe}
+                            >
+                                <div class="text-[#d1d4dc] text-xs opacity-60">{timeframe}</div>
+                                <div class="text-sm {stats.changes[timeframe] >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}">
+                                    {stats.changes[timeframe].toFixed(2)}%
+                                </div>
+                            </button>
+                        {/each}
+                    </div>
+                </div>
+
+                <!-- Transactions -->
+                <div class="bg-[#1e222d] p-2.5 rounded-lg border border-[#2B2B43] transition-colors min-w-[400px]">
+                    <div class="grid grid-cols-10 gap-4">
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">TXNS</div>
+                            <div class="text-[#d1d4dc] text-sm">{stats.transactions.total}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">BUYS</div>
+                            <div class="text-[#26a69a] text-sm">{stats.transactions.buys}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">SELLS</div>
+                            <div class="text-[#ef5350] text-sm">{stats.transactions.sells}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">VOL</div>
+                            <div class="text-[#d1d4dc] text-sm">{Intl.NumberFormat('en-US').format(Number(stats.transactions.volume.toFixed(2)))}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">BUY VOL</div>
+                            <div class="text-[#26a69a] text-sm">{Intl.NumberFormat('en-US').format(Number(stats.transactions.buyVolume.toFixed(2)))}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">SELL VOL</div>
+                            <div class="text-[#ef5350] text-sm">{Intl.NumberFormat('en-US').format(Number(stats.transactions.sellVolume.toFixed(2)))}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">VOL DELTA</div>
+                            <div class="text-sm {stats.transactions.volumeDelta >= 0 ? 'text-[#26a69a]' : 'text-[#ef5350]'}">{stats.transactions.volumeDelta >= 0 ? '+' : ''}{Intl.NumberFormat('en-US').format(Number(stats.transactions.volumeDelta.toFixed(2)))}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">MAKERS</div>
+                            <div class="text-[#d1d4dc] text-sm">{stats.transactions.makers}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">BUYERS</div>
+                            <div class="text-[#26a69a] text-sm">{stats.transactions.buyers}</div>
+                        </div>
+                        <div>
+                            <div class="text-[#d1d4dc] text-xs opacity-60">SELLERS</div>
+                            <div class="text-[#ef5350] text-sm">{stats.transactions.sellers}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div 
         bind:this={tableContainer}

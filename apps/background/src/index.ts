@@ -1,10 +1,13 @@
 import { PoolSyncService } from './services/pool-sync';
 import { startPoolSubscriber } from './services/pool-subscriber';
+import { loadAssetData } from './services/assets';
 import { redis } from './services/redis';
 
 async function main() {
     try {
        
+        await loadAssetData();
+
         // Start pool sync service
         const syncService = new PoolSyncService();
         await syncService.start();
