@@ -6,6 +6,7 @@ node_modules
 /.svelte-kit
 /build
 apps/background/build
+apps/background/dist
 apps/core/build
 
 # OS
