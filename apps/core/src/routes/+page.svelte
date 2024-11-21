@@ -29,9 +29,15 @@
    
     onMount(async () => {
         if (browser) {
-
-            const module = await import('svelte-fuels');
-            WalletProvider = module.WalletProvider;
+            console.log('browser::');
+            try{
+                const module = await import('svelte-fuels');
+                WalletProvider = module.WalletProvider;
+            }
+            catch(error){
+                console.error('Error importing WalletProvider:', error);
+            }
+            
 
             const storedPoolId = localStorage.getItem('selectedPool');
             console.log('storedPoolId', storedPoolId);
