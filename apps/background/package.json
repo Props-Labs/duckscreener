@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc --project tsconfig.json",
+    "build": "tsc",
     "start": "node build/index.js",
     "typecheck": "tsc --noEmit"
   },

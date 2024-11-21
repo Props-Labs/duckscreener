@@ -1,2 +1,2 @@
-web: cd apps/core && npm run start
-worker: cd apps/background && node build/index.js
+web: cd apps/core && npm start
+worker: cd apps/background && npm start
