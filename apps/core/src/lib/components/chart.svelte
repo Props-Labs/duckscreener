@@ -271,7 +271,7 @@
         console.log("$selectedCounterPartyToken", $selectedCounterPartyToken)
         console.log("pool", pool)
         let reducer = 1;
-        if($selectedCounterPartyToken.priceUSD == 1){
+        if($selectedCounterPartyToken?.priceUSD == 1){
             reducer = 1000;
         }
         const _usdPrice = exchangeRate * ($selectedCounterPartyToken?.priceUSD || 0) / reducer;
