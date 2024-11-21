@@ -14,7 +14,7 @@ export async function fetchPairs() {
             pairs.set(data);
             return data;
         } else {
-            throw new Error(data.error || 'Failed to fetch pairs');
+            throw new Error(data.error || 'Failed to fetch pairs::');
         }
     } catch (error) {
         console.error('Error fetching pairs:', error);
