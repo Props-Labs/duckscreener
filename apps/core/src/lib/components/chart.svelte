@@ -319,7 +319,7 @@
             }
             isRefreshing = !showFullScreenLoader;
             
-            //console.log('Loading chart data for', pool);
+            console.log('Loading chart data for', pool);
             const newRawData = await getTradingData(pool.id);
             
             if (!isInitialLoad) {
@@ -482,7 +482,10 @@
             },
         });
         
-        await loadChartData(selectedTimeFrame);
+        if(pool){
+            await loadChartData(selectedTimeFrame);
+            
+        }
         setupAutoRefresh();
         
         window.addEventListener('resize', handleChartResize);
