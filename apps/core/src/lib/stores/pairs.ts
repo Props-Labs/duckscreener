@@ -9,6 +9,7 @@ export async function fetchPairs() {
     try {
         const response = await fetch('/api/pairs');
         const data = await response.json();
+        console.log('fetchPairs()',data);
         if (response.ok) {
             pairs.set(data);
             return data;
