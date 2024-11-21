@@ -2,21 +2,21 @@
 	"compilerOptions": {
 	  "rootDir": "./src",
 	  "outDir": "./build",
+  
+	  /* Language and Environment */
 	  "target": "es2020",
-	  "module": "ESNext",
-	  "moduleResolution": "Bundler",
+	  
+	  /* Modules */
+	  "module": "commonjs",
+	  "moduleResolution": "node",
+	  
+	  /* Interop Constraints */
 	  "esModuleInterop": true,
 	  "forceConsistentCasingInFileNames": true,
+	  
+	  /* Type Checking */
 	  "strict": true,
-	  "skipLibCheck": true,
-	  "allowJs": true,
-	  "resolveJsonModule": true,
-	  "baseUrl": ".",
-	  "paths": {
-	    "*": ["node_modules/*"]
-	  }
-	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules"]
+	  "skipLibCheck": true
+	}
 }
   

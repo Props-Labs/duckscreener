@@ -1,7 +1,0 @@
-[project]
-authors = ["Mira AMM"]
-entry = "lib.sw"
-license = "Apache-2.0"
-name = "interfaces"
-
-[dependencies]
