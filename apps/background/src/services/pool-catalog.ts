@@ -1,6 +1,6 @@
 import { getValue, storeValue, deleteValue } from './redis';
 import { queryDB } from './data';
-import type { PoolMetadata, PoolId } from 'mira-dex-ts';
+import type { PoolId, PoolMetadata } from './mira-wrapper';
 import { getReadonlyMiraAmm, getPoolMetadata, getLPAssetInfo } from "./dex";
 import type {AssetId} from "fuels";
 import {Contract, Provider, WalletUnlocked, Wallet} from "fuels";

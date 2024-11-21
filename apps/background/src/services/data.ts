@@ -3,7 +3,7 @@ import 'dotenv/config';
 // @ts-ignore
 import * as GraphQL from 'graphql-request';
 import { createClient } from 'graphql-ws';
-import { WebSocket} from 'ws';
+import WebSocket from 'ws';
 
 
 //@ts-ignore
