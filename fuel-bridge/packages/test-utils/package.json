@@ -1,0 +1,39 @@
+{
+  "name": "@fuel-bridge/test-utils",
+  "version": "1.0.0",
+  "description": "The Fuel Messaging Bridge integration tests.",
+  "license": "APACHE-2.0",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "require": "./dist/index.js",
+  "main": "dist/index.js",
+  "files": [
+    "./dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:watch": "tsup --watch",
+    "bridge:deploy": "pnpm ts-node src/scripts/deploy-bridge.ts",
+    "bridge:upgrade": "pnpm ts-node src/scripts/upgrade-bridge.ts",
+    "bridge:transfer-ownership": "pnpm ts-node src/scripts/transfer-bridge-ownership.ts",
+    "bridge:relay": "pnpm ts-node src/scripts/relay-deposit.ts",
+    "bridge:withdraw": "pnpm ts-node src/scripts/withdraw-init.ts",
+    "script:check-balances": "pnpm ts-node src/scripts/check-balances.ts"
+  },
+  "peerDependencies": {
+    "ethers": "6.13.1",
+    "fuels": "0.96.1"
+  },
+  "devDependencies": {
+    "@fuel-bridge/fungible-token": "workspace:*",
+    "@fuel-bridge/message-predicates": "workspace:*",
+    "@fuel-bridge/solidity-contracts": "workspace:*",
+    "@fuels/kms-account": "0.24.0-preview-63de5d8",
+    "@inquirer/prompts": "^5.3.8",
+    "dotenv": "^16.0.3",
+    "inquirer": "^10.1.8",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}

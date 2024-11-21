@@ -4,63 +4,93 @@
     import { getPriceData } from '$lib/services/blockchain';
     import Chat from '$lib/components/chat.svelte';
     import { browser } from '$app/environment';
-    import { showWalletModal, selectedPool, ethPrice, allPools } from '$lib/stores';
+    import { showWalletModal, selectedPool, selectedCounterPartyToken, selectedPrimaryToken, allPools, allNativeAssets} from '$lib/stores';
     import WalletModal from "$lib/components/wallet-modal.svelte";
     import { getTotalAssets, getPoolMetadata} from '$lib/services/dex';
     import SwapModal from '$lib/components/swap-modal.svelte';
     import SearchBox from '$lib/components/search-box.svelte';
     import LoadingOverlay from '$lib/components/loading-overlay.svelte';
     import type { PageData } from './$types';
+    import { getBaseAssetPrice } from '$lib/services/price';
+    import { getBaseAssetSupply } from '$lib/services/supply';
 
     export let data: PageData;
 
     // Set the allPools store with the server data
     $: $allPools = data.pools;
+    $: $allNativeAssets = data.nativeAssets;
 
     $: console.log('allPools', $allPools);
+    $: console.log('allNativeAssets', $allNativeAssets);
 
     let WalletProvider: any;
    
     onMount(async () => {
-        $selectedPool = $allPools[0];
         if (browser) {
+            const storedPoolId = localStorage.getItem('selectedPool');
+            if (storedPoolId) {
+                const storedPool = JSON.parse(storedPoolId);
+                // Verify the stored pool still exists in our current pool list
+                const validPool = $allPools.find(p => p.id === storedPool.id);
+                if (validPool) {
+                    $selectedPool = validPool;
+                } else {
+                    // If stored pool is no longer valid, use first available pool
+                    $selectedPool = $allPools[0];
+                }
+            } else {
+                // No stored pool, use first available pool
+                $selectedPool = $allPools[0];
+            }
+
             const module = await import('svelte-fuels');
             WalletProvider = module.WalletProvider;
         }
+        
         const totalAssets = await getTotalAssets();
         console.log('totalAssets', Number(totalAssets));
         const poolMetadata = await getPoolMetadata($selectedPool);
         console.log('poolMetadata', poolMetadata);
     });
     
-    let currentTokenPrice = 0;
     let poolMetadata: any;
-    const TOTAL_SUPPLY = 1_000_000_000;
     let isChatOpen = false;
     let liquidityUSD = 0;
     let isSwapModalOpen = false;
     let isLoading = false;
 
-    function handlePriceUpdate(event: CustomEvent<number>) {
-        currentTokenPrice = event.detail;
-    }
-
     async function updatePoolData() {
         try {
             // Get ETH price
-            $ethPrice = await getPriceData("0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419");
-            if ($ethPrice?.formattedPrice) {
-                $ethPrice.formattedPrice = Number($ethPrice.formattedPrice);
+            
+            const counterPartyToken = await getBaseAssetPrice($selectedPool.token1Address);
+            const counterPartyTokenSupply = await getBaseAssetSupply($selectedPool.token1Address);
+            const token0Supply = await getBaseAssetSupply($selectedPool.token0Address);
+            console.log('token0Supply::::', token0Supply);
+            let primaryTokenSupply;
+            if (token0Supply?.supply <= 0) {
+                primaryTokenSupply = 1000000000;
+            } else {
+                primaryTokenSupply = token0Supply.supply / 1e9;
             }
+            console.log('primaryTokenSupply::::', primaryTokenSupply);
+            $selectedPrimaryToken = {
+                supply: primaryTokenSupply
+            };
+            console.log('selectedPrimaryToken:::::', $selectedPrimaryToken);
+            $selectedCounterPartyToken = counterPartyToken;
+            $selectedCounterPartyToken['supply'] = counterPartyTokenSupply.supply / 1e9;
+            console.log('selectedCounterPartyToken:::', $selectedCounterPartyToken);
+            //console.log('counterPartyTokenSupply', $counterPartyTokenSupply);
 
             console.log('selectedPool:::', $selectedPool);
             // Get pool metadata
             poolMetadata = await getPoolMetadata($selectedPool);
             
             // Calculate liquidity in USD
-            if (poolMetadata && $ethPrice?.formattedPrice) {
+            if (poolMetadata && $selectedCounterPartyToken.priceUSD) {
                 const ethInPool = Number(poolMetadata.reserve1) / 1e9; // Convert from decimals
-                liquidityUSD = ethInPool * $ethPrice.formattedPrice * 2; // Multiply by 2 since it's paired liquidity
+                liquidityUSD = ethInPool * $selectedCounterPartyToken.priceUSD * 2; // Multiply by 2 since it's paired liquidity
             }
         } catch (error) {
             console.error('Error updating pool data:', error);
@@ -69,26 +99,16 @@
 
     // Replace the existing get$ethPrice reactive statement with this
     $: updatePoolData();
-    $: marketCap = currentTokenPrice * TOTAL_SUPPLY * ($ethPrice?.formattedPrice || 0);
-
-    function formatCurrency(value: number): string {
-        if (value >= 1_000_000_000) {
-            return `$${(value / 1_000_000_000).toFixed(2)}B`;
-        } else if (value >= 1_000_000) {
-            return `$${(value / 1_000_000).toFixed(2)}M`;
-        } else if (value >= 1_000) {
-            return `$${(value / 1_000).toFixed(2)}K`;
-        }
-        return `$${value.toFixed(2)}`;
-    }
+   
 
     function toggleChat() {
         isChatOpen = !isChatOpen;
     }
 
-    async function handlePoolSelect(event: CustomEvent<string>) {
+    async function handlePoolSelect(event: CustomEvent<PoolCatalogEntry>) {
         try {
             isLoading = true;
+            // The selectedPool store will automatically sync with localStorage
             $selectedPool = event.detail;
             await updatePoolData();
         } catch (error) {
@@ -112,7 +132,11 @@
 
     <!-- Left side - Chart -->
     <div class="flex-1 flex flex-col min-w-0">
-        <Chart bind:pool={$selectedPool} on:priceUpdate={handlePriceUpdate} on:loadingChange={handleChartLoadingChange}>
+        <Chart 
+            bind:pool={$selectedPool} 
+            {liquidityUSD}
+            on:loadingChange={handleChartLoadingChange}
+        >
             <div slot="toolbar" class="flex flex-col sm:flex-row items-start sm:items-center justify-between flex-1 text-[#d1d4dc] w-full">
                 <div class="flex flex-col items-start w-full sm:w-auto order-first mb-2 sm:mb-0">
                     <div class="flex flex-row">
@@ -154,8 +178,15 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <a href="https://f3oesm92wa8.typeform.com/to/dPoPJ003" target="_blank" rel="noopener noreferrer" class="text-[#2B2B43] opacity-75 hover:opacity-100 hover:text-[#26a69a] transition-opacity duration-200">
+                        <div class="grid grid-cols-2 gap-2 w-full sm:w-auto flex items-center justify-center min-w-[400px]">
+                            <div class="border-2 border-dashed border-[#2B2B43] rounded-lg px-6 py-3 flex items-center justify-center min-w-[300px] min-h-[60px] col-span-2">
+                                <span class="text-sm">Advertise Here</span>
+                            </div>
+                        </div>
+                    </a>
                     <SearchBox on:select={handlePoolSelect} />
-                    
+                    <!--
                     <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
                         <div class="flex flex-col bg-[#1e222d] p-3 rounded-lg border border-[#2B2B43] hover:border-[#26a69a] transition-colors">
                             <div class="flex items-center space-x-2">
@@ -188,6 +219,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                 </div>
             </div>
         </Chart>
@@ -195,12 +227,14 @@
 
     <!-- Right side - Chat (Desktop) -->
     <div class="hidden sm:block w-80 border-l border-[#2B2B43]">
-        <Chat {$selectedPool} />
+        {#if $selectedPool}
+            <Chat bind:poolId={$selectedPool.id} />
+        {/if}
     </div>
 
     <!-- Mobile Chat Panel -->
     <div
-        class="sm:hidden fixed inset-0 bg-[#131722] z-10 transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
+        class="sm:hidden fixed inset-0 bg-[#131722] z-[60] transition-transform duration-300 ease-in-out {isChatOpen ? 'translate-y-0' : 'translate-y-full'}"
     >
         <div class="h-full pt-10">
             <Chat {$selectedPool} on:close={() => isChatOpen = false} />

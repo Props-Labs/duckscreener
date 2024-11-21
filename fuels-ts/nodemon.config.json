@@ -1,0 +1,20 @@
+{
+  "verbose": true,
+  "ext": "ts",
+  "watch": "packages",
+  "ignore": [
+    "**/__generated__/**",
+    "**/*.js",
+    "**/*.test.ts",
+    "**/*.mjs",
+    "**/dist/**",
+    "**/Forc.lock",
+    "**/getBuiltinVersions.ts",
+    "**/out/debug/**",
+    "**/out/release/**",
+    "apps/demo-typegen/src/contract-types/**",
+    "apps/demo-typegen/src/predicate-types/**",
+    "apps/demo-typegen/src/script-types/**",
+    "packages/fuels/src/cli/commands/deploy/proxy/types/**"
+  ]
+}

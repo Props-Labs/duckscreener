@@ -1,0 +1,11 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "prebuild"],
+      "outputs": ["dist/**"],
+      "inputs": ["src/**", ".vitepress/**", "types/**"]
+    }
+  }
+}
