@@ -44,6 +44,7 @@
 		"vite-plugin-node-polyfills": "^0.22.0"
 	},
 	"dependencies": {
+		"@beyonk/svelte-google-analytics": "^2.6.4",
 		"@envio-dev/hyperfuel-client": "^1.2.2",
 		"@fuels/connectors": "^0.36.1",
 		"@sveltejs/adapter-node": "^5.2.9",
