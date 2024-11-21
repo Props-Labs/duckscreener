@@ -189,9 +189,9 @@ export const getSupply = async (asset_address: string) => {
             contractAddress = '0x81d5964bfbb24fd994591cc7d0a4137458d746ac0eb7ececb9a9cf2ae966d942';
             const {supply: fuelUpSupply} = await getContractSupply(contractAddress, asset_address)
            
-            console.log('getSupply supply1::', fuelUpSupply);
+            console.log('getSupply supply1:: fup', fuelUpSupply);
             console.log('getSupply supply2::', {supply: fuelUpSupply || '0'});
-            return {supply: fuelUpSupply || '0'};
+            return {supply: fuelUpSupply?.toString() || '0'};
         }
         catch(error){
             console.log('Try Error fetching supply:', error);
