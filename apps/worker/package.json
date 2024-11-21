@@ -1,5 +1,5 @@
 {
-  "name": "@props-labs/duckscreener_test",
+  "name": "@props-labs/duckscreener_worker",
   "version": "1.0.0",
   "main": "index.js",
   "engines": {
@@ -9,9 +9,9 @@
   "packageManager": "pnpm@9.4.0",
   "type": "module",
   "scripts": {
-    "build": "vite build",
-    "start": "node build/server.js",
-    "dev": "tsx watch src/server.ts"
+    "build": "tsc",
+    "start": "node dist/server.cjs",
+    "dev": "NODE_ENV=development tsx watch src/server.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

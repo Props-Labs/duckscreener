@@ -10,8 +10,9 @@
       "strict": true,
       "skipLibCheck": true,
       "allowImportingTsExtensions": true,
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "noEmit": true
     },
-    "include": ["src", "vite.config.ts"]
+    "include": ["src"]
   }
   

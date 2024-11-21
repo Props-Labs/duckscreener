@@ -4,268 +4,268 @@
 > @props-labs/duckscreener_core@0.0.1 build /Users/bobby/Workspace/duckscreener/apps/core
 > vite build
 
-[33m10:02:08 PM [vite-plugin-svelte] Option "experimental.inspector" is no longer experimental and has moved to "inspector". Please update your Svelte or Vite config.[39m
+[33m10:02:00 AM [vite-plugin-svelte] Option "experimental.inspector" is no longer experimental and has moved to "inspector". Please update your Svelte or Vite config.[39m
 [36mvite v5.4.11 [32mbuilding SSR bundle for production...[36m[39m
-[2K[1Gtransforming (1) [2m.svelte-kit/generated/server/internal.js[22m[2K[1Gtransforming (11) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.1_@sveltejs+vite-plugin-svelte@4.0.1_svelte@5.2.7_vite@5.4.11_@types+node@2_4mriqhdiyvninmuzisdvt3gjg4/node_modules/@sveltejs/k[2K[1Gtransforming (39) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/legacy/legacy-client.js[22m[2K[1Gtransforming (59) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.1_@sveltejs+vite-plugin-svelte@4.0.1_svelte@5.2.7_vite@5.4.11_@types+node@2_4mriqhdiyvninmuzisdvt3gjg4/node_modules/@sveltejs/k[33m10:02:09 PM [vite-plugin-svelte] src/routes/+page.svelte:143:24 `<img>` element should have an alt attribute[39m
+[2K[1Gtransforming (1) [2m.svelte-kit/generated/server/internal.js[22m[2K[1Gtransforming (8) [2m../../node_modules/.pnpm/esm-env@1.1.4/node_modules/esm-env/node.js[22m[2K[1Gtransforming (28) [2msrc/routes/api/pools/search/+server.ts[22m[2K[1Gtransforming (59) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/internal/shared/errors.js[22m[33m10:02:01 AM [vite-plugin-svelte] src/routes/+page.svelte:143:24 `<img>` element should have an alt attribute[39m
 141:                 <div class="flex flex-col items-start w-full sm:w-auto order-first mb-2 sm:mb-0">
 142:                     <div class="flex flex-row">
 143:                         <img src="/logo.png" class="w-6 h-6 mr-2" />
                                                                          ^
 144:                         <span class="text-xl sm:text-xl font-bold text-white relative group">
 145:                             
-[33m10:02:09 PM [vite-plugin-svelte] src/routes/+page.svelte:153:28 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/routes/+page.svelte:153:28 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
 151:                     <div class="flex flex-col gap-1 mt-2">
 152:                         <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
 153:                             <a 
                                     ^
 154:                                 on:click|preventDefault={() => isSwapModalOpen = true}
 155:                                 class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
-[33m10:02:09 PM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` with a click handler must have an ARIA role[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` with a click handler must have an ARIA role[39m
 151:                     <div class="flex flex-col gap-1 mt-2">
 152:                         <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
 153:                             <a 
                                     ^
 154:                                 on:click|preventDefault={() => isSwapModalOpen = true}
 155:                                 class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
-[33m10:02:09 PM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` element should have an href attribute[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` element should have an href attribute[39m
 151:                     <div class="flex flex-col gap-1 mt-2">
 152:                         <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
 153:                             <a 
                                     ^
 154:                                 on:click|preventDefault={() => isSwapModalOpen = true}
 155:                                 class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
-[2K[1Gtransforming (75) [2m../../node_modules/.pnpm/set-cookie-parser@2.7.1/node_modules/set-cookie-parser/lib/set-cookie.js[22m[2K[1Gtransforming (131) [2m../../node_modules/.pnpm/svelte-fuels@0.94.9-next.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript_ddhzghxdqueczdl7vpxemlqa3a/node_modules/svelte-fue[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chart.svelte:516:63 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
-514:         transactions: {
-515:             ...stats.transactions,
-516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
-                                                                                                      ^
-517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
-518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chart.svelte:517:69 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
-515:             ...stats.transactions,
-516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
-517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
-                                                                                                            ^
-518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
-519:         }
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chart.svelte:518:71 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
-516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
-517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
-518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
-                                                                                                              ^
-519:         }
-520:     };
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chart.svelte:609:4 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
-607:     ></div>
-608: 
-609:     <button 
-                 ^
-610:         class="w-full h-8 flex items-center justify-center bg-[#1e222d] border-y border-[#2B2B43] text-[#d1d4dc] hover:bg-[#2B2B43] transition-colors relative z-10"
-611:         on:click={() => {
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chart.svelte:942:4 Unused CSS selector "img"[39m
-940:     }
-941: 
-942:     img {
-            ^
-943:         animation: glow 2s ease-in-out infinite;
-944:     }
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chat.svelte:171:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[2K[1Gtransforming (72) [2m../../node_modules/.pnpm/devalue@5.1.1/node_modules/devalue/index.js[22m[2K[1Gtransforming (77) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/internal/client/index.js[22m[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chat.svelte:171:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 169:         </div>
 170:         
 171:         <button 
                      ^
 172:             class="sm:hidden text-[#d1d4dc] hover:text-[#26a69a] transition-colors"
 173:             on:click={() => dispatch('close')}
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chat.svelte:277:4 Unused CSS selector ".system-message"[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chat.svelte:277:4 Unused CSS selector ".system-message"[39m
 275:     }
 276: 
 277:     .system-message {
                         ^
 278:         animation: fadeIn 0.3s ease-out;
 279:     }
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/chat.svelte:302:4 Unused CSS selector ".animate-spin"[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chat.svelte:302:4 Unused CSS selector ".animate-spin"[39m
 300:     }
 301: 
 302:     .animate-spin {
                       ^
 303:         animation: spin 1s linear infinite;
 304:     }
-[2K[1Gtransforming (133) [2msrc/lib/components/chat.svelte[22m[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chart.svelte:516:63 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
+514:         transactions: {
+515:             ...stats.transactions,
+516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
+                                                                                                      ^
+517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
+518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chart.svelte:517:69 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
+515:             ...stats.transactions,
+516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
+517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
+                                                                                                            ^
+518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
+519:         }
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chart.svelte:518:71 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
+516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
+517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
+518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
+                                                                                                              ^
+519:         }
+520:     };
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chart.svelte:609:4 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+607:     ></div>
+608: 
+609:     <button 
+                 ^
+610:         class="w-full h-8 flex items-center justify-center bg-[#1e222d] border-y border-[#2B2B43] text-[#d1d4dc] hover:bg-[#2B2B43] transition-colors relative z-10"
+611:         on:click={() => {
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/chart.svelte:942:4 Unused CSS selector "img"[39m
+940:     }
+941: 
+942:     img {
+            ^
+943:         animation: glow 2s ease-in-out infinite;
+944:     }
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
 178: 
 179: {#if open}
 180: <div 
           ^
 181:     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
 182:     on:click|self={handleClose}
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 `<div>` with a click handler must have an ARIA role[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 `<div>` with a click handler must have an ARIA role[39m
 178: 
 179: {#if open}
 180: <div 
           ^
 181:     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
 182:     on:click|self={handleClose}
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:188:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:188:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 186:         <div class="flex items-center justify-between p-4 border-b border-[#2B2B43]">
 187:             <h2 class="text-[#d1d4dc]"><span class="font-semibold">Swap</span> <span class="text-xs italic">(Powered by <a href="https://mira.ly" target="_blank" class="text-[#26a69a] hover:text-[#2196f3]">Mira.ly</a>)</span></h2>
 188:             <button 
                          ^
 189:                 class="text-[#d1d4dc] hover:text-[#26a69a] transition-colors"
 190:                 on:click={handleClose}
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:245:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:245:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 243:             <!-- Swap Direction Button -->
 244:             <div class="flex justify-center -my-2 relative z-10">
 245:                 <button 
                              ^
 246:                     class="bg-[#1e222d] border border-[#2B2B43] rounded-xl p-2 hover:bg-[#26a69a]/10 transition-colors"
 247:                     on:click={handleSwapTokens}
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/search-box.svelte:85:20 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/search-box.svelte:85:20 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 83:             <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
 84:                 {#if searchTerm}
 85:                     <button 
                                 ^
 86:                         class="text-[#d1d4dc] opacity-60 hover:opacity-100 p-1"
 87:                         on:click={clearSearch}
-[33m10:02:10 PM [vite-plugin-svelte] src/lib/components/search-box.svelte:94:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:01 AM [vite-plugin-svelte] src/lib/components/search-box.svelte:94:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 92:                     </button>
 93:                 {/if}
 94:                 <button 
                             ^
 95:                     class="text-[#d1d4dc] opacity-60 hover:opacity-100"
 96:                     on:click={() => showDropdown = !showDropdown}
-[2K[1Gtransforming (142) [2m../../node_modules/.pnpm/devalue@5.1.1/node_modules/devalue/src/uneval.js[22m[2K[1Gtransforming (155) [2m../../node_modules/.pnpm/@sveltejs+kit@2.8.1_@sveltejs+vite-plugin-svelte@4.0.1_svelte@5.2.7_vite@5.4.11_@types+node@2_4mriqhdiyvninmuzisdvt3gjg4/node_modules/@sveltejs/[2K[1Gtransforming (166) [2m virtual:$env/dynamic/private[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G"Account", "WalletUnlocked" and "bn" are imported from external module "fuels" but never used in "../../node_modules/.pnpm/@fuels+connectors@0.5.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript@5._iipz3zjkt6aw5qsiqravva6yw4/node_modules/@fuels/connectors/dist/index.mjs", "../../node_modules/.pnpm/svelte-fuels@0.94.9-next.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript_ddhzghxdqueczdl7vpxemlqa3a/node_modules/svelte-fuels/dist/index.js", "src/lib/services/dex.ts", "src/lib/services/token.ts" and "src/lib/services/swap.ts".
+[2K[1Gtransforming (93) [2msrc/lib/components/search-box.svelte[22m[2K[1Gtransforming (123) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/internal/client/dom/elements/bindings/props.js[22m[2K[1Gtransforming (148) [2m../../node_modules/.pnpm/devalue@5.1.1/node_modules/devalue/src/utils.js[22m[2K[1Gtransforming (164) [2msrc/app.css[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G"Account", "WalletUnlocked" and "bn" are imported from external module "fuels" but never used in "../../node_modules/.pnpm/@fuels+connectors@0.5.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript@5._iipz3zjkt6aw5qsiqravva6yw4/node_modules/@fuels/connectors/dist/index.mjs", "../../node_modules/.pnpm/svelte-fuels@0.94.9-next.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript_ddhzghxdqueczdl7vpxemlqa3a/node_modules/svelte-fuels/dist/index.js", "src/lib/services/dex.ts", "src/lib/services/token.ts" and "src/lib/services/swap.ts".
 [2K[1G[32m✓[39m 197 modules transformed.
 [2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1Grendering chunks (15)...[2K[1Grendering chunks (16)...[2K[1Grendering chunks (17)...[2K[1Grendering chunks (18)...[2K[1Grendering chunks (19)...[2K[1Grendering chunks (20)...[2K[1Grendering chunks (21)...[2K[1Grendering chunks (22)...[2K[1G[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
 (!) /Users/bobby/Workspace/duckscreener/node_modules/.pnpm/svelte-fuels@0.94.9-next.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript_ddhzghxdqueczdl7vpxemlqa3a/node_modules/svelte-fuels/dist/index.js is dynamically imported by /Users/bobby/Workspace/duckscreener/apps/core/src/routes/+page.svelte but also statically imported by /Users/bobby/Workspace/duckscreener/apps/core/src/lib/components/chat.svelte, /Users/bobby/Workspace/duckscreener/apps/core/src/lib/components/swap-modal.svelte, /Users/bobby/Workspace/duckscreener/apps/core/src/lib/components/wallet-modal.svelte, /Users/bobby/Workspace/duckscreener/node_modules/.pnpm/svelte-fuels@0.94.9-next.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript_ddhzghxdqueczdl7vpxemlqa3a/node_modules/svelte-fuels/dist/WalletProvider.svelte, dynamic import will not move module into another chunk.
 [39m
-[2K[1Grendering chunks (23)...[2K[1G[33m10:02:11 PM [vite-plugin-svelte] Option "experimental.inspector" is no longer experimental and has moved to "inspector". Please update your Svelte or Vite config.[39m
+[2K[1Grendering chunks (23)...[2K[1G[33m10:02:03 AM [vite-plugin-svelte] Option "experimental.inspector" is no longer experimental and has moved to "inspector". Please update your Svelte or Vite config.[39m
 [36mvite v5.4.11 [32mbuilding for production...[36m[39m
-[2K[1Gtransforming (1) [2m.svelte-kit/generated/client-optimized/nodes/1.js[22m[33m10:02:11 PM [vite-plugin-svelte] src/routes/+page.svelte:143:24 `<img>` element should have an alt attribute[39m
+[2K[1Gtransforming (1) [2m.svelte-kit/generated/client-optimized/app.js[22m[33m10:02:03 AM [vite-plugin-svelte] src/routes/+page.svelte:143:24 `<img>` element should have an alt attribute[39m
 141:                 <div class="flex flex-col items-start w-full sm:w-auto order-first mb-2 sm:mb-0">
 142:                     <div class="flex flex-row">
 143:                         <img src="/logo.png" class="w-6 h-6 mr-2" />
                                                                          ^
 144:                         <span class="text-xl sm:text-xl font-bold text-white relative group">
 145:                             
-[33m10:02:11 PM [vite-plugin-svelte] src/routes/+page.svelte:153:28 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
+[33m10:02:03 AM [vite-plugin-svelte] src/routes/+page.svelte:153:28 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
 151:                     <div class="flex flex-col gap-1 mt-2">
 152:                         <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
 153:                             <a 
                                     ^
 154:                                 on:click|preventDefault={() => isSwapModalOpen = true}
 155:                                 class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
-[33m10:02:11 PM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` with a click handler must have an ARIA role[39m
+[33m10:02:03 AM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` with a click handler must have an ARIA role[39m
 151:                     <div class="flex flex-col gap-1 mt-2">
 152:                         <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
 153:                             <a 
                                     ^
 154:                                 on:click|preventDefault={() => isSwapModalOpen = true}
 155:                                 class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
-[33m10:02:11 PM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` element should have an href attribute[39m
+[33m10:02:03 AM [vite-plugin-svelte] src/routes/+page.svelte:153:28 `<a>` element should have an href attribute[39m
 151:                     <div class="flex flex-col gap-1 mt-2">
 152:                         <div class="flex items-center gap-3 text-[11px] sm:text-[11px]">
 153:                             <a 
                                     ^
 154:                                 on:click|preventDefault={() => isSwapModalOpen = true}
 155:                                 class="relative inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-[#26a69a] to-[#2196f3] rounded-lg overflow-hidden group hover:scale-105 transition-transform duration-200 cursor-pointer"
-[2K[1Gtransforming (37) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/internal/client/dom/elements/attributes.js[22m[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chart.svelte:516:63 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
+[2K[1Gtransforming (37) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/internal/client/dom/elements/attributes.js[22m[33m10:02:03 AM [vite-plugin-svelte] src/lib/components/chart.svelte:516:63 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
 514:         transactions: {
 515:             ...stats.transactions,
 516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
                                                                                                       ^
 517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
 518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chart.svelte:517:69 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
+[33m10:02:03 AM [vite-plugin-svelte] src/lib/components/chart.svelte:517:69 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
 515:             ...stats.transactions,
 516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
 517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
                                                                                                             ^
 518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
 519:         }
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chart.svelte:518:71 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
+[33m10:02:03 AM [vite-plugin-svelte] src/lib/components/chart.svelte:518:71 Properties of objects and arrays are not reactive unless in runes mode. Changes to this property will not cause the reactive statement to update[39m
 516:             volume: formatCurrency(stats.transactions.volume * selectedCounterPartyToken.priceUSD),
 517:             buyVolume: formatCurrency(stats.transactions.buyVolume * selectedCounterPartyToken.priceUSD),
 518:             sellVolume: formatCurrency(stats.transactions.sellVolume * selectedCounterPartyToken.priceUSD)
                                                                                                               ^
 519:         }
 520:     };
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chart.svelte:609:4 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:03 AM [vite-plugin-svelte] src/lib/components/chart.svelte:609:4 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 607:     ></div>
 608: 
 609:     <button 
                  ^
 610:         class="w-full h-8 flex items-center justify-center bg-[#1e222d] border-y border-[#2B2B43] text-[#d1d4dc] hover:bg-[#2B2B43] transition-colors relative z-10"
 611:         on:click={() => {
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chart.svelte:942:4 Unused CSS selector "img"[39m
+[33m10:02:03 AM [vite-plugin-svelte] src/lib/components/chart.svelte:942:4 Unused CSS selector "img"[39m
 940:     }
 941: 
 942:     img {
             ^
 943:         animation: glow 2s ease-in-out infinite;
 944:     }
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chat.svelte:171:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/chat.svelte:171:8 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 169:         </div>
 170:         
 171:         <button 
                      ^
 172:             class="sm:hidden text-[#d1d4dc] hover:text-[#26a69a] transition-colors"
 173:             on:click={() => dispatch('close')}
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chat.svelte:277:4 Unused CSS selector ".system-message"[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/chat.svelte:277:4 Unused CSS selector ".system-message"[39m
 275:     }
 276: 
 277:     .system-message {
                         ^
 278:         animation: fadeIn 0.3s ease-out;
 279:     }
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/chat.svelte:302:4 Unused CSS selector ".animate-spin"[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/chat.svelte:302:4 Unused CSS selector ".animate-spin"[39m
 300:     }
 301: 
 302:     .animate-spin {
                       ^
 303:         animation: spin 1s linear infinite;
 304:     }
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate. See https://svelte.dev/docs/accessibility-warnings#a11y-click-events-have-key-events for more details[39m
 178: 
 179: {#if open}
 180: <div 
           ^
 181:     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
 182:     on:click|self={handleClose}
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 `<div>` with a click handler must have an ARIA role[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:180:0 `<div>` with a click handler must have an ARIA role[39m
 178: 
 179: {#if open}
 180: <div 
           ^
 181:     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
 182:     on:click|self={handleClose}
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:188:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:188:12 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 186:         <div class="flex items-center justify-between p-4 border-b border-[#2B2B43]">
 187:             <h2 class="text-[#d1d4dc]"><span class="font-semibold">Swap</span> <span class="text-xs italic">(Powered by <a href="https://mira.ly" target="_blank" class="text-[#26a69a] hover:text-[#2196f3]">Mira.ly</a>)</span></h2>
 188:             <button 
                          ^
 189:                 class="text-[#d1d4dc] hover:text-[#26a69a] transition-colors"
 190:                 on:click={handleClose}
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:245:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/swap-modal.svelte:245:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 243:             <!-- Swap Direction Button -->
 244:             <div class="flex justify-center -my-2 relative z-10">
 245:                 <button 
                              ^
 246:                     class="bg-[#1e222d] border border-[#2B2B43] rounded-xl p-2 hover:bg-[#26a69a]/10 transition-colors"
 247:                     on:click={handleSwapTokens}
-[2K[1Gtransforming (90) [2msrc/lib/components/swap-modal.svelte[22m[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/search-box.svelte:85:20 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[2K[1Gtransforming (92) [2msrc/lib/components/swap-modal.svelte[22m[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/search-box.svelte:85:20 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 83:             <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-1">
 84:                 {#if searchTerm}
 85:                     <button 
                                 ^
 86:                         class="text-[#d1d4dc] opacity-60 hover:opacity-100 p-1"
 87:                         on:click={clearSearch}
-[33m10:02:12 PM [vite-plugin-svelte] src/lib/components/search-box.svelte:94:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
+[33m10:02:04 AM [vite-plugin-svelte] src/lib/components/search-box.svelte:94:16 Buttons and links should either contain text or have an `aria-label` or `aria-labelledby` attribute[39m
 92:                     </button>
 93:                 {/if}
 94:                 <button 
                             ^
 95:                     class="text-[#d1d4dc] opacity-60 hover:opacity-100"
 96:                     on:click={() => showDropdown = !showDropdown}
-[2K[1Gtransforming (105) [2msrc/lib/components/modal.svelte[22m[2K[1Gtransforming (137) [2m../../node_modules/.pnpm/@fuel-ts+contract@0.94.9/node_modules/@fuel-ts/contract/dist/index.mjs[22m[2K[1Gtransforming (164) [2m../../node_modules/.pnpm/devalue@5.1.1/node_modules/devalue/src/constants.js[22m[2K[1Gtransforming (225) [2m../../node_modules/.pnpm/ramda@0.30.1/node_modules/ramda/es/constructN.js[22m[2K[1G[2K[1Gtransforming (348) [2m../../node_modules/.pnpm/ramda@0.30.1/node_modules/ramda/es/of.js[22m[2K[1Gtransforming (472) [2m../../node_modules/.pnpm/ethers@6.13.4_bufferutil@4.0.8_utf-8-validate@5.0.10/node_modules/ethers/lib.esm/transaction/index.js[22m[2K[1Gtransforming (567) [2m../../node_modules/.pnpm/ethers@6.13.4_bufferutil@4.0.8_utf-8-validate@5.0.10/node_modules/ethers/lib.esm/abi/typed.js[22m[2K[1Gtransforming (607) [2m../../node_modules/.pnpm/ethers@6.13.4_bufferutil@4.0.8_utf-8-validate@5.0.10/node_modules/ethers/lib.esm/providers/provider-chainstack.js[22m[2K[1Gtransforming (662) [2m../../node_modules/.pnpm/ethers@6.13.4_bufferutil@4.0.8_utf-8-validate@5.0.10/node_modules/ethers/lib.esm/abi/coders/fixed-bytes.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1Gtransforming (714) [2m../../node_modules/.pnpm/@noble+hashes@1.3.2/node_modules/@noble/hashes/esm/hmac.js[22m[2K[1Gtransforming (717) [2m../../node_modules/.pnpm/graphql-tag@2.12.6_graphql@16.9.0/node_modules/graphql-tag/lib/index.js[22m[2K[1Gtransforming (762) [2m../../node_modules/.pnpm/graphql@16.9.0/node_modules/graphql/type/assertName.mjs[22m[2K[1Gtransforming (800) [2m../../node_modules/.pnpm/@noble+hashes@1.5.0/node_modules/@noble/hashes/esm/utils.js[22m[2K[1Gtransforming (842) [2m../../node_modules/.pnpm/@fuel-ts+crypto@0.96.1/node_modules/@fuel-ts/crypto/dist/index.browser.mjs[22m[2K[1Gtransforming (903) [2m../../node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/tslib.es6.mjs[22m[2K[1Gtransforming (910) [2m../../node_modules/.pnpm/@fuel-ts+account@0.96.1/node_modules/@fuel-ts/account/dist/index.mjs[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 911 modules transformed.
+[2K[1Gtransforming (108) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/internal/client/dom/elements/transitions.js[22m[2K[1Gtransforming (134) [2m../../node_modules/.pnpm/svelte@5.2.7/node_modules/svelte/src/internal/client/dom/elements/bindings/shared.js[22m[2K[1Gtransforming (163) [2m../../node_modules/.pnpm/@noble+hashes@1.5.0/node_modules/@noble/hashes/esm/_md.js[22m[2K[1Gtransforming (284) [2m../../node_modules/.pnpm/ramda@0.30.1/node_modules/ramda/es/length.js[22m[2K[1G[2K[1Gtransforming (410) [2m../../node_modules/.pnpm/ramda@0.30.1/node_modules/ramda/es/uncurryN.js[22m[2K[1Gtransforming (483) [2m../../node_modules/.pnpm/ramda@0.30.1/node_modules/ramda/es/internal/_includesWith.js[22m[2K[1Gtransforming (582) [2m../../node_modules/.pnpm/ethers@6.13.4_bufferutil@4.0.8_utf-8-validate@5.0.10/node_modules/ethers/lib.esm/constants/hashes.js[22m[2K[1Gtransforming (621) [2m../../node_modules/.pnpm/ethers@6.13.4_bufferutil@4.0.8_utf-8-validate@5.0.10/node_modules/ethers/lib.esm/providers/provider-ipcsocket-browser.js[22m[2K[1Gtransforming (678) [2m../../node_modules/.pnpm/ethers@6.13.4_bufferutil@4.0.8_utf-8-validate@5.0.10/node_modules/ethers/lib.esm/wordlists/decode-owl.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1Gtransforming (704) [2m../../node_modules/.pnpm/aes-js@4.0.0-beta.5/node_modules/aes-js/lib.esm/mode-cbc.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1Gtransforming (712) [2m../../node_modules/.pnpm/@noble+hashes@1.3.2/node_modules/@noble/hashes/esm/hmac.js[22m[2K[1Gtransforming (762) [2m../../node_modules/.pnpm/graphql@16.9.0/node_modules/graphql/validation/validate.mjs[22m[2K[1Gtransforming (866) [2m../../node_modules/.pnpm/vite-plugin-node-polyfills@0.22.0_rollup@4.27.3_vite@5.4.11_@types+node@22.9.1_terser@5.36.0_/node_modules/vite-plugin-node-polyfills/shims[2K[1Gtransforming (871) [2m../../node_modules/.pnpm/ramda@0.30.1/node_modules/ramda/es/internal/_Set.js[22m[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[2K[1G[32m✓[39m 911 modules transformed.
 [2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1G[1m[33m[plugin:vite:reporter][39m[22m [33m[plugin vite:reporter] 
 (!) /Users/bobby/Workspace/duckscreener/node_modules/.pnpm/svelte-fuels@0.94.9-next.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript_ddhzghxdqueczdl7vpxemlqa3a/node_modules/svelte-fuels/dist/index.js is dynamically imported by /Users/bobby/Workspace/duckscreener/apps/core/src/routes/+page.svelte but also statically imported by /Users/bobby/Workspace/duckscreener/apps/core/src/lib/components/chat.svelte, /Users/bobby/Workspace/duckscreener/apps/core/src/lib/components/swap-modal.svelte, /Users/bobby/Workspace/duckscreener/apps/core/src/lib/components/wallet-modal.svelte, /Users/bobby/Workspace/duckscreener/node_modules/.pnpm/svelte-fuels@0.94.9-next.1_@wagmi+connectors@5.5.0_@wagmi+core@2.15.0_react@18.3.1_typescript_ddhzghxdqueczdl7vpxemlqa3a/node_modules/svelte-fuels/dist/WalletProvider.svelte, dynamic import will not move module into another chunk.
 [39m
@@ -273,27 +273,27 @@
 [2m.svelte-kit/output/client/[22m[32m.vite/manifest.json                                 [39m[1m[2m    4.81 kB[22m[1m[22m[2m │ gzip:   0.86 kB[22m
 [2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/2.D24odITd.css                [39m[1m[2m    3.36 kB[22m[1m[22m[2m │ gzip:   0.95 kB[22m
 [2m.svelte-kit/output/client/[22m[35m_app/immutable/assets/0._Uq1VnnP.css                [39m[1m[2m   31.50 kB[22m[1m[22m[2m │ gzip:   6.11 kB[22m
-[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/2.B45BWFK0.js                  [39m[1m[2m    0.07 kB[22m[1m[22m[2m │ gzip:   0.08 kB[22m
-[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/start.CO_QBTSQ.js              [39m[1m[2m    0.07 kB[22m[1m[22m[2m │ gzip:   0.08 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/2.CjIMJxde.js                  [39m[1m[2m    0.07 kB[22m[1m[22m[2m │ gzip:   0.08 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/start.ghv7npoi.js              [39m[1m[2m    0.07 kB[22m[1m[22m[2m │ gzip:   0.08 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/utils.BWYJvGga.js             [39m[1m[2m    0.20 kB[22m[1m[22m[2m │ gzip:   0.16 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/legacy.MC5khKRO.js            [39m[1m[2m    0.53 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
-[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/1.RB2AGXLf.js                  [39m[1m[2m    0.73 kB[22m[1m[22m[2m │ gzip:   0.44 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/1.C8BoF2JI.js                  [39m[1m[2m    0.73 kB[22m[1m[22m[2m │ gzip:   0.44 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/nodes/0.9jz0mI2Q.js                  [39m[1m[2m    0.83 kB[22m[1m[22m[2m │ gzip:   0.56 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/disclose-version.hqw5oXaZ.js  [39m[1m[2m    1.70 kB[22m[1m[22m[2m │ gzip:   0.89 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/store.hmL4fy0Q.js             [39m[1m[2m    3.86 kB[22m[1m[22m[2m │ gzip:   1.90 kB[22m
-[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/app.-2ocZ1Az.js                [39m[1m[2m    3.94 kB[22m[1m[22m[2m │ gzip:   1.87 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/entry/app.2jKN3ntY.js                [39m[1m[2m    3.94 kB[22m[1m[22m[2m │ gzip:   1.87 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/preload-helper.KzD4ywnW.js    [39m[1m[2m    5.68 kB[22m[1m[22m[2m │ gzip:   2.73 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/runtime.BbnY6r5A.js           [39m[1m[2m   12.17 kB[22m[1m[22m[2m │ gzip:   5.01 kB[22m
-[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/entry.DHOPDPm9.js             [39m[1m[2m   27.15 kB[22m[1m[22m[2m │ gzip:  10.88 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/entry.DZOXyWS4.js             [39m[1m[2m   27.15 kB[22m[1m[22m[2m │ gzip:  10.88 kB[22m
 [2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/index.CT2RrfgO.js             [39m[1m[2m   29.85 kB[22m[1m[22m[2m │ gzip:   9.51 kB[22m
-[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/index.DNBCws14.js             [39m[1m[2m  120.86 kB[22m[1m[22m[2m │ gzip:  63.63 kB[22m
-[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/2.DaRuAgNj.js                 [39m[1m[33m1,080.22 kB[39m[22m[2m │ gzip: 309.60 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/index.ZtprTN9V.js             [39m[1m[2m  120.86 kB[22m[1m[22m[2m │ gzip:  63.63 kB[22m
+[2m.svelte-kit/output/client/[22m[36m_app/immutable/chunks/2.u1OCVnT2.js                 [39m[1m[33m1,080.22 kB[39m[22m[2m │ gzip: 309.60 kB[22m
 [33m
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
-[32m✓ built in 4.37s[39m
+[32m✓ built in 4.14s[39m
 [2K[1G[2m.svelte-kit/output/server/[22m[32m.vite/manifest.json                                   [39m[1m[2m  5.55 kB[22m[1m[22m
 [2m.svelte-kit/output/server/[22m[35m_app/immutable/assets/_page.D24odITd.css              [39m[1m[2m  3.36 kB[22m[1m[22m
 [2m.svelte-kit/output/server/[22m[35m_app/immutable/assets/_layout._Uq1VnnP.css            [39m[1m[2m 31.50 kB[22m[1m[22m
@@ -320,7 +320,7 @@
 [2m.svelte-kit/output/server/[22m[36mchunks/index.js                                       [39m[1m[2m 26.91 kB[22m[1m[22m
 [2m.svelte-kit/output/server/[22m[36mentries/pages/_page.svelte.js                         [39m[1m[2m 90.08 kB[22m[1m[22m
 [2m.svelte-kit/output/server/[22m[36mindex.js                                              [39m[1m[2m117.60 kB[22m[1m[22m
-[32m✓ built in 7.81s[39m
+[32m✓ built in 7.83s[39m
 
 Run [1m[36mnpm run preview[22m[39m to preview your production build locally.
 [1m[36m
