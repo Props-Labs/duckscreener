@@ -2,7 +2,6 @@
     import { createEventDispatcher } from 'svelte';
     import { account, connect, connected, wallet } from "svelte-fuels";
     import { previewSwap, executeSwap, createPoolId } from '$lib/services/swap';
-    import { selectedPool} from '$lib/stores';
     import { getBalances } from '$lib/services/token';
     import { onMount } from 'svelte';
     import confetti from 'canvas-confetti';
@@ -101,10 +100,10 @@
             
             console.log('Swap intent:', pools)
                  ga.addEvent('swap_intent', {
-                    pool_name: $selectedPool?.lpName,
-                    pool_id: $selectedPool?.id,
-                    token0: $selectedPool?.token0Name,
-                    token1: $selectedPool?.token1Name,
+                    pool_name: pool?.lpName,
+                    pool_id: pool?.id,
+                    token0: pool?.token0Name,
+                    token1: pool?.token1Name,
                     amount0: fromAmount,
                     amount1: toAmount,
                     slippage: slippage
@@ -119,10 +118,10 @@
             );
 
             ga.addEvent('swap_executed', {
-                    pool_name: $selectedPool?.lpName,
-                    pool_id: $selectedPool?.id,
-                    token0: $selectedPool?.token0Name,
-                    token1: $selectedPool?.token1Name,
+                    pool_name: pool?.lpName,
+                    pool_id: pool?.id,
+                    token0: pool?.token0Name,
+                    token1: pool?.token1Name,
                     amount0: fromAmount,
                     amount1: toAmount,
                     slippage: slippage
