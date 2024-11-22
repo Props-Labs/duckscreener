@@ -900,7 +900,7 @@
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Time</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Wallet</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Type</th>
-                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Price (${pool.token0Name}/{pool.token1Name})</th>
+                    <th class="px-4 py-2 text-left text-[#d1d4dc]">Price {#if pool}{pool.token0Name}/{pool.token1Name}{/if}</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Quantity</th>
                     <th class="px-4 py-2 text-left text-[#d1d4dc]">Transaction</th>
                 </tr>
