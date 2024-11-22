@@ -1,4 +1,5 @@
 <script lang="ts">
+	console.log('layout::');
 	import '../app.css';
 	import { GoogleAnalytics } from '@beyonk/svelte-google-analytics'
 	let { children } = $props();

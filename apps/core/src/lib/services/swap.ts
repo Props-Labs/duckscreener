@@ -9,13 +9,14 @@ const getMiraDex = async () => {
     return { MiraAmm, ReadonlyMiraAmm };
 };
 
-const provider = await Provider.create(env.PUBLIC_FUEL_RPC_URL);
+
 
 let readonlyMiraAmm: ReadonlyMiraAmm;
 let miraAmm: MiraAmm;
 
 export async function getReadonlyMiraAmm() {
     if (!readonlyMiraAmm) {
+        const provider = await Provider.create(env.PUBLIC_FUEL_RPC_URL);
         const { ReadonlyMiraAmm } = await getMiraDex();
         readonlyMiraAmm = new ReadonlyMiraAmm(provider);
     }
