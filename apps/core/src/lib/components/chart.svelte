@@ -259,11 +259,10 @@
         }
     }
 
-    let isCalculatingPrice = false;
 
-    function calculatePrice() {
-        console.log("calculatePrice():::")
-        isCalculatingPrice = true;
+
+    async function calculatePrice() {
+ 
         const latestTrade = rawData[0];
         console.log("latestTrade:::", latestTrade)
         const exchangeRate = Number(latestTrade.exchange_rate) / 1e18;
@@ -285,7 +284,7 @@
         };
 
         dispatch('priceUpdate', _usdPrice);
-        isCalculatingPrice = false;
+      
     }
 
     function calculatePriceChangeForPeriod(period: '1H' | '6H' | '24H' | '1W'): number {
@@ -557,13 +556,16 @@
     }
 
 
-    function calculateMarketCap(){
+   
+    async function calculateMarketCap(){
+      
         console.log('calculateMarketCap():::::')
         console.log('$selectedCounterPartyToken?.priceUSD', $selectedCounterPartyToken?.priceUSD)
         console.log('$selectedPrimaryToken?.supply', $selectedPrimaryToken?.supply)
         console.log('Number(stats.price.usd)', Number(stats.price.usd))
         marketCap = Number(stats.price.usd) * Number($selectedPrimaryToken.supply);
         console.log('marketCap:::::', marketCap)
+      
     }
 
     $: if(stats?.price?.usd &&$selectedCounterPartyToken?.priceUSD && $selectedPrimaryToken?.supply){
@@ -715,22 +717,7 @@
                             })}
                         {/if}
                         
-                        {#if isCalculatingPrice}
-                            <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                width="12" 
-                                height="12" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                stroke-width="2" 
-                                stroke-linecap="round" 
-                                stroke-linejoin="round"
-                                class="animate-spin"
-                            >
-                                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-                            </svg>
-                        {/if}
+                        
                     </div>
                     <!-- <div class="text-[#d1d4dc] text-xs">
                         {Number(stats.price.usd)} / {Number(stats.price.eth)}
@@ -750,22 +737,7 @@
                     <div class="text-[#d1d4dc] text-xs opacity-60">Market Cap</div>
                     <div class="text-[#d1d4dc] font-semibold flex items-center gap-2">
                         {formatCurrency(marketCap)}*
-                        {#if isCalculatingPrice}
-                            <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                width="12" 
-                                height="12" 
-                                viewBox="0 0 24 24" 
-                                fill="none" 
-                                stroke="currentColor" 
-                                stroke-width="2" 
-                                stroke-linecap="round" 
-                                stroke-linejoin="round"
-                                class="animate-spin"
-                            >
-                                <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
-                            </svg>
-                        {/if}
+                        
                     </div>
                     <!-- <div class="text-[#d1d4dc] text-xs">
                         {Number(stats.price.usd)} / {Number(stats.price.eth)}
@@ -790,6 +762,8 @@
                                 minimumFractionDigits: 0,
                                 maximumFractionDigits: 2
                             })}
+
+                                
                         </div>
                         <div class="text-[#d1d4dc] text-[9px] opacity-80">
                             <span>*Supply on Fuel</span>
