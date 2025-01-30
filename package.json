@@ -10,7 +10,8 @@
   "packageManager": "pnpm@9.4.0",
   "scripts": {
     "build": "turbo run build --cache-dir=.turbo --filter=./apps/* --concurrency=1",
-    "start": "cd apps/background && npm start",
+    "start": "pnpm build && (cd apps/worker && npm start) && (cd apps/core && npm start)",
+    "dev": "turbo run dev --parallel --filter=./apps/worker --filter=./apps/core",
     "heroku-postbuild": "pnpm build"
   },
   "keywords": [],
